@@ -1,143 +1,183 @@
-<script type="text/mock-js">
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
 
-pl.game.template('TrashCan', function () {
+	<title>PlayJS Playground</title>
+	<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="library.0.1.0.js"></script>
+	<script type="text/mock-js">
 
-	pl.Entity.extend(function Screen () {
+	pl.game.component('DropIn', function () {
 
-		this.isComplete = false;
-
-		this.validation = {
-			complete: function () {
-				return this.score.isMax && this.timer.isComplete;
-			};
+		this.assest = {
+			'img': "image.png"
 		};
-
-		this.init = function () {
-			this.attachEvents();
-		};
-
-		this.attachEvents = function () {
-			var screen;
+		
+		this.entity('.trash', function () {
 			
-			screen = this;
+			// initialization arguments come from node attributes
+			this.init = function (_types) {
+				var types;
 
-			this.score.on('max', function () {
-				screen.complete();
-			});
-		};
+				types = _types.split(pl.REGEX_COMMA);
 
-		// Advance to next screen
-		this.next = function () {
-			this.manager.next();
-		};
+				this.sup();
 
-		this.complete = function () {
-			if (this.isValid('complete')) {
-				this.isComplete = true;
+				this.type = pl.random(types);
 
-				this.trigger('complete');
-				this.addClass('COMPLETE');
-			}
+				this.canit.enable()
 
-			return this.isComplete;
-		};
+				return this;
+			};
+
+		});
 
 	});
 
-	this.entity('.screen', function () {
+	pl.game.component.config('DropIn', {
+		assets: {
+			'img': ''
+		}
+	});
 
-		this.title = null;
+	pl.game.template('TrashCan', function () {
 
-		this.init = function  () {
-			this.title = 'Recycle!';
-		};
+		pl.Entity.extend(function Screen () {
+
+			this.isComplete = false;
+
+			this.validation = {
+				complete: function () {
+					return this.score.isMax && this.timer.isComplete;
+				};
+			};
+
+			this.init = function () {
+				this.attachEvents();
+			};
+
+			this.attachEvents = function () {
+				var screen;
+				
+				screen = this;
+
+				this.score.on('max', function () {
+					screen.complete();
+				});
+			};
+
+			// Advance to next screen
+			this.next = function () {
+				this.manager.next();
+			};
+
+			this.complete = function () {
+				if (this.isValid('complete')) {
+					this.isComplete = true;
+
+					this.trigger('complete');
+					this.addClass('COMPLETE');
+				}
+
+				return this.isComplete;
+			};
+
+		});
+
+		this.entity('.screen', function () {
+
+			this.title = null;
+
+			this.init = function  () {
+				this.title = 'Recycle!';
+			};
+
+		});
+
+		this.entity('#picker', function () {
+			
+			this.pick = function () {
+				// body...
+			};
+
+		});
+
+		this.entity('img.trash', function () {
+
+			this.events = {
+				'animate': 'onAnimation'
+			};
+			
+			this.begin = function () {
+				this.drop();
+			};
+
+			this.drop = function () {
+				this.addClass('DROP');
+			};
+
+			this.onAnimation = function (_event) {
+				this.cans.interact(this);
+			};
+		});
+
+		this.entity('#cans', function () {
+			
+			this.targetCan = null;
+
+			this.response = function (_entity) {
+				if (_entity.is('.trash')) {
+					this.targetCan.interact(_entity);
+				}
+			};
+
+		});
+
+		this.entity('#cans li', function () {
+			
+			this.type = '';
+
+			this.response = function (_entity) {
+				if (_entity.type === this.type) {
+					this.screen.score.up();
+				}
+			};
+
+		});
 
 	});
 
-	this.entity('#picker', function () {
+	pl.game('Recycle : TrashCan', function () {
 		
-		this.pick = function () {
-			// body...
-		};
+		this.config({
+
+		});
 
 	});
 
-	this.entity('img.trash', function () {
+	</script>
+</head>
+<body>
+	<div id="Recycle">
+		<section class="screen">
+			<h1>{{title}}</h1>
+			<p>Get ready to learn how to recycle!</p>
+			<button pl-action="next()">Next</button>
+		</section>
 
-		this.events = {
-			'animate': 'onAnimation'
-		};
-		
-		this.begin = function () {
-			this.drop();
-		};
-
-		this.drop = function () {
-			this.addClass('DROP');
-		};
-
-		this.onAnimation = function (_event) {
-			this.cans.interact(this);
-		};
-	});
-
-	this.entity('#cans', function () {
-		
-		this.targetCan = null;
-
-		this.response = function (_entity) {
-			if (_entity.is('.trash')) {
-				this.targetCan.interact(_entity);
-			}
-		};
-
-	});
-
-	this.entity('#cans li', function () {
-		
-		this.type = '';
-
-		this.response = function (_entity) {
-			if (_entity.type === this.type) {
-				this.screen.score.up();
-			}
-		};
-
-	});
-
-});
-
-pl.game('Recycle : TrashCan', function () {
-	
-	this.config({
-
-	});
-
-});
-
-</script>
+		<section id="trash-drop" class="screen" pl-component="DropIn" pl-total-trash="5">
+			<div id="trash-display">
+				<img src="bin.png" class="bg">
+				<img src="letter.png" class="trash" pl-type="trash">
+				<img src="apple.png" class="trash" pl-type="compost">
+				<img src="glass.png" class="trash" pl-type="recycling">
+			</div>
+			<ul id="dropzone"></ul>
+		</section>
+	</div>
+</body>
+</html>
 
 
-<div id="Recycle" class="pl-game">
-	<section class="screen">
-		<h1>{{title}}</h1>
-		<p>Get ready to learn how to recycle!</p>
-		<button pl-action="next()">Next</button>
-	</section>
 
-	<section id="picker" class="screen">
-		<ul class="thumbs" pl-action="pick(event.target)">
-			<li><img src="#"></li>
-			<li><img src="#"></li>
-			<li><img src="#"></li>
-			<li><img src="#"></li>
-		</ul>
-		<button pl-action="next()">Next</button>
-	</section>
-
-	<section id="trash-drop" class="screen">
-		<img src="" class="trash">
-		<button id="trash-display"></button>
-		<ul id="cans"></ul>
-	</section>
-</div>
