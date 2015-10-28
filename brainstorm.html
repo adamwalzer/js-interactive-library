@@ -6,6 +6,7 @@
 	<title>PlayJS Playground</title>
 	<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="library.0.1.0.js"></script>
+	<script type="text/javascript" src="config.game.js"></script>
 	<script type="text/mock-js">
 
 	pl.game.component('DropIn', function () {
@@ -150,7 +151,37 @@
 
 	pl.game('Recycle : TrashCan', function () {
 		
-		this.config({
+		
+
+	});
+
+	</script>
+
+	<script type="text/javascript">
+
+	pl.game.on('initialized', function () {
+		console.log('initialized!');
+	});
+	
+	pl.game('Recycle', function () {
+
+		this.whatever = function () {
+			// body...
+		};
+
+		this.screen(0, function () {
+
+			this.next = function () {
+				this.sup();
+
+				this.game.whatever()
+			};
+
+		});
+
+		this.screen('trash-drop', function () {
+			
+			this.nice = '!';
 
 		});
 
@@ -163,10 +194,12 @@
 		<section class="screen">
 			<h1>{{title}}</h1>
 			<p>Get ready to learn how to recycle!</p>
-			<button pl-action="next()">Next</button>
+			<div>
+				<button pl-action="next()">Next</button>
+			</div>
 		</section>
 
-		<section id="trash-drop" class="screen" pl-component="DropIn" pl-total-trash="5">
+		<section id="trash-drop" class="screen" pl-component="DropIn">
 			<div id="trash-display">
 				<img src="bin.png" class="bg">
 				<img src="letter.png" class="trash" pl-type="trash">
@@ -178,6 +211,3 @@
 	</div>
 </body>
 </html>
-
-
-
