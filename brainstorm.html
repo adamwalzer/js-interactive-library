@@ -10,10 +10,6 @@
 	<script type="text/mock-js">
 
 	pl.game.component('DropIn', function () {
-
-		this.assest = {
-			'img': "image.png"
-		};
 		
 		this.entity('.trash', function () {
 			
@@ -43,48 +39,6 @@
 	});
 
 	pl.game.template('TrashCan', function () {
-
-		pl.Entity.extend(function Screen () {
-
-			this.isComplete = false;
-
-			this.validation = {
-				complete: function () {
-					return this.score.isMax && this.timer.isComplete;
-				};
-			};
-
-			this.init = function () {
-				this.attachEvents();
-			};
-
-			this.attachEvents = function () {
-				var screen;
-				
-				screen = this;
-
-				this.score.on('max', function () {
-					screen.complete();
-				});
-			};
-
-			// Advance to next screen
-			this.next = function () {
-				this.manager.next();
-			};
-
-			this.complete = function () {
-				if (this.isValid('complete')) {
-					this.isComplete = true;
-
-					this.trigger('complete');
-					this.addClass('COMPLETE');
-				}
-
-				return this.isComplete;
-			};
-
-		});
 
 		this.entity('.screen', function () {
 
@@ -149,39 +103,72 @@
 
 	});
 
-	pl.game('Recycle : TrashCan', function () {
-		
-		
-
-	});
-
 	</script>
 
 	<script type="text/javascript">
 
-	pl.game.on('initialized', function () {
-		console.log('initialized!');
+	pl.game.component('DropIn', function () {
+			
+		this.pick = function (_target) {
+			console.log('screen pick', _target);
+		};
+
+		this.entity('#trash-display', function () {
+			
+			this.pick = function (_target) {
+				this.sup(_target);
+				console.log('entity pick', this);
+			};
+
+		});
+
+		this.entity('#dropzone', function () {
+			this.doSomething = function () {
+				// body...
+			};
+		});
+
+		console.log('component!');
 	});
+
+
 	
 	pl.game('Recycle', function () {
 
 		this.whatever = function () {
-			// body...
+			console.log('game whatever');
 		};
 
 		this.screen(0, function () {
 
 			this.next = function () {
 				this.sup();
-
-				this.game.whatever()
+				this.game.whatever();
 			};
 
 		});
 
 		this.screen('trash-drop', function () {
 			
-			this.nice = '!';
+			this.pick = function (_target) {
+				console.log('screen pick', _target);
+			};
+
+			this.entity('#trash-display', function () {
+				
+				this.pick = function (_target) {
+					this.sup(_target);
+					console.log('entity pick', this);
+					this.dropzone.doSomething();
+				};
+
+			});
+
+			this.entity('#dropzone', function () {
+				this.doSomething = function () {
+					console.log(this.trash_display.pick);
+				};
+			});
 
 		});
 
@@ -194,13 +181,13 @@
 		<section class="screen">
 			<h1>{{title}}</h1>
 			<p>Get ready to learn how to recycle!</p>
-			<div>
-				<button pl-action="next()">Next</button>
+			<div pl-action="next()">
+				<button>Next</button>
 			</div>
 		</section>
 
 		<section id="trash-drop" class="screen" pl-component="DropIn">
-			<div id="trash-display">
+			<div id="trash-display" pl-action="pick(event.target)">
 				<img src="bin.png" class="bg">
 				<img src="letter.png" class="trash" pl-type="trash">
 				<img src="apple.png" class="trash" pl-type="compost">
