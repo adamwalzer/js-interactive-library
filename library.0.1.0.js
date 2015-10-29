@@ -313,7 +313,7 @@ Play = pl = (function () {
 			}
 
 			function transformId (_id) {
-				return _id.replace(/[-\s]+/g, '_');
+				return _id && _id.replace(/[-\s]+/g, '_');
 			}
 
 			this.screens = null;
@@ -321,11 +321,10 @@ Play = pl = (function () {
 			this.properties = null;
 			this.propertyHandlers = null;
 			
-			this.initialize = function (_node_selector) {
+			this.initialize = function (_node_selector, _isComponent) {
 				var scope;
 
 				scope = this;
-
 				this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
 				if (!this.$els.length) {
@@ -335,18 +334,21 @@ Play = pl = (function () {
 
 				this.addClass('pl-scope');
 				this.data('pl-scope', this);
+				this.data('pl-component', _isComponent);
 
 				// NOTE:
 				// We may want this performed regardless of game initialization
 				// for scopes that are created after game initialization.
 				// 
 				if (!pl.game.isInitialized) {
+					console.log('initialize', _node_selector);
 					pl.game.queue(this);
 					
 					this.init();
 
-					pl.game.on('initialized', function () {
+					pl.game.on('initialized', function done () {
 						scope.setup();
+						pl.game.off('initialized');
 					});
 
 					pl.game.queue.complete(this, 'initialized');
@@ -382,24 +384,43 @@ Play = pl = (function () {
 				prototype = (type.Screen.isPrototypeOf(this)) ? this : type.Screen;
 				
 				this.find(screenSelector).each(function (_index) {
-					var screen, record, key, id, index;
+					var screen, record, key, id, index, component;
 
 					// Skip screens that are nested. They will be initialized by their parent scope.
 					if (!scope.is($(this).closest('.pl-scope'))) return;
 
 					key = (this.id) ? (id = this.id, 'name') : (id = _index, 'index');
+					component = $(this).attr('pl-component');
 
-					record = getRecordBy(key, id, scope.screens);
+					if (component) {
+						record = pl.game.component.get(component);
+
+						if (!record) {
+							console.error('Error: Faild to load component', component);
+							return;
+						}
+					}
+
+					else {
+						record = getRecordBy(key, id, scope.screens);
+						index = scope.screens.indexOf(record);
+					}
 
 					if (record) {
-						index = scope.screens.indexOf(record);
-						screen = prototype.extend(record.implementation).initialize(this);
-						scope.screens[index] = screen;
+						screen = prototype.extend(record.implementation).initialize(this, !!component);
+
+						if (index) {
+							scope.screens[index] = screen;
+						}
+
+						else {
+							scope.screens.splice(_index, 0, screen);
+						}
 					}
 
 					else {
 						screen = prototype.create().initialize(this);
-						scope.screens.push(screen);
+						scope.screens.splice(_index, 0, screen);;
 					}
 
 					screen.screen = screen;
@@ -422,10 +443,18 @@ Play = pl = (function () {
 				this.entities.forEach(function (_record, _index) {
 					var instance, id;
 
-					instance = scope.extend(_record.implementation).initialize(scope.find(_record.selector));
+					if (!type.Scope.isPrototypeOf(_record)) {
+						instance = scope.extend(_record.implementation).initialize(scope.find(_record.selector));
+						scope.entities[_index] = instance;
+					}
+
+					else {
+						instance = _record;
+					}
+
+					
 					id = transformId(instance.attr('id'));
-					scope.entities[_index] = instance;
-					if (id) scope[id] = instance;;
+					if (id) scope[id] = instance;
 				});
 
 				return this;
@@ -508,7 +537,7 @@ Play = pl = (function () {
 
 				if (!this.hasOwnProperty('screens')) this.screens = [];
 
-				if (this.$els) {
+				if (this.hasOwnProperty('$els')) {
 					screenSelector = pl.game.config('screenSelector');
 					prototype = (type.Screen.isPrototypeOf(this)) ? this : type.Screen;
 					selector = (typeof _id === 'number') ? screenSelector+':nth-child('+(_id+1)+')' : '#'+_id;
@@ -532,10 +561,17 @@ Play = pl = (function () {
 			};
 
 			this.entity = function (_selector, _implementation) {
+				var prototype, id;
+
 				if (!this.hasOwnProperty('entities')) this.entities = [];
 
-				if (this.$els) {
+				if (this.hasOwnProperty('$els')) {
+					prototype = (type.Entity.isPrototypeOf(this)) ? this : type.Entity;
+					instance = prototype.extend(_implementation).initialize(this.find(_selector));
+					id = transformId(instance.attr('id'));
 
+					this.entities.push(instance);
+					if (id) this[id] = instance;
 				}
 
 				else {
@@ -546,10 +582,6 @@ Play = pl = (function () {
 				}
 
 				return this;
-			};
-
-			this.provideEntityPrototype = function () {
-				return type.Entity;
 			};
 
 		});
@@ -655,11 +687,6 @@ Play = pl = (function () {
 
 			this.actionables = null;
 
-			this.provideEntityPrototype = function () {
-				console.log('Entity prototype', this);
-				return this;
-			};
-
 		});
 
 		type('Screen : Entity', function () {
@@ -667,11 +694,18 @@ Play = pl = (function () {
 			this.handleProperty(function () {
 				
 				this.component = function (_node, _name, _value, _property) {
-					var record;
+					var record, scope, id;
 
-					// record = pl.game.component.get(_value);
+					if ($(_node).data('pl-component')) return;
 
-					console.log('--handleProperty', this, _node, record );
+					record = pl.game.component.get(_value);
+					scope = this.extend(record.implementation).initialize(_node, true);
+					id = scope.attr('id') || _value;
+
+					this.entities.push(scope);
+					this[id] = scope;
+
+					console.log('--handleProperty', this, scope );
 
 				};
 
@@ -798,7 +832,7 @@ Play = pl = (function () {
 					COMPONENTS.push({
 						name: _name,
 						implementation: _implementation
-					});	
+					});
 				}
 
 				return this;

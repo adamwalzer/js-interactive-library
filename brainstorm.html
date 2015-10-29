@@ -127,8 +127,19 @@
 				// body...
 			};
 		});
+	});
 
+	pl.game.component('wow', function () {
 		console.log('component!');
+
+		this.special = true;
+
+		this.entity('strong', function () {
+			this.setup = function () {
+				this.css('color', 'blue');
+			};
+
+		});
 	});
 
 
@@ -148,29 +159,29 @@
 
 		});
 
-		this.screen('trash-drop', function () {
+		// this.screen('trash-drop', function () {
 			
-			this.pick = function (_target) {
-				console.log('screen pick', _target);
-			};
+		// 	this.pick = function (_target) {
+		// 		console.log('screen pick', _target);
+		// 	};
 
-			this.entity('#trash-display', function () {
+		// 	this.entity('#trash-display', function () {
 				
-				this.pick = function (_target) {
-					this.sup(_target);
-					console.log('entity pick', this);
-					this.dropzone.doSomething();
-				};
+		// 		this.pick = function (_target) {
+		// 			this.sup(_target);
+		// 			console.log('entity pick', this);
+		// 			this.dropzone.doSomething();
+		// 		};
 
-			});
+		// 	});
 
-			this.entity('#dropzone', function () {
-				this.doSomething = function () {
-					console.log(this.trash_display.pick);
-				};
-			});
+		// 	this.entity('#dropzone', function () {
+		// 		this.doSomething = function () {
+		// 			console.log(this.trash_display.pick);
+		// 		};
+		// 	});
 
-		});
+		// });
 
 	});
 
@@ -194,6 +205,9 @@
 				<img src="glass.png" class="trash" pl-type="recycling">
 			</div>
 			<ul id="dropzone"></ul>
+			<div pl-component="wow">
+				<strong>Wow!</strong>
+			</div>
 		</section>
 	</div>
 </body>
