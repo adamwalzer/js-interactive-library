@@ -1,0 +1,16 @@
+{
+  "name": "js-interactive-library",
+  "version": "0.0.1",
+  "description": "ChangeMyWorldNow Games Library",
+  "main": "index.html",
+  "devDependencies": {
+    "babel": "^5.8.29",
+    "babel-loader": "^5.3.3",
+    "gulp": "^3.9.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.12.1"
+  },
+  "author": "Max Rafferty",
+  "license": "ISC"
+}

@@ -265,13 +265,21 @@ Play = pl = (function () {
 			*/
 			function createProxyFunction (_name) {
 				return function () {
+					var response;
+
 					// This makes sure your not calling any jQuery methods before initialization.
 					if (!this.$els) {
 						console.error('ReferenceError: Unable to invoke', _name, 'because the scope is not initialized.');
 						return;
 					}
 
-					return $.fn[_name].apply(this.$els, arguments);
+					response = $.fn[_name].apply(this.$els, arguments);
+
+					if (response === this.$els || (response && response.jquery && response.is(this.$els))) {
+						return this;
+					}
+
+					return response;
 				};
 			}
 
@@ -341,7 +349,6 @@ Play = pl = (function () {
 				// for scopes that are created after game initialization.
 				// 
 				if (!pl.game.isInitialized) {
-					console.log('initialize', _node_selector);
 					pl.game.queue(this);
 					
 					this.init();
@@ -391,6 +398,7 @@ Play = pl = (function () {
 
 					key = (this.id) ? (id = this.id, 'name') : (id = _index, 'index');
 					component = $(this).attr('pl-component');
+					index = -1;
 
 					if (component) {
 						record = pl.game.component.get(component);
@@ -409,7 +417,7 @@ Play = pl = (function () {
 					if (record) {
 						screen = prototype.extend(record.implementation).initialize(this, !!component);
 
-						if (index) {
+						if (~index) {
 							scope.screens[index] = screen;
 						}
 
@@ -686,6 +694,44 @@ Play = pl = (function () {
 			});
 
 			this.actionables = null;
+			this.timeoutID = null;
+			this.intervalID = null;
+
+			this.index = function () {
+				return this.game.screens.indexOf(this);
+			};
+
+			this.delay = function (_time, _cb) {
+				var screen;
+
+				screen = this;
+
+				this.timeoutID = setTimeout(function() {
+					_cb.call(screen);
+				}, _time);
+			};
+
+			this.repeat = function (_time, _cb) {
+				var screen;
+
+				screen = this;
+
+				this.intervalID = setInterval(function() {
+					_cb.call(screen);
+				}, _time);
+			};
+
+			this.open = function () {
+				return this.addClass('OPEN');
+			};
+
+			this.close = function () {
+				return this.removeClass('OPEN');
+			};
+
+			this.leave = function () {
+				return this.close().addClass('LEAVE');
+			};
 
 		});
 
@@ -705,8 +751,6 @@ Play = pl = (function () {
 					this.entities.push(scope);
 					this[id] = scope;
 
-					console.log('--handleProperty', this, scope );
-
 				};
 
 			});
@@ -716,10 +760,12 @@ Play = pl = (function () {
 
 			this.next = function () {
 				console.log('Screen next()');
+				return this.game.screens[this.index()+1];
 			};
 
 			this.prev = function () {
 				console.log('Screen prev()');
+				return this.game.screens[this.index()-1];
 			};
 
 		});
