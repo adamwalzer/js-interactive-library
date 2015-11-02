@@ -1,10 +1,15 @@
-import type from 'types/Basic';
-import Scope from 'types/Scope';
 /**
+*  Entity
 *  @desc Contains...
 *  @proto GlobalScope
 */
-export default type('Entity : GlobalScope', function () {
+
+import GlobalScope from 'types/GlobalScope';
+import Basic from 'types/Basic';
+import util from 'util';
+import evalAction from 'evalAction';
+
+export default GlobalScope.extend(function () {
 
 	var Actionables;
 
@@ -22,7 +27,7 @@ export default type('Entity : GlobalScope', function () {
 				record = entity.actionables.item(target);
 
 				if (record) {
-					pl.util.eval(record.action, entity);
+					evalAction(record.action, entity);
 				}
 			}
 		});

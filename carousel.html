@@ -6,112 +6,9 @@
 
 	<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="build/play.js"></script>
-	<!--script type="text/javascript" src="config.game.js"></script-->
+	<script type="text/javascript" src="config.game.js"></script>
 
-	<style type="text/css">
-	html, body {
-		height: 100%;
-	}
-	body {
-		margin: 0;
-		/*transform: translate3d(0,0,0);*/
-
-		font-family: HelveticaNeue-Light;
-		perspective: 500px;
-	}
-
-	h1, h2, h3, b, strong {
-		font-family: HelveticaNeue-Medium;
-		font-weight: normal;
-	}
-
-	button, textarea, input, select {
-		font-family: inherit;
-		font-size: inherit;
-	}
-
-	.center {
-		position: absolute;
-		top: 0; bottom: 0;
-		left: 0; right: 0;
-		text-align: center;
-		white-space: nowrap;
-	}
-
-	.center::after {
-		content: '';
-		display: inline-block;
-		vertical-align: middle;
-		height: 100%;
-	}
-		.center > * {
-			position: relative;
-			display: inline-block;
-			vertical-align: middle;
-			text-align: left;
-		}
-
-#screens {
-	width: 70%; height: 600px;
-}
-
-	.screen {
-		position: absolute;
-		border: solid 1px #ddd;
-		top: 0; left: 0;
-		width: 100%; height: 100%;
-		overflow: hidden;
-
-		opacity: 0;
-		border-radius: 4px;
-		transform: translateZ(-300px);
-		transition: transform 1s, opacity 1s;
-	}
-
-	.screen.OPEN {
-		opacity: 1;
-		transform: translateZ(0);
-	}
-
-	.screen.LEAVE {
-		opacity: 0;
-		transform: translateZ(300px);
-	}
-
-	.screen.OPEN {
-		opacity: 1;
-		transform: translateZ(0);
-	}
-		.screen img {
-			position: absolute;
-			top: 0; left: 0;
-			max-height: 100%;
-			opacity: 0;
-			transition: opacity 1s;
-		}
-
-		.screen img.OPEN {
-			opacity: 1;
-		}
-
-	#welcome button {
-		position: absolute;
-		bottom: 0; right: 0;
-		border: none;
-		border-bottom: solid 1px;
-		margin: 8px;
-		padding: 0;
-		padding-bottom: 4px;
-
-		color: #05a;
-		background: none;
-		outline: none;
-		text-transform: uppercase;
-		cursor: pointer;
-	}
-	</style>
-
-	<script type="text/test">
+	<script type="text/javascript">
 	pl.game('carousel', function () {
 		
 		this.screen('welcome', function () {
@@ -136,37 +33,67 @@
 
 		});
 
-		this.screen('images', function () {
-			
-			this.$images = null;
-
-			this.setup = function () {
-				this.sup();
-
-				this.$images = this.find('img');
-
-				return this;
-			};
-
-			this.beginShow = function () {
-				this.repeat(3000, function () {
-					this.$images
-						.filter('.OPEN')
-						.removeClass('OPEN')
-						.next()
-						.addClass('OPEN');
-				});
-			};
-
-			this.open = function () {
-				this.sup();
-				return this.beginShow();
-			};
-
-		});
-
 	});
 	</script>
+
+	<link rel="stylesheet" type="text/css" href="style/reset.css">
+	<link rel="stylesheet" type="text/css" href="style/layout.css">
+
+	<style type="text/css">
+	body {
+		font-family: HelveticaNeue-Light;
+		perspective: 500px;
+	}
+
+	h1, h2, h3, b, strong {
+		font-family: HelveticaNeue-Medium;
+		font-weight: normal;
+	}
+
+	#screens {
+		width: 70%; height: 600px;
+	}
+
+		.screen {
+			position: absolute;
+			border: solid 1px #ddd;
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+			overflow: hidden;
+
+			opacity: 0;
+			border-radius: 4px;
+			transform: translateZ(-300px);
+			transition: transform 1s, opacity 1s;
+		}
+
+		.screen.OPEN {
+			opacity: 1;
+			transform: translateZ(0);
+		}
+
+		.screen.LEAVE {
+			opacity: 0;
+			transform: translateZ(300px);
+		}
+
+	#welcome button {
+		position: absolute;
+		bottom: 0; right: 0;
+		border: none;
+		border-bottom: solid 1px;
+		margin: 8px;
+		padding: 0;
+		padding-bottom: 4px;
+
+		color: #05a;
+		background: none;
+		outline: none;
+		text-transform: uppercase;
+		cursor: pointer;
+	}
+	</style>
+
 </head>
 <body id="carousel">
 	<div class="center">
@@ -177,13 +104,7 @@
 				</div>
 				<button pl-action="next()">continue</button>
 			</div>
-			<div id="images" class="screen">
-				<img src="images/Yosemite.jpg" class="OPEN">
-				<img src="images/Yosemite 2.jpg">
-				<img src="images/Yosemite 3.jpg">
-				<img src="images/Yosemite 4.jpg">
-				<img src="images/Yosemite 5.jpg">
-			</div>
+			<div id="images" class="screen" pl-component="carousel"></div>
 		</div>
 	</div>
 	

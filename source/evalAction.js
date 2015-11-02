@@ -1,7 +1,7 @@
 /**
 *  @desc 
 */
-export function evalAction (_source, _scope, _errorMessage) {
+export default function evalAction (_source, _scope, _errorMessage) {
 	var error;
 	// expose members of the object as if they were local variables.
 	// NOTE: methods still retain their "this" binding to the object! :D

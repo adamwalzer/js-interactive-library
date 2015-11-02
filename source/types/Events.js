@@ -1,9 +1,12 @@
-import type from 'types/Basic';
 /**
+*  Events
 *  @desc Contains methods for managing and dispatching events from objects.
 *  @proto Basic
 */
-export default type('Events', function () {
+
+import Basic from 'types/Basic';
+
+export default Basic.extend(function () {
 	var i, method, methods;
 	/**
 	*  @desc Creates a function with a proxy to the jQuery method.
@@ -13,7 +16,7 @@ export default type('Events', function () {
 	*/
 	function createProxyFunction (_name) {
 		return function () {
-			$jq = $();
+			var $jq = $();
 			// We must wrap our object in jQuery. If 'typeof this' is a function then we need
 			// to add it in this manner, otherwise jQuery treats it like a ready callback.
 			$jq.push(this);

@@ -1,10 +1,12 @@
-import { default as type, Basic } from 'types/Basic';
-
 /**
+*  jQProxy
 *  @desc Contains all the jQuery methods targeted towards a property which references a jQuery object.
 *  @proto Basic
 */
-export default type('jQProxy', function () {
+
+import Basic from 'types/Basic';
+
+export default Basic.extend(function () {
 	var method, exclude;
 
 	/**

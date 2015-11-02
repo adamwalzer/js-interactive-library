@@ -1,15 +1,16 @@
-import type from 'types/Basic';
-import jQProxy from 'types/jQProxy';
-import Screen from 'types/Screen';
-
-export var GlobalScope;
-
 /**
+*  Scope
 *  @desc Scopes are packages which contain a reference to a DOM element wrapped in a jQuery object.
 *        This enables properties and methods to be in context of the DOM node and its descendants.
 *  @proto jQProxy
 */
-export default type('Scope : jQProxy', function () {
+import jQProxy from 'types/jQProxy';
+import Basic from 'types/Basic';
+import game from 'play.game'
+
+export default jQProxy.extend(function () {
+
+	var Scope;
 
 	function getRecordBy (_key, _member, _collection) {
 		var i, record;
@@ -34,10 +35,13 @@ export default type('Scope : jQProxy', function () {
 		return _id && _id.replace(/[-\s]+/g, '_');
 	}
 
+	Scope = this;
+
 	this.screens = null;
 	this.entities = null;
 	this.properties = null;
 	this.propertyHandlers = null;
+	this.assetQueue = null;
 	
 	this.initialize = function (_node_selector, _isComponent) {
 		var scope;
@@ -58,17 +62,17 @@ export default type('Scope : jQProxy', function () {
 		// We may want this performed regardless of game initialization
 		// for scopes that are created after game initialization.
 		// 
-		if (!pl.game.isInitialized) {
-			pl.game.queue(this);
+		if (!game.isInitialized) {
+			game.queue(this);
 			
 			this.init();
 
-			pl.game.on('initialized', function done () {
+			game.on('initialized', function done () {
 				scope.setup();
-				pl.game.off('initialized');
+				game.off('initialized');
 			});
 
-			pl.game.queue.complete(this, 'initialized');
+			game.queue.complete(this, 'initialized');
 		}
 
 		else {
@@ -79,6 +83,8 @@ export default type('Scope : jQProxy', function () {
 	};
 
 	this.init = function () {
+		this.assetQueue = [];
+
 		return this
 			.attachEvents()
 			.initializeEntities()
@@ -86,19 +92,118 @@ export default type('Scope : jQProxy', function () {
 	};
 
 	this.setup = function () {
-		return this.captureProperties();
+		var scope, component;
+
+		scope = this;
+		component = this.attr('pl-component');
+
+		if (component) {
+			this.loadComponent(component);
+		}
+
+		else {
+			this.find('img, audio, video, [pl-component]').each(function () {
+				var $node, component;
+
+				$node = $(this);
+
+				// Skip screens that are nested. They will be initialized by their parent scope.
+				if (scope.is($node.closest('.pl-scope'))) {
+					switch (this.nodeName) {
+						case 'IMG':
+							if (this.complete) return;
+							scope.assetQueue.push(this.src);
+							this.onload = (function (_node) {
+								return function (_event) {
+									var index;
+
+									index = scope.assetQueue.indexOf(_node.src);
+
+									if (~index) scope.assetQueue.splice(index, 1);
+									scope.trigger('load', [_node]);
+								};
+							}(this));
+							break;
+
+						default:
+							component = $node.attr('pl-component');
+
+							if (component) {
+								scope.assetQueue.push(component);
+							}
+									
+					}
+				}
+
+			});
+		}
+
+		return this //.captureProperties();
 	};
 
-	this.attachEvents = function () { return this; };
+	this.loadComponent = function (_name, _callback) {
+		var scope, path, $style;
+
+		function ready () {
+			var index;
+
+			ready.status +=1;
+
+			if (ready.status === 3) {
+				if (_callback) {
+					_callback.call(scope);
+					index = scope.assetQueue.indexOf(_name);
+					scope.assetQueue.splice(index, 1);
+				}
+			}
+		}
+
+		ready.status = 0;
+
+		scope = this;
+		path = 'components/'+_name+'/';
+		$style = $('<style type="text/css">');
+
+		$.getScript(path+'behavior.js', function () {
+			var record;
+
+			record = game.component.get(_name);
+
+			if (record) {
+				record.implementation.call(scope);
+			}
+
+			ready()
+		});
+
+		this.load(path+'template.html', ready);
+
+		$style.load(path+'style.css', function () {
+			$(document.body).append($style);
+			ready();
+		});
+
+		this.assetQueue.push(_name);
+
+		return this;
+	};
+
+	this.attachEvents = function () {
+		this.on('load', function (_event, _loaded) {
+			console.log('Complete', _loaded);
+		});
+		return this;
+	};
 
 	this.captureScreens = function () {
-		var scope, screenSelector, prototype;
+		var Screen, scope, screenSelector, prototype;
 
 		if (!this.hasOwnProperty('screens')) return this;
 
 		scope = this;
+		Screen = game.provideScreenType();
 		screenSelector = pl.game.config('screenSelector');
-		prototype = (type.Screen.isPrototypeOf(this)) ? this : type.Screen;
+		prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
 		
 		this.find(screenSelector).each(function (_index) {
 			var screen, record, key, id, index, component;
@@ -113,10 +218,10 @@ export default type('Scope : jQProxy', function () {
 			if (component) {
 				record = pl.game.component.get(component);
 
-				if (!record) {
-					console.error('Error: Faild to load component', component);
-					return;
-				}
+				// if (!record) {
+				// 	console.error('Error: Faild to load component', component);
+				// 	return;
+				// }
 			}
 
 			else {
@@ -137,6 +242,7 @@ export default type('Scope : jQProxy', function () {
 			}
 
 			else {
+				console.log('empty screen', this);
 				screen = prototype.create().initialize(this);
 				scope.screens.splice(_index, 0, screen);;
 			}
@@ -161,7 +267,7 @@ export default type('Scope : jQProxy', function () {
 		this.entities.forEach(function (_record, _index) {
 			var instance, id;
 
-			if (!type.Scope.isPrototypeOf(_record)) {
+			if (!Scope.isPrototypeOf(_record)) {
 				instance = scope.extend(_record.implementation).initialize(scope.find(_record.selector));
 				scope.entities[_index] = instance;
 			}
@@ -251,13 +357,15 @@ export default type('Scope : jQProxy', function () {
 	};
 
 	this.screen = function (_id, _implementation) {
-		var prototype, selector, screenSelector, instance;
+		var Screen, prototype, selector, screenSelector, instance;
+
+		Screen = game.provideScreenType();
 
 		if (!this.hasOwnProperty('screens')) this.screens = [];
 
 		if (this.hasOwnProperty('$els')) {
 			screenSelector = pl.game.config('screenSelector');
-			prototype = (type.Screen.isPrototypeOf(this)) ? this : type.Screen;
+			prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
 			selector = (typeof _id === 'number') ? screenSelector+':nth-child('+(_id+1)+')' : '#'+_id;
 			instance = prototype.extend(_implementation).initialize(this.find(selector));
 
@@ -279,12 +387,14 @@ export default type('Scope : jQProxy', function () {
 	};
 
 	this.entity = function (_selector, _implementation) {
-		var prototype, id;
+		var Entity, prototype, id;
+
+		Entity = game.provideEntityType();
 
 		if (!this.hasOwnProperty('entities')) this.entities = [];
 
 		if (this.hasOwnProperty('$els')) {
-			prototype = (type.Entity.isPrototypeOf(this)) ? this : type.Entity;
+			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
 			id = transformId(instance.attr('id'));
 
@@ -303,6 +413,3 @@ export default type('Scope : jQProxy', function () {
 	};
 
 });
-
-GlobalScope = type('GlobalScope : Scope');
-console.log(type);

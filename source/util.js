@@ -1,4 +1,7 @@
-export var util = new (function () {
+/**
+*  @desc 
+*/
+export default new (function () {
 
 	/**
 	*  @desc Accepts one or more objects to combine their own properties to single object.

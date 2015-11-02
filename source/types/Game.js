@@ -1,10 +1,12 @@
-import type from 'types/Basic';
-import Scope from 'types/Scope';
 /**
+*  Game
 *  @desc Contains...
 *  @proto GlobalScope
 */
-export default type('Game : GlobalScope', function () {
+
+import GlobalScope from 'types/GlobalScope';
+
+export default GlobalScope.extend(function () {
 
 	this.setup = function () {
 		var game;

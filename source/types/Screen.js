@@ -1,10 +1,12 @@
-import type from 'types/Basic';
-import Scope from 'types/Entity';
 /**
+*  Screen
 *  @desc Contains...
-*  @proto GlobalScope
+*  @proto Entity
 */
-export default type('Screen : Entity', function () {
+
+import Entity from 'types/Entity';
+
+export default Entity.extend(function () {
 
 	this.handleProperty(function () {
 		
