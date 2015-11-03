@@ -15,7 +15,7 @@
 			
 			this.timeout = null;
 			
-			this.setup = function () {
+			this.ready = function () {
 				this.sup();
 				this.delay(1000, this.open);
 
@@ -76,6 +76,14 @@
 			opacity: 0;
 			transform: translateZ(300px);
 		}
+
+			.screen > * {
+				display: none;
+			}
+
+			.screen.READY > * {
+				display: initial;
+			}
 
 	#welcome button {
 		position: absolute;

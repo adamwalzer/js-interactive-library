@@ -1,3 +1,4 @@
 pl.game.config({
-	screenSelector: '.screen'
+	screenSelector: '.screen',
+	componentDirectory: 'components/'
 });

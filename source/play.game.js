@@ -56,50 +56,57 @@ GAMES = [];
 CONFIG = {};
 READY_QUEUE = [];
 
-game.run = function () {
-	game.isDOMReady = true;
-	game.trigger('dom-ready');
+(function () {
 
-	initialize(GAMES);
-};
+	this.component = component;
+	
+	util.mixin(game, Events);
 
-game.config = function (_key_mixin) {
-	switch (typeof _key_mixin) {
-		case 'string': return CONFIG[_key_mixin];
-		case 'object':
-			if (_key_mixin) util.mixin(CONFIG, _key_mixin);
-	}
+	this.run = function () {
+		game.isDOMReady = true;
+		game.trigger('dom-ready');
 
-	return this;
-};
+		game.component.loadAll(function () {
+			initialize(GAMES);
+			console.log('* All components loaded.');
+		});
+	};
 
-game.provideEntityType = function () {
-	return Entity;
-};
+	this.config = function (_key_mixin) {
+		switch (typeof _key_mixin) {
+			case 'string': return CONFIG[_key_mixin];
+			case 'object':
+				if (_key_mixin) util.mixin(CONFIG, _key_mixin);
+		}
 
-game.provideScreenType = function () {
-	return Screen;
-};
+		return this;
+	};
 
-// TODO: Implement an actual queue
-// 
-game.queue = function (_item) {
-	if (!~READY_QUEUE.indexOf(_item)) READY_QUEUE.push(_item);
+	this.provideEntityType = function () {
+		return Entity;
+	};
 
-	return this;
-};
+	this.provideScreenType = function () {
+		return Screen;
+	};
 
-game.queue.complete = function (_item, _eventName) {
-	var index;
+	// TODO: Implement an actual queue
+	// 
+	this.queue = function (_item) {
+		if (!~READY_QUEUE.indexOf(_item)) READY_QUEUE.push(_item);
 
-	index = READY_QUEUE.indexOf(_item);
-	READY_QUEUE.splice(index, 1);
+		return this;
+	};
 
-	ready(_eventName);
+	this.queue.complete = function (_item, _eventName) {
+		var index;
 
-	return this;
-};
+		index = READY_QUEUE.indexOf(_item);
+		READY_QUEUE.splice(index, 1);
 
-util.mixin(game, Events);
+		ready(_eventName);
 
-game.component = component;
+		return this;
+	};
+
+}).call(game);

@@ -6,7 +6,8 @@
 */
 import jQProxy from 'types/jQProxy';
 import Basic from 'types/Basic';
-import game from 'play.game'
+import game from 'play.game';
+import Queue from 'types/Queue';
 
 export default jQProxy.extend(function () {
 
@@ -37,6 +38,7 @@ export default jQProxy.extend(function () {
 
 	Scope = this;
 
+	this.isReady = false;
 	this.screens = null;
 	this.entities = null;
 	this.properties = null;
@@ -83,7 +85,7 @@ export default jQProxy.extend(function () {
 	};
 
 	this.init = function () {
-		this.assetQueue = [];
+		this.assetQueue = Queue.create();
 
 		return this
 			.attachEvents()
@@ -92,105 +94,111 @@ export default jQProxy.extend(function () {
 	};
 
 	this.setup = function () {
-		var scope, component;
+		console.log('setup');
+		this
+			.watchAssets()
+			.captureProperties();
 
-		scope = this;
-		component = this.attr('pl-component');
+		this.assetQueue.ready();
 
-		if (component) {
-			this.loadComponent(component);
-		}
-
-		else {
-			this.find('img, audio, video, [pl-component]').each(function () {
-				var $node, component;
-
-				$node = $(this);
-
-				// Skip screens that are nested. They will be initialized by their parent scope.
-				if (scope.is($node.closest('.pl-scope'))) {
-					switch (this.nodeName) {
-						case 'IMG':
-							if (this.complete) return;
-							scope.assetQueue.push(this.src);
-							this.onload = (function (_node) {
-								return function (_event) {
-									var index;
-
-									index = scope.assetQueue.indexOf(_node.src);
-
-									if (~index) scope.assetQueue.splice(index, 1);
-									scope.trigger('load', [_node]);
-								};
-							}(this));
-							break;
-
-						default:
-							component = $node.attr('pl-component');
-
-							if (component) {
-								scope.assetQueue.push(component);
-							}
-									
-					}
-				}
-
-			});
-		}
-
-		return this //.captureProperties();
+		return this;
 	};
 
-	this.loadComponent = function (_name, _callback) {
-		var scope, path, $style;
+	this.ready = function () {
+		console.log('scope ready', this);
+		this.isReady = true;
+		this.addClass('READY');
+		this.trigger('ready');
+		return this;
+	};
+
+	this.loadComponentAssets = function (_name, _callback) {
+		var scope, path;
 
 		function ready () {
-			var index;
-
 			ready.status +=1;
 
-			if (ready.status === 3) {
+			if (ready.status === 2) {
 				if (_callback) {
-					_callback.call(scope);
-					index = scope.assetQueue.indexOf(_name);
-					scope.assetQueue.splice(index, 1);
+					_callback.call(scope, _name);
+					scope.assetQueue.ready(_name);
 				}
 			}
 		}
 
-		ready.status = 0;
-
 		scope = this;
-		path = 'components/'+_name+'/';
-		$style = $('<style type="text/css">');
-
-		$.getScript(path+'behavior.js', function () {
-			var record;
-
-			record = game.component.get(_name);
-
-			if (record) {
-				record.implementation.call(scope);
-			}
-
-			ready()
-		});
+		path = game.config('componentDirectory')+_name+'/';
+		ready.status = 0;
 
 		this.load(path+'template.html', ready);
 
-		$style.load(path+'style.css', function () {
-			$(document.body).append($style);
-			ready();
-		});
+		$('<style type="text/css" pl-component="'+_name+'">')
+			.load(path+'style.css', function () {
+				$(document.body).append(this);
+				scope.watchAssets();
+				ready();
+			});
 
-		this.assetQueue.push(_name);
+		this.assetQueue.add(_name);
+
+		return this;
+	};
+
+	this.watchAssets = function () {
+		var scope;
+
+		scope = this;
+
+		console.log('watchAssets()');
+
+		this.find('img, audio, video').each(function () {
+			var $node;
+
+			$node = $(this);
+
+			console.log('watch', this.nodeName, this.src);
+
+			// Skip screens that are nested. They will be initialized by their parent scope.
+			if (scope.is($node.closest('.pl-scope'))) {
+				switch (this.nodeName) {
+					case 'IMG':
+						if (this.complete) {
+							console.log('already complete', this.src);
+							return;
+						}
+
+						scope.assetQueue.add(this.src);
+						console.log('track image', this.src);
+
+						this.onload = (function (_node) {
+							return function (_event) {
+								scope.assetQueue.ready(_node.src);
+								console.log('** image load', this.src);
+								scope.trigger('loaded', [_node]);
+							};
+						}(this));
+						break;
+								
+				}
+			}
+		});
 
 		return this;
 	};
 
 	this.attachEvents = function () {
-		this.on('load', function (_event, _loaded) {
-			console.log('Complete', _loaded);
+		var scope;
+
+		scope = this;
+
+		this.assetQueue.on('complete', function () {
+			console.log('** assetQueue complete', scope);
+			scope.ready();
+		});
+
+		this.on('init', function () {
+			console.log('initialized');
+			scope.off('init');
 		});
 		return this;
 	};
@@ -218,10 +226,10 @@ export default jQProxy.extend(function () {
 			if (component) {
 				record = pl.game.component.get(component);
 
-				// if (!record) {
-				// 	console.error('Error: Faild to load component', component);
-				// 	return;
-				// }
+				if (!record) {
+					console.error('Error: Faild to load component', component);
+					return;
+				}
 			}
 
 			else {
@@ -249,7 +257,7 @@ export default jQProxy.extend(function () {
 
 			screen.screen = screen;
 			
-			if (this.id) scope[transformId(this.id)] = screen;
+			if (this.id||component) scope[transformId(this.id||component)] = screen;
 		});
 
 		scope = null;
@@ -299,7 +307,7 @@ export default jQProxy.extend(function () {
 					name = attr.name.slice(3);
 					handler = scope.propertyHandlers[name];
 					collection[transformId(name)] = attr.value;
-
+					
 					collection.push(name);
 					if (handler) handler.call(scope, this, name, attr.value, attr);
 				}
@@ -333,20 +341,22 @@ export default jQProxy.extend(function () {
 	};
 
 	this.handleProperty = function (_implementation) {
-		if (this.hasOwnProperty('propertyHandlers')) {
-			switch (typeof _implementation) {
-				case 'function':
-					_implementation.call(this.propertyHandlers);
-					break;
+		if (this.propertyHandlers) {
+			if (this.hasOwnProperty('propertyHandlers')) {
+				switch (typeof _implementation) {
+					case 'function':
+						_implementation.call(this.propertyHandlers);
+						break;
 
-				case 'object':
-					this.propertyHandlers.mixin(_implementation);
-					break;
+					case 'object':
+						this.propertyHandlers.mixin(_implementation);
+						break;
+				}
 			}
-		}
 
-		else if (this.propertyHandlers) {
-			this.propertyHandlers = this.propertyHandlers.extend(_implementation);
+			else {
+				this.propertyHandlers = this.propertyHandlers.extend(_implementation);
+			}
 		}
 
 		else {
@@ -411,5 +421,31 @@ export default jQProxy.extend(function () {
 
 		return this;
 	};
+
+	this.handleProperty(function () {
+		
+		this.component = function (_node, _name, _value, _property) {
+			var self;
+
+			self = this;
+
+			this.loadComponentAssets(_value, function () {
+				var record, scope, id;
+
+				if (!$(_node).data('pl-component')) {
+					record = pl.game.component.get(_value);
+					scope = this.extend(record.implementation).initialize(_node, true);
+					id = scope.attr('id') || _value;
+					this[id] = scope;
+
+					// this.assetQueue.add(scope);
+					// scope.on('ready', function () {
+					// 	self.assetQueue.ready(scope);
+					// });
+				}
+			});
+		};
+
+	});
 
 });
