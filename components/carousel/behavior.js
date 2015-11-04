@@ -3,14 +3,16 @@ pl.game.component('carousel', function () {
 	this.$images = null;
 
 	this.ready = function () {
-		this.sup();
+		console.log('carousel ready');
 
+		// As a rule you should define properties before calling sup().
 		this.$images = this.find('img');
 
-		return this;
+		return this.sup();
 	};
 
 	this.beginShow = function () {
+		console.log('carousel beginShow');
 		if (this.isReady) {
 			this.repeat(3000, function () {
 				this.$images
@@ -31,5 +33,3 @@ pl.game.component('carousel', function () {
 		return this.beginShow();
 	};
 });
-
-console.log('parsed');

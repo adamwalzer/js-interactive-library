@@ -7,7 +7,8 @@ export default function component (_name, _implementation) {
 	if (!component.get(_name)) {
 		COMPONENTS.push({
 			name: _name,
-			implementation: _implementation
+			implementation: _implementation,
+			config: {}
 		});
 	}
 

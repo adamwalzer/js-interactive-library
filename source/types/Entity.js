@@ -5,89 +5,20 @@
 */
 
 import GlobalScope from 'types/GlobalScope';
-import Basic from 'types/Basic';
-import util from 'util';
-import evalAction from 'evalAction';
 
 export default GlobalScope.extend(function () {
 
-	var Actionables;
-
-	function attachActionHandler () {
-		var entity;
-
-		entity = this;
-
-		this.on(pl.EVENT.CLICK, function (_event) {
-			var target, record;
-
-			target = $(_event.target).closest('[pl-action]')[0];
-
-			if (target) {
-				record = entity.actionables.item(target);
-
-				if (record) {
-					evalAction(record.action, entity);
-				}
-			}
-		});
+	function resolveTarget (_target) {
+		return _target ? (_target.jquery ? _target : $(_target)) : this
 	}
 
-	Actionables = (function () {
+	this.STATE = {
+		OPEN: 'OPEN',
+		LEAVE: 'LEAVE',
+		ENABLED: 'ENABLED',
+		DISABLED: 'DISABLED',
+	};
 
-		util.mixin(this, Basic);
-
-		this.add = function (_node, _action) {
-			if (!this.has(_node)) {
-				this.push({
-					node: _node,
-					action: _action
-				});
-			}
-
-			return this;
-		};
-
-		this.remove = function (_node) {
-			var item, index;
-
-			item = this.item(_node);
-			index = this.indexOf(item);
-			if (~index) this.splice(index, 1);
-
-			return this;
-		};
-
-		this.item = function (_node) {
-			var i, item;
-
-			for (i=0; item = this[i]; i+=1) {
-				if (item.node === _node) return item;
-			}
-		}
-
-		this.has = function (_node) {
-			return !!this.item(_node);
-		};
-
-		return this;
-
-	}).call([]);
-
-	this.handleProperty(function () {
-
-		this.action = function (_node, _name, _value, _property) {
-			if (!this.actionables) {
-				this.actionables = Actionables.create();
-				attachActionHandler.call(this);	
-			}
-
-			this.actionables.add(_node, _value);
-		};
-
-	});
-
-	this.actionables = null;
 	this.timeoutID = null;
 	this.intervalID = null;
 
@@ -115,16 +46,35 @@ export default GlobalScope.extend(function () {
 		}, _time);
 	};
 
-	this.open = function () {
-		return this.addClass('OPEN');
+	this.state = function (_test) {
+		var classes;
+
+		if (_test) return this.hasClass(_test);
+
+		classes = this.attr('class').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/);
+
+		return classes && (classes.length === 1 ? classes[0] : classes);
 	};
 
-	this.close = function () {
-		return this.removeClass('OPEN');
+	this.open = function (_target) {
+		return resolveTarget.call(this, _target).addClass(this.STATE.OPEN);
 	};
 
-	this.leave = function () {
-		return this.close().addClass('LEAVE');
+	this.close = function (_target) {
+		return resolveTarget.call(this, _target).removeClass(this.STATE.OPEN);
+	};
+
+	this.leave = function (_target) {
+		this.close();
+		return resolveTarget.call(this, _target).addClass(this.STATE.LEAVE);
+	};
+
+	this.enable = function (_target) {
+		return resolveTarget.call(this, _target).removeClass(this.STATE.DISABLED).addClass(this.STATE.ENABLED);
+	};
+
+	this.disable = function (_target) {
+		return resolveTarget.call(this, _target).removeClass(this.STATE.ENABLED).addClass(this.STATE.DISABLED);
 	};
 
 });

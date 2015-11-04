@@ -11,8 +11,10 @@ import Events from 'types/Events';
 var Queue = (function () {
 
 	this.add = function (_record) {
-		if (~this.indexOf(_record)) return this;
+		if (~this.indexOf(_record)) return false;
 		this.push(_record);
+
+		return this;
 	};
 
 	this.remove = function (_record) {

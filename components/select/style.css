@@ -1,0 +1,40 @@
+.select-component {}
+	
+	.select-component ul {
+		display: flex;
+		padding: 0;
+		list-style: none;
+	}
+
+		.select-component li {
+			position: relative;
+			width: 200px;
+		}
+
+		.select-component li img {
+			position: absolute;
+			top: 0; left: 0;
+			width: 100%;
+			opacity: 0;
+			transition: opacity 0.5s, transform 0.5s cubic-bezier(0, 0.18, 0, 1.01);
+		}
+
+		.select-component li img.on:hover,
+		.select-component li img.off {
+			transform: translateY(-40px);
+		}
+
+		.select-component li img.on {
+			opacity: 1;
+		}
+
+		.select-component li.DISABLED img.on {
+			opacity: 0;
+			z-index: -1;
+			transform: translateY(0);
+		}
+
+		.select-component li.DISABLED img.off {
+			opacity: 1;
+			transform: translateY(0);
+		}

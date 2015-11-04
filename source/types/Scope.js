@@ -6,12 +6,34 @@
 */
 import jQProxy from 'types/jQProxy';
 import Basic from 'types/Basic';
-import game from 'play.game';
 import Queue from 'types/Queue';
+import game from 'play.game';
+import util from 'util';
+import evalAction from 'evalAction';
 
 export default jQProxy.extend(function () {
 
-	var Scope;
+	var Scope, Actionables;
+
+	function attachActionHandler () {
+		var entity;
+
+		entity = this;
+
+		this.on(pl.EVENT.CLICK, function (_event) {
+			var target, record;
+
+			target = $(_event.target).closest('[pl-action]')[0];
+
+			if (target) {
+				record = entity.actionables.item(target);
+
+				if (record) {
+					evalAction(record.action, entity);
+				}
+			}
+		});
+	}
 
 	function getRecordBy (_key, _member, _collection) {
 		var i, record;
@@ -38,27 +60,71 @@ export default jQProxy.extend(function () {
 
 	Scope = this;
 
+	Actionables = (function () {
+
+		util.mixin(this, Basic);
+
+		this.add = function (_node, _action) {
+			if (!this.has(_node)) {
+				this.push({
+					node: _node,
+					action: _action
+				});
+			}
+
+			return this;
+		};
+
+		this.remove = function (_node) {
+			var item, index;
+
+			item = this.item(_node);
+			index = this.indexOf(item);
+			if (~index) this.splice(index, 1);
+
+			return this;
+		};
+
+		this.item = function (_node) {
+			var i, item;
+
+			for (i=0; item = this[i]; i+=1) {
+				if (item.node === _node) return item;
+			}
+		}
+
+		this.has = function (_node) {
+			return !!this.item(_node);
+		};
+
+		return this;
+
+	}).call([]);
+
+	this.actionables = null;
 	this.isReady = false;
+	this.isComponent = false;
 	this.screens = null;
 	this.entities = null;
 	this.properties = null;
 	this.propertyHandlers = null;
 	this.assetQueue = null;
 	
-	this.initialize = function (_node_selector, _isComponent) {
+	this.initialize = function (_node_selector, _componentName) {
 		var scope;
 
 		scope = this;
 		this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
+		if (_componentName) this.isComponent = true;
 
 		if (!this.$els.length) {
 			console.error('ReferenceError: Unable to locate the element with selector', this.$els.selector);
 			return;
 		}
 
-		this.addClass('pl-scope');
+		this.addClass('pl-scope '+(_componentName ? _componentName+'-component' : ''));
 		this.data('pl-scope', this);
-		this.data('pl-component', _isComponent);
+		this.data('pl-isComponent', !!_componentName);
 
 		// NOTE:
 		// We may want this performed regardless of game initialization
@@ -70,7 +136,16 @@ export default jQProxy.extend(function () {
 			this.init();
 
 			game.on('initialized', function done () {
-				scope.setup();
+				if (scope.isComponent) {
+					scope.loadComponentAssets(_componentName, function () {
+						this.setup();
+					})
+				}
+
+				else {
+					scope.setup();
+					scope.assetQueue.ready();
+				}
 				game.off('initialized');
 			});
 
@@ -94,18 +169,12 @@ export default jQProxy.extend(function () {
 	};
 
 	this.setup = function () {
-		console.log('setup');
-		this
+		return this
 			.watchAssets()
 			.captureProperties();
-
-		this.assetQueue.ready();
-
-		return this;
 	};
 
 	this.ready = function () {
-		console.log('scope ready', this);
 		this.isReady = true;
 		this.addClass('READY');
 		this.trigger('ready');
@@ -135,7 +204,6 @@ export default jQProxy.extend(function () {
 		$('<style type="text/css" pl-component="'+_name+'">')
 			.load(path+'style.css', function () {
 				$(document.body).append(this);
-				scope.watchAssets();
 				ready();
 			});
 
@@ -149,34 +217,27 @@ export default jQProxy.extend(function () {
 
 		scope = this;
 
-		console.log('watchAssets()');
-
 		this.find('img, audio, video').each(function () {
 			var $node;
 
 			$node = $(this);
 
-			console.log('watch', this.nodeName, this.src);
-
 			// Skip screens that are nested. They will be initialized by their parent scope.
 			if (scope.is($node.closest('.pl-scope'))) {
 				switch (this.nodeName) {
 					case 'IMG':
-						if (this.complete) {
-							console.log('already complete', this.src);
-							return;
+						if (this.complete) return;
+
+						if (scope.assetQueue.add(this.src)) {
+
+							this.onload = (function (_node) {
+								return function (_event) {
+									scope.assetQueue.ready(_node.src);
+									scope.trigger('loaded', [_node]);
+								};
+							}(this));
 						}
-
-						scope.assetQueue.add(this.src);
-						console.log('track image', this.src);
-
-						this.onload = (function (_node) {
-							return function (_event) {
-								scope.assetQueue.ready(_node.src);
-								console.log('** image load', this.src);
-								scope.trigger('loaded', [_node]);
-							};
-						}(this));
+							
 						break;
 								
 				}
@@ -192,13 +253,8 @@ export default jQProxy.extend(function () {
 		scope = this;
 
 		this.assetQueue.on('complete', function () {
-			console.log('** assetQueue complete', scope);
+			scope.assetQueue.off();
 			scope.ready();
-		});
-
-		this.on('init', function () {
-			console.log('initialized');
-			scope.off('init');
 		});
 		return this;
 	};
@@ -238,7 +294,7 @@ export default jQProxy.extend(function () {
 			}
 
 			if (record) {
-				screen = prototype.extend(record.implementation).initialize(this, !!component);
+				screen = prototype.extend(record.implementation).initialize(this, component);
 
 				if (~index) {
 					scope.screens[index] = screen;
@@ -250,7 +306,6 @@ export default jQProxy.extend(function () {
 			}
 
 			else {
-				console.log('empty screen', this);
 				screen = prototype.create().initialize(this);
 				scope.screens.splice(_index, 0, screen);;
 			}
@@ -293,7 +348,7 @@ export default jQProxy.extend(function () {
 	};
 
 	this.captureProperties = function () {
-		var scope, property, collection, $nodes, handler;
+		var scope, property, collection, handler;
 
 		scope = this;
 		collection = [];
@@ -322,18 +377,18 @@ export default jQProxy.extend(function () {
 				if (Basic.hasOwnProperty(property)) continue;
 
 				handler = this.propertyHandlers[property];
-				$nodes = this.find('[pl-'+property+']');
 
-				if ($nodes.length) {
-					$nodes.each(function () {
-						var attr;
+				this.find('[pl-'+property+']').each(function () {
+					var attr;
 
-						if (scope.is($(this).closest('.pl-scope'))) {
-							attr = this.attributes.getNamedItem('pl-'+property);
-							if (handler) handler.call(scope, this, property, attr.value, attr);
-						}
-					});
-				}
+					if (scope.is($(this).closest('.pl-scope'))) {
+						attr = this.attributes.getNamedItem('pl-'+property);
+						
+						console.log('- handle property', property, attr.value, scope);
+
+						if (handler) handler.call(scope, this, property, attr.value, attr);
+					}
+				});
 			}
 		}
 
@@ -425,25 +480,32 @@ export default jQProxy.extend(function () {
 	this.handleProperty(function () {
 		
 		this.component = function (_node, _name, _value, _property) {
-			var self;
+			var self, record, scope, id;
 
-			self = this;
+			if (!$(_node).data('pl-isComponent')) {
+				self = this;
+				record = pl.game.component.get(_value);
+				scope = this.extend(record.implementation).initialize(_node, _value);
+				id = scope.attr('id') || _value;
+				this[id] = scope;
 
-			this.loadComponentAssets(_value, function () {
-				var record, scope, id;
+				this.assetQueue.add(scope);
+				scope.on('ready', function () {
+					self.assetQueue.ready(scope);
+					this.off('ready');
+				});
+			}
+		};
 
-				if (!$(_node).data('pl-component')) {
-					record = pl.game.component.get(_value);
-					scope = this.extend(record.implementation).initialize(_node, true);
-					id = scope.attr('id') || _value;
-					this[id] = scope;
+		this.action = function (_node, _name, _value, _property) {
+			console.log('action', this);
+			
+			if (!this.hasOwnProperty('actionables')) {
+				this.actionables = Actionables.create();
+				attachActionHandler.call(this);	
+			}
 
-					// this.assetQueue.add(scope);
-					// scope.on('ready', function () {
-					// 	self.assetQueue.ready(scope);
-					// });
-				}
-			});
+			this.actionables.add(_node, _value);
 		};
 
 	});

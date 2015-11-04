@@ -67,8 +67,8 @@ READY_QUEUE = [];
 		game.trigger('dom-ready');
 
 		game.component.loadAll(function () {
-			initialize(GAMES);
 			console.log('* All components loaded.');
+			initialize(GAMES);
 		});
 	};
 
@@ -88,6 +88,18 @@ READY_QUEUE = [];
 
 	this.provideScreenType = function () {
 		return Screen;
+	};
+
+	this.scope = function (_mixin) {
+		if (typeof _mixin === 'function') {
+			_mixin.call(SCOPE);
+		}
+
+		else if (_mixin) {
+			SCOPE.mixin(_mixin);
+		}
+
+		return this;
 	};
 
 	// TODO: Implement an actual queue

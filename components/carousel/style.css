@@ -1,4 +1,4 @@
-.screen img {
+.carousel-component.READY img {
 	position: absolute;
 	top: 0; left: 0;
 	max-height: 100%;
@@ -6,6 +6,6 @@
 	transition: opacity 1s;
 }
 
-.screen img.OPEN {
+.carousel-component.READY img.OPEN {
 	opacity: 1;
 }

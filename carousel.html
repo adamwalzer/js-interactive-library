@@ -23,17 +23,43 @@
 			};
 
 			this.next = function () {
-				var nextScreen;
-
-				nextScreen = this.sup();
-
-				this.leave();
-				return nextScreen.open();
+				return this
+					.leave()
+					.sup()
+					.open();
 			};
 
 		});
 
+		this.screen('be-bright', function () {
+
+			this.open = function () {
+				this.opener.play()
+				return this.sup();
+			};
+
+			this.next = function () {
+				return this.leave().sup().open();
+			};
+
+			this.entity('audio.opener', function () {
+				
+				this.setup = function () {
+					this.screen.opener = this;
+					return this.sup();
+				};
+
+				this.play = function () {
+					this.$els[0].play();
+					return this;
+				};
+
+			});
+
+		});
+
 	});
+
 	</script>
 
 	<link rel="stylesheet" type="text/css" href="style/reset.css">
@@ -61,14 +87,22 @@
 			width: 100%; height: 100%;
 			overflow: hidden;
 
+			background: url(images/loading.gif) no-repeat center center;
+			background-size: 100px;
 			opacity: 0;
 			border-radius: 4px;
 			transform: translateZ(-300px);
 			transition: transform 1s, opacity 1s;
+			z-index: -1;
+		}
+
+		.screen.READY {
+			background: none;
 		}
 
 		.screen.OPEN {
 			opacity: 1;
+			z-index: auto;
 			transform: translateZ(0);
 		}
 
@@ -78,27 +112,32 @@
 		}
 
 			.screen > * {
-				display: none;
+				opacity: 0;
+				transition: opacity 1s;
 			}
 
 			.screen.READY > * {
-				display: initial;
+				opacity: 1;
 			}
 
-	#welcome button {
-		position: absolute;
-		bottom: 0; right: 0;
-		border: none;
-		border-bottom: solid 1px;
-		margin: 8px;
-		padding: 0;
-		padding-bottom: 4px;
+		.screen button {
+			position: absolute;
+			bottom: 0; right: 0;
+			border: none;
+			border-bottom: solid 1px;
+			margin: 8px;
+			padding: 0;
+			padding-bottom: 4px;
 
-		color: #05a;
-		background: none;
-		outline: none;
-		text-transform: uppercase;
-		cursor: pointer;
+			color: #05a;
+			background: none;
+			outline: none;
+			text-transform: uppercase;
+			cursor: pointer;
+		}
+
+	#be-bright h1 {
+		text-align: center;
 	}
 	</style>
 
@@ -106,13 +145,19 @@
 <body id="carousel">
 	<div class="center">
 		<div id="screens">
-			<div id="welcome" class="screen">
+			<section id="welcome" class="screen">
 				<div class="center">
 					<h1>Welcome to the carousel!</h1>
 				</div>
 				<button pl-action="next()">continue</button>
-			</div>
-			<div id="images" class="screen" pl-component="carousel"></div>
+			</section>
+			<section id="be-bright" class="screen">
+				<audio class="opener" src="media/audio/header.mp3" preload></audio>
+				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
+				<div pl-component="select"></div>
+				<button pl-action="next()">continue</button>
+			</section>
+			<section id="images" class="screen" pl-component="carousel"></section>
 		</div>
 	</div>
 	
