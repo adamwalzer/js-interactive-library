@@ -16,7 +16,6 @@
 			this.timeout = null;
 			
 			this.ready = function () {
-				this.sup();
 				this.delay(1000, this.open);
 
 				return this;
@@ -25,7 +24,7 @@
 			this.next = function () {
 				return this
 					.leave()
-					.sup()
+					.proto()
 					.open();
 			};
 
@@ -33,20 +32,29 @@
 
 		this.screen('be-bright', function () {
 
+			this.audio = {};
+
 			this.open = function () {
-				this.opener.play()
-				return this.sup();
+				console.log('screen open');
+				this.audio.opener.play();
+				return this.proto();
 			};
 
 			this.next = function () {
-				return this.leave().sup().open();
+				return this.leave().proto().open();
 			};
+
+			this.entity('#bulbs', function () {
+				this.ready = function () {
+					console.log('override #bulbs', this);
+					return this;
+				};
+			});
 
 			this.entity('audio.opener', function () {
 				
-				this.setup = function () {
-					this.screen.opener = this;
-					return this.sup();
+				this.init = function () {
+					this.audio.opener = this;
 				};
 
 				this.play = function () {
@@ -154,7 +162,7 @@
 			<section id="be-bright" class="screen">
 				<audio class="opener" src="media/audio/header.mp3" preload></audio>
 				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
-				<div pl-component="select"></div>
+				<div id="bulbs" pl-component="select"></div>
 				<button pl-action="next()">continue</button>
 			</section>
 			<section id="images" class="screen" pl-component="carousel"></section>

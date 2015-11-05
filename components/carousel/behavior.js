@@ -8,7 +8,7 @@ pl.game.component('carousel', function () {
 		// As a rule you should define properties before calling sup().
 		this.$images = this.find('img');
 
-		return this.sup();
+		return this.proto();
 	};
 
 	this.beginShow = function () {
@@ -29,7 +29,7 @@ pl.game.component('carousel', function () {
 	};
 
 	this.open = function () {
-		this.sup();
+		this.proto();
 		return this.beginShow();
 	};
 });

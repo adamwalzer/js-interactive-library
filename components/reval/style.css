@@ -1,0 +1,11 @@
+.reval-component {}
+
+	.reval-component li {
+		list-style: none;
+		opacity: 0;
+		transition: opacity 0.5s;
+	}
+
+	.reval-component li.OPEN {
+		opacity: 1;
+	}

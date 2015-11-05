@@ -37,12 +37,16 @@ COMPONENTS = [];
 	this.load = function (_name, _callback) {
 		var path
 
+		if (component.get(_name)) return null;
+
 		path = pl.game.config('componentDirectory')+_name+'/behavior.js';
 
 		$.getScript(path, function () {
 			if (_callback) _callback.apply(component, arguments);
 			component.trigger('loaded', [_name]);
 		});
+
+		return this;
 	};
 
 	this.loadAll = function (_callback) {

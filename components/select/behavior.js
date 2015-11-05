@@ -9,10 +9,17 @@ pl.game.component('select', function () {
 
 			if ($li.prev().hasClass(this.STATE.DISABLED) || $li.index() === 0) {
 				this.disable($li);
+				this.reval.item($li.index());
 			}	
 		}
 
 		return this;
 	};
-	
+
+	this.open = function (_target) {
+		console.log('component open', _target);
+
+		return this.sup(_target);
+	};
+
 });

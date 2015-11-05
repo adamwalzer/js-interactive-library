@@ -9,7 +9,7 @@
 
 import Basic from 'types/Basic';
 
-export default Basic.extend(function () {
+var jQProxy = Basic.extend(function () {
 	var method, exclude;
 
 	/**
@@ -43,7 +43,7 @@ export default Basic.extend(function () {
 
 		args = [];
 
-		if (_method === 'on') {
+		if (~(['on', 'load']).indexOf(_method)) {
 			for (i=0; arg = _args[i]; i+=1) {
 				if (typeof arg === 'function') {
 					args.push((function (_handler) {
@@ -65,6 +65,7 @@ export default Basic.extend(function () {
 	// We don't want jQuery methods overridding our base type's methods.
 	exclude = ['constructor'].concat(Object.keys(Basic));
 
+	this.baseType = 'TYPE_JQPROXY';
 	this.$els = null;
 
 	for (method in $.fn) {
@@ -72,3 +73,5 @@ export default Basic.extend(function () {
 		this[method] = createProxyFunction(method);
 	}
 });
+
+export default jQProxy;

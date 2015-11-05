@@ -4,7 +4,9 @@
 */
 import util from 'util';
 
-export default {
+var Basic = {
+
+	baseType: 'TYPE_BASIC',
 	
 	/**
 	*  @desc Creates a new object with the current object as its prototype.
@@ -67,11 +69,11 @@ export default {
 	*  @param ... (*) Whatever amount of arguments the caller takes.
 	*  @return (*) Whatever the caller returns.
 	*/
-	sup: function () {
+	proto: function () {
 		var method, name, owner, prototype;
 
 		// Get the function which invoked sup() in the call stack.
-		method = this.sup.caller;
+		method = this.proto.caller;
 
 		// Check to see if 'this' owns the method.
 		// NOTE: We may want to move this logic into getOwner().
@@ -91,6 +93,34 @@ export default {
 
 		if (!method) {
 			console.error('ReferenceError: Unable to locate prototype method.', this.sup.caller);
+			debugger;
+			return null;
+		}
+
+		return method.apply(this, arguments);
+	},
+
+	sup: function () {
+		var method, name, owner, prototype;
+
+		// Get the function which invoked sup() in the call stack.
+		method = this.sup.caller;
+		owner = util.getOwner(this, this.baseType);
+		prototype = owner.object;
+		name = this.keyOf(method);
+
+		// Check to see if 'this' owns the method.
+		// NOTE: We may want to move this logic into getOwner().
+		// 
+		if (!name) {
+			owner = util.getOwner(this, method);
+			name = owner.name;
+		}
+
+		method = prototype[name];
+
+		if (!method) {
+			console.error('ReferenceError: Unable to locate prototype method.', this.sup.caller);
 			return null;
 		}
 
@@ -98,3 +128,5 @@ export default {
 	}
 
 };
+
+export default Basic;

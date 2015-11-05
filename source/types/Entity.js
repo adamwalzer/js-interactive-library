@@ -6,12 +6,13 @@
 
 import GlobalScope from 'types/GlobalScope';
 
-export default GlobalScope.extend(function () {
+var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
 		return _target ? (_target.jquery ? _target : $(_target)) : this
 	}
 
+	this.baseType = 'TYPE_ENTITY';
 	this.STATE = {
 		OPEN: 'OPEN',
 		LEAVE: 'LEAVE',
@@ -78,3 +79,5 @@ export default GlobalScope.extend(function () {
 	};
 
 });
+
+export default Entity;

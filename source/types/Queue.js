@@ -10,6 +10,8 @@ import Events from 'types/Events';
 
 var Queue = (function () {
 
+	this.baseType = 'TYPE_QUEUE';
+
 	this.add = function (_record) {
 		if (~this.indexOf(_record)) return false;
 		this.push(_record);
@@ -34,6 +36,10 @@ var Queue = (function () {
 		}
 
 		return this;
+	};
+
+	this.has = function (_record) {
+		return !!~this.indexOf(_record);
 	};
 
 	this.get = function (_member, _key) {

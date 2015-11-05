@@ -4,10 +4,10 @@
 
 import Scope from 'types/Scope';
 
-export default Scope.extend(function () {
+var GlobalScope = Scope.extend(function () {
 	
-	this.random = function () {
-		// body...
-	};
+	this.baseType = 'TYPE_GLOBAL_SCOPE';
 
 });
+
+export default GlobalScope;

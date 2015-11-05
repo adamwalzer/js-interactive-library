@@ -6,7 +6,9 @@
 
 import GlobalScope from 'types/GlobalScope';
 
-export default GlobalScope.extend(function () {
+var Game = GlobalScope.extend(function () {
+
+	this.baseType = 'TYPE_GAME';
 
 	this.setup = function () {
 		var game;
@@ -23,3 +25,5 @@ export default GlobalScope.extend(function () {
 	};
 
 });
+
+export default Game;

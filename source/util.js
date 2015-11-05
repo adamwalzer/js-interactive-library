@@ -1,7 +1,7 @@
 /**
 *  @desc 
 */
-export default new (function () {
+var util = new (function () {
 
 	/**
 	*  @desc Accepts one or more objects to combine their own properties to single object.
@@ -73,3 +73,5 @@ export default new (function () {
 	};
 
 });
+
+export default util;

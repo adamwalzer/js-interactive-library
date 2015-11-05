@@ -6,7 +6,7 @@
 
 import Basic from 'types/Basic';
 
-export default Basic.extend(function () {
+var Events = Basic.extend(function () {
 	var i, method, methods;
 	/**
 	*  @desc Creates a function with a proxy to the jQuery method.
@@ -27,7 +27,11 @@ export default Basic.extend(function () {
 
 	methods = ['on', 'off', 'trigger'];
 
+	this.baseType = 'TYPE_EVENTS';
+
 	for (i=0; method = methods[i]; i+=1) {
 		this[method] = createProxyFunction(method);
 	}
 });
+
+export default Events;

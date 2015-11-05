@@ -6,26 +6,9 @@
 
 import Entity from 'types/Entity';
 
-export default Entity.extend(function () {
-
-	// this.handleProperty(function () {
-		
-	// 	this.component = function (_node, _name, _value, _property) {
-	// 		var record, scope, id;
-
-	// 		if ($(_node).data('pl-component')) return;
-
-	// 		record = pl.game.component.get(_value);
-	// 		scope = this.extend(record.implementation).initialize(_node, true);
-	// 		id = scope.attr('id') || _value;
-
-	// 		this.entities.push(scope);
-	// 		this[id] = scope;
-
-	// 	};
-
-	// });
+var Screen = Entity.extend(function () {
 	
+	this.baseType = 'TYPE_SCREEN';
 	this.game = null;
 	this.screen = null;
 
@@ -40,3 +23,5 @@ export default Entity.extend(function () {
 	};
 
 });
+
+export default Screen;
