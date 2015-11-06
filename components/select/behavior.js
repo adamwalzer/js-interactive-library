@@ -1,11 +1,13 @@
 pl.game.component('select', function () {
+
+	console.log('boom')
 	
 	this.select = function (_target) {
 		var $li;
 
 		$li = $(_target).parent();
 
-		if (!$li.hasClass(this.STATE.DISABLED)) {
+		if (!$li.hasClass(this.STATE.DISABLED) && !this.parent().scope().state(this.STATE.VOICE_OVER)) {
 
 			if ($li.prev().hasClass(this.STATE.DISABLED) || $li.index() === 0) {
 				this.disable($li);

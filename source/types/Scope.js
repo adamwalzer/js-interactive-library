@@ -136,6 +136,7 @@ var Scope = jQProxy.extend(function () {
 	this.isComponent = false;
 	this.screens = null;
 	this.entities = null;
+	this.audio = null;
 	this.properties = null;
 	this.propertyHandlers = null;
 	this.assetQueue = null;
@@ -191,6 +192,49 @@ var Scope = jQProxy.extend(function () {
 		return this;
 	};
 
+	this.initializeEntities = function () {
+		var scope;
+
+		if (!this.hasOwnProperty('entities')) return this;
+
+		scope = this;
+
+		this.entities.forEach(function (_record, _index) {
+			var $node, component, componentRecord, instance, id, prototype;
+
+			$node = scope.find(_record.selector);
+			component = $node.attr('pl-component');
+			prototype = scope;
+
+			if (component) {
+				componentRecord = game.component.get(component);
+
+				if (componentRecord) {
+					prototype = scope.extend(componentRecord.implementation);
+				}
+
+				else {
+					console.error('Error: No implementation record for the', component, 'component.');
+					debugger;
+				}
+			}
+
+			if (!Scope.isPrototypeOf(_record)) {
+				instance = prototype.extend(_record.implementation).initialize($node, component);
+				scope.entities[_index] = instance;
+				scope.assetQueue.add(instance);
+			}
+
+			else {
+				instance = _record;
+			}
+			
+			id = transformId(instance.id());
+			if (id) scope[id] = instance;
+		});
+
+		return this;
+	};
 
 	this.willInit = function () { return this; };
 	this.init = function () { return this; };
@@ -247,8 +291,8 @@ var Scope = jQProxy.extend(function () {
 			ready();
 		});
 
-		if (!$('style[pl-component="'+_name+'"]').length) {
-			$('<style type="text/css" pl-component="'+_name+'">')
+		if (!$('style[pl-for-component="'+_name+'"]').length) {
+			$('<style type="text/css" pl-for-component="'+_name+'">')
 				.load(path+'style.css', ready)
 				.appendTo(document.body);
 		}
@@ -305,7 +349,7 @@ var Scope = jQProxy.extend(function () {
 
 		this.find(assetTypes.join(',')).each(function () {
 			// Skip scopes that are nested. They will be initialized by their parent scope.
-			if (scope.is($(this).closest('.pl-scope'))) {
+			if (scope === $(this).scope()) {
 				watch.call(this);
 			}
 		});
@@ -319,14 +363,12 @@ var Scope = jQProxy.extend(function () {
 		scope = this;
 
 		this.assetQueue.on('complete', function () {
-			console.log('assetQueue complete', scope);
 			scope.assetQueue.off();
 			ready.call(scope);
 		});
 
 		this.on('ready', function (_event) {
 			if (this.has(_event.targetScope.$els) && this.assetQueue.has(_event.targetScope)) {
-				console.log('child scope ready', _event.targetScope);
 				this.assetQueue.ready(_event.targetScope);
 
 				if (!this.assetQueue.length) this.off('ready');
@@ -347,13 +389,15 @@ var Scope = jQProxy.extend(function () {
 		prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
 		
 		this.find(screenSelector).each(function (_index) {
-			var screen, record, key, id, index, component;
+			var $node, screen, record, key, id, index, component;
 
 			// Skip screens that are nested. They will be initialized by their parent scope.
-			if (!scope.is($(this).closest('.pl-scope'))) return;
+			if (!scope === $(this).scope()) return;
 
-			key = (this.id) ? (id = this.id, 'name') : (id = _index, 'index');
-			component = $(this).attr('pl-component');
+			$node = $(this);
+			id = $node.id();
+			key = (id) ? 'name' : (id = _index, 'index');
+			component = $node.attr('pl-component');
 			index = -1;
 
 			if (component) {
@@ -389,54 +433,10 @@ var Scope = jQProxy.extend(function () {
 
 			screen.screen = screen;
 			
-			if (this.id||component) scope[transformId(this.id||component)] = screen;
+			if (id||component) scope[transformId(id||component)] = screen;
 		});
 
 		scope = null;
-
-		return this;
-	};
-
-	this.initializeEntities = function () {
-		var scope;
-
-		if (!this.hasOwnProperty('entities')) return this;
-
-		scope = this;
-
-		this.entities.forEach(function (_record, _index) {
-			var $node, component, componentRecord, instance, id, prototype;
-
-			$node = scope.find(_record.selector);
-			component = $node.attr('pl-component');
-			prototype = scope;
-
-			if (component) {
-				componentRecord = game.component.get(component);
-
-				if (componentRecord) {
-					prototype = scope.extend(componentRecord.implementation);
-				}
-
-				else {
-					console.error('Error: No implementation record for the', component, 'component.');
-					debugger;
-				}
-			}
-
-			if (!Scope.isPrototypeOf(_record)) {
-				instance = prototype.extend(_record.implementation).initialize($node, component);
-				scope.entities[_index] = instance;
-				scope.assetQueue.add(instance);
-			}
-
-			else {
-				instance = _record;
-			}
-			
-			id = transformId(instance.attr('id'));
-			if (id) scope[id] = instance;
-		});
 
 		return this;
 	};
@@ -475,7 +475,7 @@ var Scope = jQProxy.extend(function () {
 				this.find('[pl-'+property+']').each(function () {
 					var attr;
 
-					if (scope.is($(this).closest('.pl-scope'))) {
+					if (scope === $(this).scope()) {
 						attr = this.attributes.getNamedItem('pl-'+property);
 
 						if (handler) handler.call(scope, this, property, attr.value, attr);
@@ -483,6 +483,55 @@ var Scope = jQProxy.extend(function () {
 				});
 			}
 		}
+
+		return this;
+	};
+
+	this.captureAudioAssets = function () {
+		var scope, map;
+
+		scope = this;
+		map = {
+			background: 'background',
+			'voice-over': 'voiceOver'
+		};
+
+		this.findOwn('audio').each(function () {
+			var $node, id, audioTypes;
+
+			if (!scope.hasOwnProperty('audio')) {
+				scope.audio = {
+					background: [],
+					voiceOver: []
+				};
+			}
+
+			$node = $(this);
+			id = transformId($node.id());
+			audioTypes = ['background', 'voice-over'];
+
+			audioTypes.forEach(function (_type) {
+				if ($node.hasClass(_type)) {
+					$node.on('play pause ended', function (_event) {
+						switch (_event.type) {
+							case 'play':
+								scope.addClass('PLAYING '+_type.toUpperCase());
+								break;
+
+							case 'puase':
+							case 'ended':
+								scope.removeClass('PLAYING '+_type.toUpperCase());
+								break;
+						}
+						scope.trigger($.Event('audio-'+_event.type, { target: $node[0], targetScope: scope, audioType: _type }));
+					});
+
+					scope.audio[map[_type]].push($node[0]);
+
+					if (id) scope.audio[map[_type]][id] = $node[0];
+				}
+			});
+		});
 
 		return this;
 	};
@@ -553,7 +602,7 @@ var Scope = jQProxy.extend(function () {
 		if (this.hasOwnProperty('$els')) {
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
-			id = transformId(instance.attr('id'));
+			id = transformId(instance.id());
 
 			this.entities.push(instance);
 			if (id) this[id] = instance;
@@ -580,7 +629,7 @@ var Scope = jQProxy.extend(function () {
 
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
-					id = scope.attr('id') || _value;
+					id = transformId(scope.id()) || _value;
 					this[id] = scope;
 
 					this.assetQueue.add(scope);

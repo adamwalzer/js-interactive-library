@@ -72,6 +72,16 @@ var jQProxy = Basic.extend(function () {
 		if (!$.fn.hasOwnProperty(method) || ~exclude.indexOf(method)) continue;
 		this[method] = createProxyFunction(method);
 	}
+
+	this.findOwn = function (_selector) {
+		var scope;
+
+		scope = this;
+
+		return this.find(_selector).filter(function () {
+			return $(this).scope() === scope;
+		});
+	};
 });
 
 export default jQProxy;

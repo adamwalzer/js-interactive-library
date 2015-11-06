@@ -18,13 +18,20 @@ var Entity = GlobalScope.extend(function () {
 		LEAVE: 'LEAVE',
 		ENABLED: 'ENABLED',
 		DISABLED: 'DISABLED',
+		SELECTED: 'SELECTED',
+		PLAYING: 'PLAYING',
+		BACKGROUND: 'BACKGROUND',
+		VOICE_OVER: 'VOICE-OVER'
 	};
 
 	this.timeoutID = null;
 	this.intervalID = null;
 
-	this.index = function () {
-		return this.game.screens.indexOf(this);
+	this.setup = function () {
+		this.proto();
+		this.captureAudioAssets();
+
+		return this;
 	};
 
 	this.delay = function (_time, _cb) {
@@ -52,7 +59,7 @@ var Entity = GlobalScope.extend(function () {
 
 		if (_test) return this.hasClass(_test);
 
-		classes = this.attr('class').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/);
+		classes = this.attr('class').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
 
 		return classes && (classes.length === 1 ? classes[0] : classes);
 	};

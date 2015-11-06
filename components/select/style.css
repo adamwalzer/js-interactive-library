@@ -20,8 +20,13 @@
 			transition: opacity 0.5s, transform 0.5s cubic-bezier(0, 0.18, 0, 1.01);
 		}
 
+		.select-component.VOICE-OVER .items li img,
+		.VOICE-OVER .select-component .items li img {
+			pointer-events: none;
+		}
+
 		.select-component .items li img.checked:hover,
-		.select-component .items li img.unchecked {
+		.select-component .items li img.unchecked:hover {
 			transform: translateY(-40px);
 		}
 

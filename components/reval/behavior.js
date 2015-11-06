@@ -1,14 +1,27 @@
 pl.game.component('reval', function () {
 
-	this.audio = null;
+	this.init = function () {
+		// Move this into a watchEntityAudioEvents()
+		this.on('audio-play audio-ended', function (_event) {
+			var parent;
 
-	this.ready = function () {
-		this.audio = this.find('audio');
+			parent = this.parent().scope();
+
+			switch (_event.type) {
+				case 'audio-play':
+					parent.addClass('PLAYING '+_event.audioType.toUpperCase());
+					break;
+
+				case 'audio-ended':
+					parent.removeClass('PLAYING '+_event.audioType.toUpperCase());
+					break;
+			}
+		});
 	};
 
 	this.item = function (_index) {
 		this.open(this.find('li').eq(_index));
-		this.audio[_index].play();
+		this.audio.voiceOver[_index].play();
 	};
 
 });

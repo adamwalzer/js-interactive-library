@@ -32,37 +32,23 @@
 
 		this.screen('be-bright', function () {
 
-			this.audio = {};
-
 			this.open = function () {
-				console.log('screen open');
-				this.audio.opener.play();
-				return this.proto();
+				if (this.isReady) {
+					this.audio.voiceOver.intro.play();
+				}
+				
+				return this.sup();
+			};
+
+			this.ready = function () {
+				if (this.state(this.STATE.OPEN)) {
+					this.audio.voiceOver.intro.play();
+				}
 			};
 
 			this.next = function () {
 				return this.leave().proto().open();
 			};
-
-			this.entity('#bulbs', function () {
-				this.ready = function () {
-					console.log('override #bulbs', this);
-					return this;
-				};
-			});
-
-			this.entity('audio.opener', function () {
-				
-				this.init = function () {
-					this.audio.opener = this;
-				};
-
-				this.play = function () {
-					this.$els[0].play();
-					return this;
-				};
-
-			});
 
 		});
 
@@ -77,6 +63,9 @@
 	body {
 		font-family: HelveticaNeue-Light;
 		perspective: 500px;
+		background: url(images/background.png) no-repeat center center;
+		background-size: auto 100%;
+		overflow: hidden;
 	}
 
 	h1, h2, h3, b, strong {
@@ -90,13 +79,13 @@
 
 		.screen {
 			position: absolute;
-			border: solid 1px #ddd;
 			top: 0; left: 0;
 			width: 100%; height: 100%;
 			overflow: hidden;
 
-			background: url(images/loading.gif) no-repeat center center;
+			background: rgba(255,255,255,0.7) url(images/loading.gif) no-repeat center center;
 			background-size: 100px;
+			box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
 			opacity: 0;
 			border-radius: 4px;
 			transform: translateZ(-300px);
@@ -105,7 +94,7 @@
 		}
 
 		.screen.READY {
-			background: none;
+			background-image: none;
 		}
 
 		.screen.OPEN {
@@ -151,6 +140,7 @@
 
 </head>
 <body id="carousel">
+	<audio id="music" class="background" src="media/audio/Instrumentals.mp3" preload autoplay="1"></audio>
 	<div class="center">
 		<div id="screens">
 			<section id="welcome" class="screen">
@@ -160,7 +150,7 @@
 				<button pl-action="next()">continue</button>
 			</section>
 			<section id="be-bright" class="screen">
-				<audio class="opener" src="media/audio/header.mp3" preload></audio>
+				<audio pl-id="intro" class="voice-over" src="media/audio/header.mp3" preload></audio>
 				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
 				<div id="bulbs" pl-component="select"></div>
 				<button pl-action="next()">continue</button>
