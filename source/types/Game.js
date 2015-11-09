@@ -50,8 +50,6 @@ var Game = GlobalScope.extend(function () {
 					this.audio.background.music.volume = 0.2;
 				}
 			}
-
-			// console.log(_event.type, _event.audioType);
 		});
 
 		this.on('audio-ended', function (_event) {
@@ -63,8 +61,6 @@ var Game = GlobalScope.extend(function () {
 			if (_event.audioType === 'voice-over') {
 				this.audio.background.music.volume = 1;
 			}
-
-			// console.log('game', _event.type, _event.target);
 		});
 	};
 

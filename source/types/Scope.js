@@ -59,6 +59,60 @@ var Scope = jQProxy.extend(function () {
 	}
 
 	// Protected
+	function captureProperties () {
+		var i, attr, name, collection;
+
+		collection = [];
+
+		for (i=0; attr = this.$els[0].attributes[i]; i+=1) {
+			// I explicitly want it to be at the beginning.
+			if (attr.name.indexOf('pl-') === 0) {
+				name = attr.name.slice(3);
+				collection[transformId(name)] = attr.value;
+				
+				collection.push(name);
+			}
+		}
+
+		if (collection.length) this.properties = collection;
+
+		return this;
+	}
+
+	function handleProperties () {
+		var scope, property, handler;
+
+		scope = this;
+
+		if (this.properties) {
+			this.properties.forEach(function (_name) {
+				handler = scope.propertyHandlers[_name];
+				if (handler) handler.call(scope, scope.$els[0], _name, scope.properties[_name]);
+			});
+		}
+
+		if (this.propertyHandlers) {
+			for (property in this.propertyHandlers) {
+				// only exclide members on the base type
+				if (Basic.hasOwnProperty(property)) continue;
+
+				handler = this.propertyHandlers[property];
+
+				this.find('[pl-'+property+']').each(function () {
+					var attr;
+
+					if (scope === $(this).scope()) {
+						attr = this.attributes.getNamedItem('pl-'+property);
+
+						if (handler) handler.call(scope, this, property, attr.value);
+					}
+				});
+			}
+		}
+
+		return this;
+	}
+
 	function invokeLocal (_name) {
 		var args;
 
@@ -72,7 +126,7 @@ var Scope = jQProxy.extend(function () {
 	function init () {
 		this.assetQueue = Queue.create();
 
-		return this
+		return captureProperties.call(this)
 			.attachEvents()
 			.initializeEntities()
 			.captureScreens();
@@ -130,6 +184,10 @@ var Scope = jQProxy.extend(function () {
 
 	}).call([]);
 
+	this.TRANSCLIDE_REPLACE = 'replace';
+	this.TRANSCLIDE_PREPEND = 'prepend';
+	this.TRANSCLIDE_APPEND = 'append';
+	
 	this.baseType = 'TYPE_SCOPE';
 	this.actionables = null;
 	this.isReady = false;
@@ -240,15 +298,14 @@ var Scope = jQProxy.extend(function () {
 	this.init = function () { return this; };
 
 	this.setup = function () {
-		return this
-			.watchAssets()
-			.captureProperties();
+		this.watchAssets();
+		return handleProperties.call(this);
 	};
 
 	this.ready = function () { return this; };
 
 	this.loadComponentAssets = function (_name, _callback) {
-		var scope, path, totalRequests;
+		var scope, path, totalRequests, transclideMode;
 
 		function ready () {
 			ready.status +=1;
@@ -261,35 +318,51 @@ var Scope = jQProxy.extend(function () {
 			}
 		}
 
-		totalRequests = 2;
+		totalRequests = 1;
 		scope = this;
 		path = game.config('componentDirectory')+_name+'/';
+		transclideMode = this.properties.transclide || this.TRANSCLIDE_REPLACE;
 		ready.status = 0;
 
-		this.load(path+'template.html', function () {
-			var memory;
+		if (!this.children().length || ~[this.TRANSCLIDE_APPEND, this.TRANSCLIDE_PREPEND].indexOf(transclideMode)) {
+			totalRequests+=1;
+			$('<div>').load(path+'template.html', function () {
+				var memory;
 
-			memory = [];
+				memory = [];
 
-			this.find('[pl-component]').each(function () {
-				var name;
+				if (transclideMode === scope.TRANSCLIDE_APPEND) {
+					scope.append(this.children);
+				}
 
-				name = $(this).attr('pl-component');
+				else if (transclideMode === scope.TRANSCLIDE_PREPEND) {
+					scope.prepend(this.children);
+				}
 
-				if (~memory.indexOf(name)) return;
+				else {
+					scope.html(this.innerHTML);
+				}
 
-				memory.push(name);
+				scope.find('[pl-component]').each(function () {
+					var name;
 
-				totalRequests+=1;
-				scope.assetQueue.add(name);
+					name = $(this).attr('pl-component');
 
-				game.component.load(name, function () {
-					scope.assetQueue.ready(name);
-					ready();
+					if (~memory.indexOf(name)) return;
+
+					memory.push(name);
+
+					totalRequests+=1;
+					scope.assetQueue.add(name);
+
+					game.component.load(name, function () {
+						scope.assetQueue.ready(name);
+						ready();
+					});
 				});
+				ready();
 			});
-			ready();
-		});
+		}
 
 		if (!$('style[pl-for-component="'+_name+'"]').length) {
 			$('<style type="text/css" pl-for-component="'+_name+'">')
@@ -441,52 +514,6 @@ var Scope = jQProxy.extend(function () {
 		return this;
 	};
 
-	this.captureProperties = function () {
-		var scope, property, collection, handler;
-
-		scope = this;
-		collection = [];
-
-		this.each(function () {
-			var i, attr, name;
-
-			for (i=0; attr = this.attributes[i]; i+=1) {
-				// I explicitly want it to be at the beginning.
-				if (attr.name.indexOf('pl-') === 0) {
-					name = attr.name.slice(3);
-					handler = scope.propertyHandlers[name];
-					collection[transformId(name)] = attr.value;
-					
-					collection.push(name);
-					if (handler) handler.call(scope, this, name, attr.value, attr);
-				}
-			}
-		});
-
-		if (collection.length) this.properties = collection;
-
-		if (this.propertyHandlers) {
-			for (property in this.propertyHandlers) {
-				// only exclide members on the base type
-				if (Basic.hasOwnProperty(property)) continue;
-
-				handler = this.propertyHandlers[property];
-
-				this.find('[pl-'+property+']').each(function () {
-					var attr;
-
-					if (scope === $(this).scope()) {
-						attr = this.attributes.getNamedItem('pl-'+property);
-
-						if (handler) handler.call(scope, this, property, attr.value, attr);
-					}
-				});
-			}
-		}
-
-		return this;
-	};
-
 	this.captureAudioAssets = function () {
 		var scope, map;
 
@@ -616,6 +643,18 @@ var Scope = jQProxy.extend(function () {
 		}
 
 		return this;
+	};
+
+	// Wraps you function 'this' to the scope.
+	// 
+	this.bind = function (_handler) {
+		var scope;
+
+		scope = this;
+
+		return function () {
+			return _handler.apply(scope, arguments);
+		};
 	};
 
 	this.handleProperty(function () {

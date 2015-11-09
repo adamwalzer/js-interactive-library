@@ -72,6 +72,13 @@ var util = new (function () {
 		};
 	};
 
+	this.random = function (_collection) {
+		var index;
+		index = Math.floor(Math.random()*_collection.length);
+		if (index === _collection.length) index = _collection.length-1;
+		return _collection && _collection[index];
+	};
+
 });
 
 export default util;

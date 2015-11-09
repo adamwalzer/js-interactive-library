@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 var sourcemaps = require('gulp-sourcemaps');
-//var source = require('vinyl-source-stream');
+var watch = require('gulp-watch');
 //var buffer = require('vinyl-buffer');
 //var browserify = require('browserify');
 //var watchify = require('watchify');
@@ -53,3 +53,9 @@ gulp.task("webpack:build-dev", function(callback) {
     });
 });
 
+
+gulp.task("watch", function(callback) {
+    watch('source/**/*.js', function () {
+        gulp.start('webpack:build-dev');
+    });
+});

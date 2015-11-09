@@ -30,6 +30,21 @@
 
 		});
 
+		this.screen('bears', function () {
+
+			this.ready = function () {
+				this.cannon.on('fire', function () {
+					console.log('recived payload', this.carousel.current().next());
+				});
+			};
+			
+			this.open = function (_target) {
+				if (!this.carousel.isPlaying) this.carousel.beginShow();
+				return this.proto(_target);
+			};
+
+		});
+
 		this.screen('be-bright', function () {
 
 			this.open = function () {
@@ -136,6 +151,10 @@
 	#be-bright h1 {
 		text-align: center;
 	}
+
+	#bears img {
+		padding: 30px;
+	}
 	</style>
 
 </head>
@@ -149,13 +168,27 @@
 				</div>
 				<button pl-action="next()">continue</button>
 			</section>
+			<section id="bears" class="screen">
+				<div class="slide" pl-component="carousel" pl-size="33%, auto">
+					<img src="images/carousel_andean_bear2.png">
+					<img src="images/carousel_asiatic_black_bear2.png">
+					<img src="images/carousel_black_bear2.png">
+					<img src="images/carousel_brown_bear2.png">
+					<img src="images/carousel_panda2.png">
+					<img src="images/carousel_polar_bear2.png">
+					<img src="images/carousel_sloth_bear2.png">
+					<img src="images/carousel_sun_bear2.png">
+				</div>
+				<div pl-component="cannon"></div>
+				<button pl-action="next()">continue</button>
+			</section>
+			<section id="yosemite" class="screen" pl-component="carousel"></section>
 			<section id="be-bright" class="screen">
 				<audio pl-id="intro" class="voice-over" src="media/audio/header.mp3" preload></audio>
 				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
 				<div id="bulbs" pl-component="select"></div>
 				<button pl-action="next()">continue</button>
 			</section>
-			<section id="images" class="screen" pl-component="carousel"></section>
 		</div>
 	</div>
 	
