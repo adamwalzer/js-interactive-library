@@ -11,11 +11,20 @@ pl.game.component('carousel', function () {
 
 	this.type = null
 	this.$images = null;
+	this.nodes = null;
 	this.shouldRandomize = false;
 	this.isPlaying = false;
 
 	this.ready = function () {
 		this.$images = this.find('img');
+		this.shouldRandomize = this.properties.has('randomize');
+
+		if (this.$images.length) {
+			this.nodes = [];
+			this.$images.each(this.bind(function (_index, _item) {
+				this.nodes.push(_item);
+			}));
+		}
 		
 		this.TYPE.forEach(this.bind(function (_item) {
 			if (this.hasClass(_item)) this.type = _item;
@@ -26,11 +35,18 @@ pl.game.component('carousel', function () {
 				this.recycle();
 			}
 		});
-
-		this.screen.on('behavior', function (_event) {
-			console.log('responding to behavior', _event.name);
-		});
 	};
+
+	this.respond('fire', function (_event) {
+		this.hit(_event.message);
+	});
+
+	this.behavior('hit', function (_message) {
+		return {
+			message: _message,
+			behaviorTarget: this.provideBehaviorTarget()
+		};
+	});
 
 	this.beginShow = function () {
 		if (this.isReady) {
@@ -59,7 +75,10 @@ pl.game.component('carousel', function () {
 		$current = this.current();
 		reload = this.reloadWithNode(this.$images[0]);
 
+		console.log()
+
 		$current.removeClass(this.STATE.LEAVE);
+		$current.remove();
 
 		[].shift.call(this.$images);
 
@@ -70,10 +89,21 @@ pl.game.component('carousel', function () {
 	};
 
 	this.reloadWithNode = function (_item) {
+		var $clone, state;
+
 		if (this.shouldRandomize) {
-			return pl.util.random(this.$images);
+			$clone = $(pl.util.random(this.nodes)).clone();
+			state = $clone.state();
+
+			if (state) $clone.removeClass(state.join ? state.join(' ') : state);
+
+			return $clone[0];
 		}
 
 		return _item;
+	};
+
+	this.provideBehaviorTarget = function () {
+		return this.current();
 	};
 });

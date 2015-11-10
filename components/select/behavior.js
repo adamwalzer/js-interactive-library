@@ -1,6 +1,4 @@
 pl.game.component('select', function () {
-
-	console.log('boom')
 	
 	this.select = function (_target) {
 		var $li;

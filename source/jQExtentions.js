@@ -28,6 +28,7 @@
 	};
 
 	this.id = function (_set) {
+
 		if (_set !== undefined) {
 			// Remove attribute.
 			if (~['', null].indexOf(_set)) {
@@ -45,7 +46,28 @@
 			}
 		}
 
-		return this.attr('id') || this.attr('pl-id');
+
+		return this.attr('id') || this.attr('pl-id') || this.attr('pl-component');
+	};
+
+	this.address = function () {
+		var tag, id, classes;
+
+		tag = this[0].nodeName.toLowerCase();
+		id = this.attr('id');
+		classes = this.attr('class') ? '.'+this.attr('class').split(' ').join('.') : '';
+		
+		return tag+(id ? '#'+id : '')+classes;
+	};
+
+	this.state = function (_test) {
+		var classes;
+
+		if (_test) return this.hasClass(_test);
+
+		classes = (this.attr('class') || '').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
+
+		return classes && (classes.length === 1 ? classes[0] : classes);
 	};
 
 }).call($.fn);

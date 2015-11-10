@@ -62,7 +62,15 @@ var Scope = jQProxy.extend(function () {
 	function captureProperties () {
 		var i, attr, name, collection;
 
-		collection = [];
+		collection = (function () {
+			
+			this.has = function (_name) {
+				return !!~this.indexOf(_name);
+			};
+
+			return this;
+
+		}).call([]);
 
 		for (i=0; attr = this.$els[0].attributes[i]; i+=1) {
 			// I explicitly want it to be at the beginning.
@@ -84,7 +92,7 @@ var Scope = jQProxy.extend(function () {
 
 		scope = this;
 
-		if (this.properties) {
+		if (this.hasOwnProperty('properties')) {
 			this.properties.forEach(function (_name) {
 				handler = scope.propertyHandlers[_name];
 				if (handler) handler.call(scope, scope.$els[0], _name, scope.properties[_name]);
@@ -114,11 +122,11 @@ var Scope = jQProxy.extend(function () {
 	}
 
 	function invokeLocal (_name) {
-		var args;
+		var args, owner;
 
 		args = [].slice.call(arguments, 1);
 
-		if (this.hasOwnProperty(_name)) {
+		if (this.isMemberSafe(_name)) {
 			return this[_name].apply(this, arguments);
 		}
 	}
@@ -187,7 +195,7 @@ var Scope = jQProxy.extend(function () {
 	this.TRANSCLIDE_REPLACE = 'replace';
 	this.TRANSCLIDE_PREPEND = 'prepend';
 	this.TRANSCLIDE_APPEND = 'append';
-	
+
 	this.baseType = 'TYPE_SCOPE';
 	this.actionables = null;
 	this.isReady = false;
@@ -207,8 +215,7 @@ var Scope = jQProxy.extend(function () {
 		if (_componentName) this.isComponent = true;
 
 		if (!this.$els.length) {
-			console.error('ReferenceError: Unable to locate the element with selector', this.$els.selector);
-			return;
+			throw ReferenceError('Unable to locate the element with selector '+this.$els.selector+'.');
 		}
 
 		this.addClass('pl-scope '+(_componentName ? _componentName+'-component' : ''));
@@ -318,7 +325,7 @@ var Scope = jQProxy.extend(function () {
 			}
 		}
 
-		totalRequests = 1;
+		totalRequests = 0;
 		scope = this;
 		path = game.config('componentDirectory')+_name+'/';
 		transclideMode = this.properties.transclide || this.TRANSCLIDE_REPLACE;
@@ -365,12 +372,13 @@ var Scope = jQProxy.extend(function () {
 		}
 
 		if (!$('style[pl-for-component="'+_name+'"]').length) {
+			totalRequests+=1;
 			$('<style type="text/css" pl-for-component="'+_name+'">')
 				.load(path+'style.css', ready)
 				.appendTo(document.body);
 		}
 
-		this.assetQueue.add(_name);
+		if (totalRequests) this.assetQueue.add(_name);
 
 		return this;
 	};
@@ -655,6 +663,22 @@ var Scope = jQProxy.extend(function () {
 		return function () {
 			return _handler.apply(scope, arguments);
 		};
+	};
+
+	this.isMemberSafe = function (_name) {
+		var owner;
+
+		if (this[_name] == null) return false;
+		if (this.hasOwnProperty(_name)) return true;
+
+		owner = util.getOwner(this, this[_name]);
+
+		if (Object.getPrototypeOf(this) === owner.object && !owner.object.hasOwnProperty('$els')) {
+			console.log('okay to use', _name, this);
+			return true;
+		}
+
+		return false;
 	};
 
 	this.handleProperty(function () {

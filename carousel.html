@@ -8,69 +8,6 @@
 	<script type="text/javascript" src="build/play.js"></script>
 	<script type="text/javascript" src="config.game.js"></script>
 
-	<script type="text/javascript">
-	pl.game('carousel', function () {
-		
-		this.screen('welcome', function () {
-			
-			this.timeout = null;
-			
-			this.ready = function () {
-				this.delay(1000, this.open);
-
-				return this;
-			};
-
-			this.next = function () {
-				return this
-					.leave()
-					.proto()
-					.open();
-			};
-
-		});
-
-		this.screen('bears', function () {
-
-			this.ready = function () {
-				this.cannon.on('fire', function () {
-					console.log('recived payload', this.carousel.current().next());
-				});
-			};
-			
-			this.open = function (_target) {
-				if (!this.carousel.isPlaying) this.carousel.beginShow();
-				return this.proto(_target);
-			};
-
-		});
-
-		this.screen('be-bright', function () {
-
-			this.open = function () {
-				if (this.isReady) {
-					this.audio.voiceOver.intro.play();
-				}
-				
-				return this.sup();
-			};
-
-			this.ready = function () {
-				if (this.state(this.STATE.OPEN)) {
-					this.audio.voiceOver.intro.play();
-				}
-			};
-
-			this.next = function () {
-				return this.leave().proto().open();
-			};
-
-		});
-
-	});
-
-	</script>
-
 	<link rel="stylesheet" type="text/css" href="style/reset.css">
 	<link rel="stylesheet" type="text/css" href="style/layout.css">
 
@@ -152,43 +89,165 @@
 		text-align: center;
 	}
 
-	#bears img {
+	#bears .bears-carousel img {
 		padding: 30px;
 	}
+
+	#bears .cannon-component {
+		text-align: center;
+	}
+
+		#bears .cannon-component img {
+			width: 100px;
+			cursor: pointer;
+		}
 	</style>
+
+	<script type="text/javascript">
+	pl.game('carousel', function () {
+		
+		this.screen('welcome', function () {
+			
+			this.timeout = null;
+			
+			this.ready = function () {
+				this.delay(1000, this.open);
+
+				return this;
+			};
+
+			this.next = function () {
+				return this
+					.leave()
+					.proto()
+					.open();
+			};
+
+		});
+
+		this.screen('bears', function () {
+
+			this.points = 0;
+
+			this.entity('.bears-carousel', function () {
+
+				// The event 'behaviorTarget' for this entities 'hit' behavior
+				this.provideBehaviorTarget = function () {
+					// Choose the item thats in the middle of the 3 visible.
+					return this.current().next();
+				};
+
+			});
+
+			this.respond('hit', function (_event) {
+				var $target;
+
+				if (_event.behaviorTarget) {
+
+					$target = _event.behaviorTarget;
+
+					if ($target.id() === _event.message) {
+						this.score.up();
+						console.log('Correct', this.points);
+					}
+
+					else {
+						console.log('Inccorect', this.reval.item($target.id()));
+					}
+				}
+			});
+
+			
+			this.open = function (_target) {
+				if (!this.carousel.isPlaying) this.carousel.beginShow();
+				return this.proto(_target);
+			};
+
+			this.next = function () {
+				return this
+					.leave()
+					.proto()
+					.open();
+			};
+
+		});
+
+		this.screen('be-bright', function () {
+
+			this.open = function () {
+				if (this.isReady) {
+					this.audio.voiceOver.intro.play();
+				}
+				
+				return this.sup();
+			};
+
+			this.ready = function () {
+				if (this.state(this.STATE.OPEN)) {
+					this.audio.voiceOver.intro.play();
+				}
+			};
+
+			this.next = function () {
+				return this.leave().proto().open();
+			};
+
+		});
+
+	});
+
+	</script>
 
 </head>
 <body id="carousel">
 	<audio id="music" class="background" src="media/audio/Instrumentals.mp3" preload autoplay="1"></audio>
 	<div class="center">
 		<div id="screens">
+
 			<section id="welcome" class="screen">
 				<div class="center">
 					<h1>Welcome to the carousel!</h1>
 				</div>
 				<button pl-action="next()">continue</button>
 			</section>
+
 			<section id="bears" class="screen">
-				<div class="slide" pl-component="carousel" pl-size="33%, auto">
-					<img src="images/carousel_andean_bear2.png">
-					<img src="images/carousel_asiatic_black_bear2.png">
-					<img src="images/carousel_black_bear2.png">
-					<img src="images/carousel_brown_bear2.png">
-					<img src="images/carousel_panda2.png">
-					<img src="images/carousel_polar_bear2.png">
-					<img src="images/carousel_sloth_bear2.png">
-					<img src="images/carousel_sun_bear2.png">
+				<div pl-component="score" pl-max="5"></div>
+				<div class="bears-carousel slide" pl-component="carousel" pl-size="33%, auto" pl-randomize>
+					<img pl-id="andean" src="images/carousel_andean_bear2.png">
+					<img pl-id="asiatic" src="images/carousel_asiatic_black_bear2.png">
+					<img pl-id="black" src="images/carousel_black_bear2.png">
+					<img pl-id="brown" src="images/carousel_brown_bear2.png">
+					<img pl-id="panda" src="images/carousel_panda2.png">
+					<img pl-id="polar" src="images/carousel_polar_bear2.png">
+					<img pl-id="sloth" src="images/carousel_sloth_bear2.png">
+					<img pl-id="sun" src="images/carousel_sun_bear2.png">
 				</div>
-				<div pl-component="cannon"></div>
+				<div pl-component="cannon" pl-fire="polar"></div>
+				<div pl-component="reval">
+					<ul>
+						<li pl-id="andean">Andean Bear</li>
+						<li pl-id="asiatic">Asiatic Black Bear</li>
+						<li pl-id="black">Black Bear</li>
+						<li pl-id="brown">Brown Bear</li>
+						<li pl-id="panda">Panda</li>
+						<li pl-id="polar">Polar Bear</li>
+						<li pl-id="sloth">Sloth Bear</li>
+						<li pl-id="sun">Sun Bear</li>
+					</ul>
+				</div>
 				<button pl-action="next()">continue</button>
 			</section>
-			<section id="yosemite" class="screen" pl-component="carousel"></section>
+
 			<section id="be-bright" class="screen">
 				<audio pl-id="intro" class="voice-over" src="media/audio/header.mp3" preload></audio>
 				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
 				<div id="bulbs" pl-component="select"></div>
 				<button pl-action="next()">continue</button>
 			</section>
+
+			<section id="yosemite" class="screen" pl-component="carousel"></section>
+
 		</div>
 	</div>
 	

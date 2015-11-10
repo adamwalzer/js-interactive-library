@@ -1,4 +1,10 @@
 pl.game.component('reval', function () {
+	
+	this.handleProperty(function () {
+		this.id = function (_node, _name, _value, _property) {
+			this[_value] = $(_node);
+		};
+	});
 
 	this.init = function () {
 		// Move this into a watchEntityAudioEvents()
@@ -19,9 +25,22 @@ pl.game.component('reval', function () {
 		});
 	};
 
-	this.item = function (_index) {
-		this.open(this.find('li').eq(_index));
-		this.audio.voiceOver[_index].play();
+	this.item = function (_id) {
+		this.close(this.find('li.OPEN'));
+
+		if (typeof _id === 'number') {
+			this.open(this.find('li').eq(_index));
+			this.audio.voiceOver[_index].play();
+		}
+			
+		else if (typeof _id === 'string') {
+			if (this[_id]) {
+				this.open(this[_id])
+				if (this.audio.voiceOver[_id]) {
+					this.audio.voiceOver[_id].play();
+				}
+			}
+		}
 	};
 
 });

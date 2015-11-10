@@ -1,7 +1,9 @@
 pl.game.component('cannon', function () {
 
 	this.behavior('fire', function () {
-		console.log('FIRE!!');
+		return {
+			message: this.properties.fire
+		};
 	});
 
 });

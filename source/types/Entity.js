@@ -6,11 +6,39 @@
 
 import util from 'util';
 import GlobalScope from 'types/GlobalScope';
+import Collection from 'types/Collection';
 
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
 		return _target ? (_target.jquery ? _target : $(_target)) : this
+	}
+
+	function ResponsibilityRecord (_name, _ability) {
+		this.name = _name;
+		this.ability = _ability;
+	}
+
+	function behaviorGreeter (_event) {
+		var i, record;
+
+		for (i=0; record = this.responsibilities[i]; i+=1) {
+			if (record.name === _event.name) {
+				record.ability.call(this, _event);
+				_event.stopPropagation();
+			}
+		}
+	}
+
+	function attachBehaviorEvent () {
+		if (this.isMemberSafe('responsibilities')) {
+			parentScope = this.parent().scope();
+			if (parentScope) {
+				parentScope.on('behavior', this.bind(behaviorGreeter));
+			}
+		}
+
+		return this;
 	}
 
 	this.handleProperty(function () {
@@ -53,10 +81,12 @@ var Entity = GlobalScope.extend(function () {
 
 	this.timeoutID = null;
 	this.intervalID = null;
+	this.responsibilities = null;
 
 	this.setup = function () {
 		this.proto();
 		this.captureAudioAssets();
+		attachBehaviorEvent.call(this);
 
 		return this;
 	};
@@ -67,7 +97,9 @@ var Entity = GlobalScope.extend(function () {
 
 			behaviorEvent = {
 				name: _name,
-				targetScope: this
+				message: '',
+				targetScope: this,
+				behaviorTarget: this
 			};
 
 			result = _method.apply(this, arguments);
@@ -82,8 +114,38 @@ var Entity = GlobalScope.extend(function () {
 		};
 	};
 
-	this.ability = function () {
-		// body...
+	this.respond = function () {
+		var name, ability, parentScope;
+
+		if (!this.hasOwnProperty('responsibilities')) {
+			this.responsibilities = Collection.create();
+		}
+
+		if (arguments.length === 1) {
+			switch (typeof arguments[0]) {
+				case 'string': name = arguments[0]; break;
+
+				case 'function':
+				case 'object': ability = arguments[0]; break;
+			}
+		}
+
+		else {
+			name = arguments[0];
+			ability = arguments[1];
+		}
+
+		switch (typeof ability) {
+			case 'object':
+				for (name in ability) {
+					this.respond(name, ability[name]);
+				}
+				break;
+
+			case 'function':
+				this.responsibilities.add(new ResponsibilityRecord(name, ability));
+				break;
+		}
 	};
 
 	this.delay = function (_time, _cb) {
@@ -104,16 +166,6 @@ var Entity = GlobalScope.extend(function () {
 		this.intervalID = setInterval(function() {
 			_cb.call(screen);
 		}, _time);
-	};
-
-	this.state = function (_test) {
-		var classes;
-
-		if (_test) return this.hasClass(_test);
-
-		classes = this.attr('class').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
-
-		return classes && (classes.length === 1 ? classes[0] : classes);
 	};
 
 	this.open = function (_target) {
