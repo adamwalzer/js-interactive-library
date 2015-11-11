@@ -2,7 +2,7 @@
 *  GlobalScope
 */
 
-import Scope from 'types/Scope';
+import { Scope } from 'types/Scope';
 
 var GlobalScope = Scope.extend(function () {
 	

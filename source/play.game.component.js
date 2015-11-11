@@ -37,7 +37,10 @@ COMPONENTS = [];
 	this.load = function (_name, _callback) {
 		var path
 
-		if (component.get(_name)) return null;
+		if (component.get(_name)) {
+			if (_callback) _callback.apply(component, arguments);
+			return null;
+		}
 
 		path = pl.game.config('componentDirectory')+_name+'/behavior.js';
 
@@ -61,7 +64,7 @@ COMPONENTS = [];
 
 			if (~queue.indexOf(name)) return;
 			
-			console.log('** loading component', name);
+			console.log('* loading', name, '(component source)');
 
 			queue.push(name);
 			component.load(name, function () {

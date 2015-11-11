@@ -21,7 +21,7 @@ var Entity = GlobalScope.extend(function () {
 
 	function behaviorGreeter (_event) {
 		var i, record;
-
+		console.log('behavior');
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
 				record.ability.call(this, _event);
@@ -31,9 +31,12 @@ var Entity = GlobalScope.extend(function () {
 	}
 
 	function attachBehaviorEvent () {
+		console.log('attachBehaviorEvent', this.id(), this.isMemberSafe('responsibilities'));
+
 		if (this.isMemberSafe('responsibilities')) {
 			parentScope = this.parent().scope();
 			if (parentScope) {
+				console.log('attachBehaviorEvent')
 				parentScope.on('behavior', this.bind(behaviorGreeter));
 			}
 		}
@@ -83,9 +86,8 @@ var Entity = GlobalScope.extend(function () {
 	this.intervalID = null;
 	this.responsibilities = null;
 
-	this.setup = function () {
-		this.proto();
-		this.captureAudioAssets();
+	this.init = function () {
+		console.log('Entity::init()');
 		attachBehaviorEvent.call(this);
 
 		return this;
@@ -134,6 +136,9 @@ var Entity = GlobalScope.extend(function () {
 			name = arguments[0];
 			ability = arguments[1];
 		}
+
+		console.log('define response', name, this);
+		debugger;
 
 		switch (typeof ability) {
 			case 'object':

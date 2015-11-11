@@ -79,6 +79,10 @@ var util = new (function () {
 		return _collection && _collection[index];
 	};
 
+	this.transformId = function (_id) {
+		return _id && _id.replace(/[-\s]+/g, '_');
+	};
+
 });
 
 export default util;

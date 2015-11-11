@@ -125,6 +125,15 @@ var Basic = {
 		}
 
 		return method.apply(this, arguments);
+	},
+
+	toString: function () {
+		var type;
+		
+		type = this.baseType.replace('TYPE_', '');
+		type = type.slice(0,1)+type.slice(1).toLowerCase();
+
+		return '[object '+type+']';
 	}
 
 };

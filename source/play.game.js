@@ -67,7 +67,7 @@ READY_QUEUE = [];
 		game.trigger('dom-ready');
 
 		game.component.loadAll(function () {
-			console.log('* All components loaded.');
+			console.log('** All component sources loaded.');
 			initialize(GAMES);
 		});
 	};
