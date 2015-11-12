@@ -64,7 +64,7 @@ COMPONENTS = [];
 
 			if (~queue.indexOf(name)) return;
 			
-			console.log('* loading', name, '(component source)');
+			// console.log('* loading', name, '(component source)');
 
 			queue.push(name);
 			component.load(name, function () {

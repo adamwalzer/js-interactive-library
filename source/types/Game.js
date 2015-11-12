@@ -60,7 +60,6 @@ var Game = GlobalScope.extend(function () {
 		if (!this.hasOwnProperty('screens')) return this;
 
 		scope = this;
-		// Screen = game.provideScreenType();
 		screenSelector = pl.game.config('screenSelector');
 		prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
 		collection = [];
@@ -79,6 +78,8 @@ var Game = GlobalScope.extend(function () {
 			screen.screen = screen;
 			screen.game = scope;
 
+			// console.log('capture', screen.id());
+
 			collection.push(screen);
 			
 			if (id||component) scope[util.transformId(id||component)] = screen;
@@ -94,15 +95,31 @@ var Game = GlobalScope.extend(function () {
 	this.watchAudio = function () {
 		var playing;
 
-		playing = [];
+		playing = Collection.create();
 
 		this.on('audio-play', function (_event) {
-			if (!~playing.indexOf(_event.audioType)) {
-				playing.push(_event.audioType);
+			var current;
+
+			current = playing.filter(_event.audioType, 'type');
+
+			if (!current) {
+				playing.push({
+					audio: _event.target,
+					type: _event.audioType
+				});
+				console.log('start: playing', playing.length, current);
+			}
+
+			else {
+				current.forEach(function (_record) {
+					console.log('pause', current.length, _event.audioType, [_record.audio.paused, _record.audio.currentTime]);
+					_record.audio.pause();
+					_record.audio.currentTime = 0;
+				});
 			}
 
 			if (_event.audioType === 'voice-over') {
-				if (~playing.indexOf('background')) {
+				if (playing.get('background', 'type')) {
 					this.audio.background.music.volume = 0.2;
 				}
 			}
@@ -111,10 +128,11 @@ var Game = GlobalScope.extend(function () {
 		this.on('audio-ended', function (_event) {
 			var index;
 
-			index = playing.indexOf(_event.audioType);
-			if (~index) playing.splice(index, 1);
+			playing.remove(playing.get(_event.audioType, 'type'));
 
-			if (_event.audioType === 'voice-over') {
+			console.log('stop: playing', playing);
+
+			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
 				this.audio.background.music.volume = 1;
 			}
 		});

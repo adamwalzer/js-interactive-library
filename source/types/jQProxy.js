@@ -23,8 +23,14 @@ var jQProxy = Basic.extend(function () {
 			var response;
 
 			// This makes sure your not calling any jQuery methods before initialization.
-			if (!this.$els) {
-				console.error('ReferenceError: Unable to invoke', _name, 'because the scope is not initialized.');
+			if (!this.hasOwnProperty('$els')) {
+				if (_name === 'on') {
+					this.registerHandler(arguments);
+				}
+
+				else {
+					throw new ReferenceError('Unable to invoke '+_name+' because the scope is not initialized.');
+				}
 				return;
 			}
 
@@ -67,11 +73,32 @@ var jQProxy = Basic.extend(function () {
 
 	this.baseType = 'TYPE_JQPROXY';
 	this.$els = null;
+	this.eventRegistry = null;
 
 	for (method in $.fn) {
 		if (!$.fn.hasOwnProperty(method) || ~exclude.indexOf(method)) continue;
 		this[method] = createProxyFunction(method);
 	}
+
+	this.registerHandler = function (_definition) {
+		if (!this.hasOwnProperty('eventRegistry')) {
+			this.eventRegistry = [];
+		}
+
+		this.eventRegistry.push(_definition);
+	};
+
+	this.attachEvents = function () {
+		var self;
+
+		self = this;
+
+		if (this.hasOwnProperty('eventRegistry')) {
+			this.eventRegistry.forEach(function (_definition) {
+				self.on.apply(self, _definition);
+			});
+		}
+	};
 
 	this.findOwn = function (_selector) {
 		var scope;

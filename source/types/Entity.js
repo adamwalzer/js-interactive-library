@@ -21,7 +21,7 @@ var Entity = GlobalScope.extend(function () {
 
 	function behaviorGreeter (_event) {
 		var i, record;
-		console.log('behavior');
+
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
 				record.ability.call(this, _event);
@@ -31,18 +31,28 @@ var Entity = GlobalScope.extend(function () {
 	}
 
 	function attachBehaviorEvent () {
-		console.log('attachBehaviorEvent', this.id(), this.isMemberSafe('responsibilities'));
-
 		if (this.isMemberSafe('responsibilities')) {
 			parentScope = this.parent().scope();
 			if (parentScope) {
-				console.log('attachBehaviorEvent')
 				parentScope.on('behavior', this.bind(behaviorGreeter));
 			}
 		}
 
 		return this;
 	}
+
+	this.baseType = 'TYPE_ENTITY';
+	this.STATE = {
+		SELECTED: 'SELECTED',
+		PLAYING: 'PLAYING',
+		BACKGROUND: 'BACKGROUND',
+		VOICE_OVER: 'VOICE-OVER'
+	};
+
+	this.timeoutID = null;
+	this.intervalID = null;
+	this.responsibilities = null;
+	this.isComplete = false;
 
 	this.handleProperty(function () {
 		this.size = function (_node, _name, _value, _property) {
@@ -70,24 +80,7 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
-	this.baseType = 'TYPE_ENTITY';
-	this.STATE = {
-		OPEN: 'OPEN',
-		LEAVE: 'LEAVE',
-		ENABLED: 'ENABLED',
-		DISABLED: 'DISABLED',
-		SELECTED: 'SELECTED',
-		PLAYING: 'PLAYING',
-		BACKGROUND: 'BACKGROUND',
-		VOICE_OVER: 'VOICE-OVER'
-	};
-
-	this.timeoutID = null;
-	this.intervalID = null;
-	this.responsibilities = null;
-
-	this.init = function () {
-		console.log('Entity::init()');
+	this.__init = function () {
 		attachBehaviorEvent.call(this);
 
 		return this;
@@ -137,9 +130,6 @@ var Entity = GlobalScope.extend(function () {
 			ability = arguments[1];
 		}
 
-		console.log('define response', name, this);
-		debugger;
-
 		switch (typeof ability) {
 			case 'object':
 				for (name in ability) {
@@ -173,26 +163,83 @@ var Entity = GlobalScope.extend(function () {
 		}, _time);
 	};
 
-	this.open = function (_target) {
-		return resolveTarget.call(this, _target).removeClass(this.STATE.LEAVE).addClass(this.STATE.OPEN);
+	this.kill = function (_timer) {
+		if (_timer === 'repeat') {
+			clearInterval(this.intervalID);
+		}
+
+		else {
+			clearTimeout(this.timeoutID);
+		}
+
+		return this;
 	};
 
-	this.close = function (_target) {
-		return resolveTarget.call(this, _target).removeClass(this.STATE.OPEN);
+	this.state = function (_flag, _definition, _imp) {
+		var flag, def, opperations;
+
+		if (!_definition) {
+			return this.proto(_flag);
+		}
+
+		def = _definition.split(/\s+/);
+		opperations = [];
+
+		def.forEach(this.bind(function (_opp) {
+			var method, flag;
+
+			method = (_opp.slice(0, 1) === '+') ? 'addClass' : 'removeClass';
+
+			opperations.push({
+				method: method,
+				flag: _opp.slice(1)
+			});
+
+			if (method === 'addClass') {
+				flag = _opp.slice(1);
+				this.STATE[util.transformId(flag)] = flag;
+			}
+		}));
+
+		
+
+		this[_flag] = function (_target) {
+			var target, uiStateEvent;
+
+			target = resolveTarget.call(this, _target);
+			uiStateEvent = $.Event('ui-'+_flag, { targetScope: this });
+
+			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
+
+			opperations.forEach(function (_record) {
+				target[_record.method](_record.flag);
+			});
+
+			if (_imp && _imp.didSet) _imp.didSet.apply(this, arguments);
+
+			this.trigger(uiStateEvent);
+
+			return target;
+		}
 	};
 
-	this.leave = function (_target) {
-		this.close(_target);
-		return resolveTarget.call(this, _target).addClass(this.STATE.LEAVE);
-	};
+	this.behavior('complete', function () {
+		this.isComplete = true;
 
-	this.enable = function (_target) {
-		return resolveTarget.call(this, _target).removeClass(this.STATE.DISABLED).addClass(this.STATE.ENABLED);
-	};
+		return {
+			behaviorTarget: this
+		};
+	});
 
-	this.disable = function (_target) {
-		return resolveTarget.call(this, _target).removeClass(this.STATE.ENABLED).addClass(this.STATE.DISABLED);
-	};
+	this.state('open', '+OPEN -LEAVE');
+	this.state('close', '-OPEN');
+	this.state('leave', '+LEAVE', {
+		willSet: function (_target) {
+			this.close(_target);
+		}
+	});
+	this.state('enable', '+ENABLED -DISABLED');
+	this.state('disable', '+DISABLED -ENABLED');
 
 });
 

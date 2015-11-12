@@ -42,7 +42,7 @@
 			border-radius: 4px;
 			transform: translateZ(-300px);
 			transition: transform 1s, opacity 1s;
-			z-index: -1;
+			/*z-index: -1;*/
 		}
 
 		.screen.READY {
@@ -51,12 +51,13 @@
 
 		.screen.OPEN {
 			opacity: 1;
-			z-index: auto;
+			z-index: 1;
 			transform: translateZ(0);
 		}
 
 		.screen.LEAVE {
 			opacity: 0;
+			z-index: -1;
 			transform: translateZ(300px);
 		}
 
@@ -89,26 +90,47 @@
 		text-align: center;
 	}
 
-	#bears .bears-carousel img {
-		padding: 30px;
+	#bears .bears-carousel {
+		z-index: 1;
 	}
-
-	#bears .cannon-component {
-		text-align: center;
-	}
-
-		#bears .cannon-component img {
-			width: 100px;
-			cursor: pointer;
+		#bears .bears-carousel img {
+			padding: 30px;
+			transition-duration: 0.5s;
 		}
+
+		#bears .cannon-component {
+			text-align: center;
+		}
+
+			#bears .cannon-component img {
+				width: 100px;
+				cursor: pointer;
+			}
+
+		#bears .score-component {
+			text-align: center;
+			font-size: 2em;
+			font-weight: bold;
+		}
+
 	</style>
 
 	<script type="text/javascript">
 	pl.game('carousel', function () {
+
+		function next () {
+			var nextScreen;
+			nextScreen = this.proto();
+
+			if (nextScreen) {
+				this.leave();
+				nextScreen.open();
+			}
+
+			return nextScreen;
+		};
 		
 		this.screen('welcome', function () {
-			
-			this.timeout = null;
 			
 			this.ready = function () {
 				this.delay(1000, this.open);
@@ -116,12 +138,11 @@
 				return this;
 			};
 
-			this.next = function () {
-				return this
-					.leave()
-					.proto()
-					.open();
-			};
+			// this.on('open', function (_target) {
+			// 	this.complete();
+			// });
+
+			this.next = next;
 
 		});
 
@@ -148,49 +169,61 @@
 
 					if ($target.id() === _event.message) {
 						this.score.up();
-						console.log('Correct', this.points);
 					}
 
 					else {
-						console.log('Inccorect', this.reval.item($target.id()));
+						this.reval.item($target.id());
 					}
 				}
 			});
 
-			
-			this.open = function (_target) {
-				if (!this.carousel.isPlaying) this.carousel.beginShow();
-				return this.proto(_target);
+			this.respond('next', function () {
+				if (this.cannon.didLaunch()) this.cannon.reload();
+			});
+
+			this.on('ui-open', function (_event) {
+				if (this === _event.targetScope) {
+					this.start();	
+				}
+			});
+
+			this.on('ui-leave', function (_event) {
+				if (this === _event.targetScope) {
+					this.stop();	
+				}
+			});
+
+			this.start = function () {
+				if (!this.carousel.isPlaying) this.carousel.start();
 			};
 
-			this.next = function () {
-				return this
-					.leave()
-					.proto()
-					.open();
+			this.stop = function () {
+				this.carousel.stop();
 			};
+
+			this.next = next;
 
 		});
 
 		this.screen('be-bright', function () {
 
-			this.open = function () {
-				if (this.isReady) {
-					this.audio.voiceOver.intro.play();
+			this.on('ui-open', function (_event) {
+				if (this.isReady && this === _event.targetScope) {
+					this.start();
 				}
-				
-				return this.sup();
-			};
+			});
 
 			this.ready = function () {
 				if (this.state(this.STATE.OPEN)) {
-					this.audio.voiceOver.intro.play();
+					this.start()
 				}
 			};
 
-			this.next = function () {
-				return this.leave().proto().open();
+			this.start = function () {
+				this.audio.voiceOver.intro.play();
 			};
+
+			this.next = next;
 
 		});
 
@@ -200,7 +233,7 @@
 
 </head>
 <body id="carousel">
-	<audio id="music" class="background" src="media/audio/Instrumentals.mp3" preload autoplay></audio>
+	<audio id="music" class="background" src="media/audio/Instrumentals.mp3" preload ></audio>
 	<div class="center">
 		<div id="screens">
 
@@ -212,19 +245,23 @@
 			</section>
 
 			<section id="bears" class="screen">
-				<div pl-component="score" pl-max="5"></div>
-				<div class="bears-carousel slide" pl-component="carousel" pl-size="33%, auto" pl-randomize>
+				<div class="score" pl-component="score" pl-max="5"></div>
+				<div class="bears-carousel slide" pl-component="carousel" pl-size="33%, auto" pl-randomize pl-delay="1000">
 					<img pl-id="andean" src="images/carousel_andean_bear2.png">
 					<img pl-id="asiatic" src="images/carousel_asiatic_black_bear2.png">
 					<img pl-id="black" src="images/carousel_black_bear2.png">
 					<img pl-id="brown" src="images/carousel_brown_bear2.png">
-					<img pl-id="panda" src="images/carousel_panda2.png">
+					<!-- <img pl-id="panda" src="images/carousel_panda2.png">
 					<img pl-id="polar" src="images/carousel_polar_bear2.png">
 					<img pl-id="sloth" src="images/carousel_sloth_bear2.png">
-					<img pl-id="sun" src="images/carousel_sun_bear2.png">
+					<img pl-id="sun" src="images/carousel_sun_bear2.png"> -->
 				</div>
 				<div pl-component="cannon" pl-fire="polar"></div>
 				<div pl-component="reval">
+					<audio class="voice-over" src="media/audio/messageOne.mp3" preload></audio>
+					<audio class="voice-over" src="media/audio/messageTwo.mp3" preload></audio>
+					<audio class="voice-over" src="media/audio/messageThree.mp3" preload></audio>
+					<audio class="voice-over" src="media/audio/messageFour.mp3" preload></audio>
 					<ul>
 						<li pl-id="andean">Andean Bear</li>
 						<li pl-id="asiatic">Asiatic Black Bear</li>

@@ -14,6 +14,13 @@ pl.game.component('carousel', function () {
 	this.nodes = null;
 	this.shouldRandomize = false;
 	this.isPlaying = false;
+	this.delay = 3000;
+
+	this.handleProperty(function () {
+		this.delay = function (_node, _name, _value, _property) {
+			this.delay = Number(_value);
+		};
+	});
 
 	this.ready = function () {
 		this.$images = this.find('img');
@@ -31,7 +38,7 @@ pl.game.component('carousel', function () {
 		}));
 
 		this.on('transitionend', function (_event) {
-			if (_event.target.nodeName === 'IMG' && $(_event.target).hasClass(this.STATE.LEAVE)) {
+			if (_event.target.nodeName === 'IMG' && $(_event.target).state(this.STATE.LEAVE)) {
 				this.recycle();
 			}
 		});
@@ -48,11 +55,20 @@ pl.game.component('carousel', function () {
 		};
 	});
 
-	this.beginShow = function () {
+	this.behavior('next', function () {
+		var current;
+
+		current = this.$images.first();
+
+		this.leave(current);
+		this.open(current.next());
+	});
+
+	this.start = function () {
 		if (this.isReady) {
 			this.isPlaying = true;
-			this.open(this.current());
-			this.repeat(3000, this.next);
+			this.open(this.$images.first());
+			this.repeat(this.delay, this.next);
 		}
 		
 		else {
@@ -60,19 +76,18 @@ pl.game.component('carousel', function () {
 		}
 	};
 
-	this.current = function () {
-		return this.$images.first();
+	this.stop = function () {
+		this.kill('repeat');
 	};
 
-	this.next = function () {
-		this.leave(this.current());
-		this.open(this.$images.eq(1));
+	this.current = function () {
+		return this.$images.filter('.OPEN');
 	};
 
 	this.recycle = function () {
 		var $current, reload;
 
-		$current = this.current();
+		$current = this.$images.first();
 		reload = this.reloadWithNode(this.$images[0]);
 
 		console.log()
@@ -106,4 +121,6 @@ pl.game.component('carousel', function () {
 	this.provideBehaviorTarget = function () {
 		return this.current();
 	};
+
+
 });

@@ -190,22 +190,18 @@ var Scope = jQProxy.extend(function () {
 
 			$node = this.find(_record.selector);
 
-			console.log('initializeEntities: '+$node.id());
-
 			if (!Scope.isPrototypeOf(_record)) {
 				instance = createEntity.call(this, $node, _record.implementation);
 				this.entities[_index] = instance;
 
 				if (!instance.isReady) {
 					this.assetQueue.add(instance);
-					console.log('   queue add', instance.id(), instance.isReady);
 				}
 				
 			}
 
 			else {
 				instance = _record;
-				console.log('   scope queue add '+instance);
 			}
 			
 			id = transformId(instance.id());
@@ -269,12 +265,12 @@ var Scope = jQProxy.extend(function () {
 
 		this.watchAssets();
 		this.captureAudioAssets();
+		this.captureReferences();
 
+		this.__init();
 		invokeLocal.call(this, 'init');
 
 		if (!this.isReady) this.assetQueue.ready();
-
-		// game.queue.complete(this, 'initialized');
 
 		return this;
 	}
@@ -288,6 +284,7 @@ var Scope = jQProxy.extend(function () {
 		this.addClass('READY');
 		this.trigger(readyEvent);
 
+		this.__ready();
 		invokeLocal.call(this, 'ready');
 	}
 
@@ -379,15 +376,12 @@ var Scope = jQProxy.extend(function () {
 		return this;
 	};
 
+	// only for use in base types
+	this.__init = function () { return this; };
+	this.__ready = function () { return this; };
+
 	this.willInit = function () { return this; };
 	this.init = function () { return this; };
-
-	this.setup = function () {
-		// this.watchAssets();
-		// return handleProperties.call(this);
-		return this;
-	};
-
 	this.ready = function () { return this; };
 
 	this.watchAssets = function () {
@@ -449,6 +443,8 @@ var Scope = jQProxy.extend(function () {
 	this.attachEvents = function () {
 		var scope;
 
+		this.proto();
+
 		scope = this;
 
 		this.assetQueue.on('complete', function () {
@@ -468,6 +464,19 @@ var Scope = jQProxy.extend(function () {
 		});
 
 		return this;
+	};
+
+	this.captureReferences = function () {
+		this.findOwn('[id], [pl-id]').each(this.bind(function (_index, _node) {
+			var $node, id;
+
+			$node = $(_node);
+			id = $node.attr('id') || $node.attr('pl-id');
+
+			if (!this[id]) {
+				this[id] = $node.data('pl-scope') || $node;
+			}
+		}));
 	};
 
 	this.captureAudioAssets = function () {
@@ -639,8 +648,6 @@ var Scope = jQProxy.extend(function () {
 		};
 
 		this.action = function (_node, _name, _value, _property) {
-			console.log('action', this.id(), _value);
-
 			if (!this.hasOwnProperty('actionables')) {
 				this.actionables = Actionables.create();
 				attachActionHandler.call(this);	
