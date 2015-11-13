@@ -621,7 +621,7 @@ var Scope = jQProxy.extend(function () {
 
 		child = Scope.isPrototypeOf(_child) ? _child.$els : _child;
 
-		return !!this.$els.has(child);
+		return !!this.$els.has(child).length;
 	};
 
 	this.handleProperty(function () {

@@ -1,13 +1,6 @@
 pl.game.component('score', function () {
 
 	this.value = 0;
-	this.max = 0;
-
-	this.handleProperty(function () {
-		this.max = function (_node, _name, _value, _property) {
-			this.max = Number(_value);
-		};
-	});
 
 	this.entity('.board', function () {
 		
@@ -37,7 +30,10 @@ pl.game.component('score', function () {
 
 		this.board.render();
 
-		if (this.value === this.max) {
+		console.log('score', this.value, this.properties.max)
+
+		if (this.value == this.properties.max) {
+			console.log('oh word');
 			this.complete();
 		}
 
@@ -49,7 +45,7 @@ pl.game.component('score', function () {
 
 		this.board.render();
 		
-		if (this.value === this.max) {
+		if (this.value == this.properties.max) {
 			this.complete();
 		}
 

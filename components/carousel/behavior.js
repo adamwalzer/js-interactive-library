@@ -44,6 +44,14 @@ pl.game.component('carousel', function () {
 		});
 	};
 
+	this.provideBehaviorTarget = function () {
+		return this.current();
+	};
+
+	this.provideBehaviorEventScope = function () {
+		return this.parent().scope();
+	};
+
 	this.respond('fire', function (_event) {
 		this.hit(_event.message);
 	});
@@ -116,10 +124,6 @@ pl.game.component('carousel', function () {
 		}
 
 		return _item;
-	};
-
-	this.provideBehaviorTarget = function () {
-		return this.current();
 	};
 
 

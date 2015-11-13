@@ -24,17 +24,20 @@ var Entity = GlobalScope.extend(function () {
 
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
-				record.ability.call(this, _event);
-				_event.stopPropagation();
+				if (!record.ability.call(this, _event)) {
+					_event.stopPropagation();
+				}
 			}
 		}
 	}
 
 	function attachBehaviorEvent () {
+		var scope;
+
 		if (this.isMemberSafe('responsibilities')) {
-			parentScope = this.parent().scope();
-			if (parentScope) {
-				parentScope.on('behavior', this.bind(behaviorGreeter));
+			scope = this.provideBehaviorEventScope();
+			if (scope) {
+				scope.on('behavior', this.bind(behaviorGreeter));
 			}
 		}
 
@@ -53,6 +56,7 @@ var Entity = GlobalScope.extend(function () {
 	this.intervalID = null;
 	this.responsibilities = null;
 	this.isComplete = false;
+	this.shouldInheritAbilities = true;
 
 	this.handleProperty(function () {
 		this.size = function (_node, _name, _value, _property) {
@@ -103,6 +107,8 @@ var Entity = GlobalScope.extend(function () {
 				behaviorEvent = util.mixin(behaviorEvent, result);
 			}
 
+			// console.log('BEHAVIOR', _name, this.id());
+
 			this.trigger($.Event('behavior', behaviorEvent));
 
 			return this;
@@ -110,10 +116,17 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.respond = function () {
-		var name, ability, parentScope;
+		var name, ability, parentScope, abilities, protoAbilities;
 
 		if (!this.hasOwnProperty('responsibilities')) {
-			this.responsibilities = Collection.create();
+			abilities = Collection.create();
+			protoAbilities = this.provideAblilityPototype();
+
+			if (this.shouldInheritAbilities && (protoAbilities && protoAbilities.responsibilities)) {
+				abilities.push.apply(abilities, protoAbilities.responsibilities);
+			}
+
+			this.responsibilities = abilities;
 		}
 
 		if (arguments.length === 1) {
@@ -221,6 +234,18 @@ var Entity = GlobalScope.extend(function () {
 
 			return target;
 		}
+	};
+
+	this.provideBehaviorEventScope = function () {
+		return this;
+	};
+
+	this.provideAblilityPototype = function () {
+		var owner;
+
+		owner = util.getOwner(this, this.baseType);
+
+		return !!owner && owner.object;
 	};
 
 	this.behavior('complete', function () {

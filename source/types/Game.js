@@ -12,6 +12,10 @@ import { createEntity } from 'types/Scope';
 
 var Game = GlobalScope.extend(function () {
 
+	var screenPrototype;
+
+	screenPrototype = Screen;
+
 	this.baseType = 'TYPE_GAME';
 	this.screens = null;
 
@@ -28,12 +32,17 @@ var Game = GlobalScope.extend(function () {
 	this.screen = function (_id, _implementation) {
 		var prototype, selector, screenSelector, instance;
 
+		if (arguments.length === 1 && typeof _id === 'function') {
+			screenPrototype = Screen.extend(_id);
+			return this;
+		}
+
 		if (!this.hasOwnProperty('screens')) this.screens = Collection.create();
 
 		if (this.hasOwnProperty('$els')) {
 			debugger;
 			screenSelector = pl.game.config('screenSelector');
-			prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
+			prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
 			selector = (typeof _id === 'number') ? screenSelector+':nth-child('+(_id+1)+')' : '#'+_id;
 			instance = prototype.extend(_implementation).initialize(this.find(selector));
 
@@ -61,7 +70,7 @@ var Game = GlobalScope.extend(function () {
 
 		scope = this;
 		screenSelector = pl.game.config('screenSelector');
-		prototype = (Screen.isPrototypeOf(this)) ? this : Screen;
+		prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
 		collection = [];
 		
 		this.find(screenSelector).each(function (_index) {
@@ -107,12 +116,12 @@ var Game = GlobalScope.extend(function () {
 					audio: _event.target,
 					type: _event.audioType
 				});
-				console.log('start: playing', playing.length, current);
+				// console.log('start: playing', playing.length, current);
 			}
 
 			else {
 				current.forEach(function (_record) {
-					console.log('pause', current.length, _event.audioType, [_record.audio.paused, _record.audio.currentTime]);
+					// console.log('pause', current.length, _event.audioType, [_record.audio.paused, _record.audio.currentTime]);
 					_record.audio.pause();
 					_record.audio.currentTime = 0;
 				});
@@ -130,7 +139,7 @@ var Game = GlobalScope.extend(function () {
 
 			playing.remove(playing.get(_event.audioType, 'type'));
 
-			console.log('stop: playing', playing);
+			// console.log('stop: playing', playing);
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
 				this.audio.background.music.volume = 1;

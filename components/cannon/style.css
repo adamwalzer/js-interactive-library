@@ -1,13 +1,3 @@
-@keyframes launch {
-	0% {
-		transform: translateY(0);
-	}
-
-	100% {
-		transform: translateY(-100px);
-	}
-}
-
 @keyframes reload {
 	0% {
 		opacity: 0;

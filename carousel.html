@@ -10,6 +10,7 @@
 
 	<link rel="stylesheet" type="text/css" href="style/reset.css">
 	<link rel="stylesheet" type="text/css" href="style/layout.css">
+	<link rel="stylesheet" type="text/css" href="style/animate.css">
 
 	<style type="text/css">
 	body {
@@ -117,32 +118,21 @@
 
 	<script type="text/javascript">
 	pl.game('carousel', function () {
-
-		function next () {
-			var nextScreen;
-			nextScreen = this.proto();
-
-			if (nextScreen) {
-				this.leave();
-				nextScreen.open();
-			}
-
-			return nextScreen;
-		};
 		
-		this.screen('welcome', function () {
-			
-			this.ready = function () {
-				this.delay(1000, this.open);
+		// default behavior for all screens
+		this.screen(function () {
 
-				return this;
+			this.next = function () {
+				var nextScreen;
+				nextScreen = this.proto();
+
+				if (nextScreen) {
+					this.leave();
+					nextScreen.open();
+				}
+
+				return nextScreen;
 			};
-
-			// this.on('open', function (_target) {
-			// 	this.complete();
-			// });
-
-			this.next = next;
 
 		});
 
@@ -201,8 +191,6 @@
 				this.carousel.stop();
 			};
 
-			this.next = next;
-
 		});
 
 		this.screen('be-bright', function () {
@@ -223,8 +211,6 @@
 				this.audio.voiceOver.intro.play();
 			};
 
-			this.next = next;
-
 		});
 
 	});
@@ -237,12 +223,7 @@
 	<div class="center">
 		<div id="screens">
 
-			<section id="welcome" class="screen">
-				<div class="center">
-					<h1>Welcome to the carousel!</h1>
-				</div>
-				<button pl-action="next()">continue</button>
-			</section>
+			<section id="welcome" class="screen" pl-component="title"></section>
 
 			<section id="bears" class="screen">
 				<div class="score" pl-component="score" pl-max="5"></div>
@@ -251,10 +232,10 @@
 					<img pl-id="asiatic" src="images/carousel_asiatic_black_bear2.png">
 					<img pl-id="black" src="images/carousel_black_bear2.png">
 					<img pl-id="brown" src="images/carousel_brown_bear2.png">
-					<!-- <img pl-id="panda" src="images/carousel_panda2.png">
+					<img pl-id="panda" src="images/carousel_panda2.png">
 					<img pl-id="polar" src="images/carousel_polar_bear2.png">
 					<img pl-id="sloth" src="images/carousel_sloth_bear2.png">
-					<img pl-id="sun" src="images/carousel_sun_bear2.png"> -->
+					<img pl-id="sun" src="images/carousel_sun_bear2.png">
 				</div>
 				<div pl-component="cannon" pl-fire="polar"></div>
 				<div pl-component="reval">

@@ -13,7 +13,6 @@ var Screen = Entity.extend(function () {
 	this.game = null;
 	this.screen = null;
 	this.requiredQueue = null;
-	this.isComplete = undefined;
 
 	this.start = function () {
 		return this;
@@ -45,6 +44,10 @@ var Screen = Entity.extend(function () {
 	this.require = function (_entity) {
 		if (!this.hasOwnProperty('requiredQueue')) {
 			this.requiredQueue = Queue.create();
+			this.requiredQueue.on('complete', this.bind(function () {
+				console.log('** screen complete');
+				this.complete();
+			}))
 		}
 
 		this.requiredQueue.add(_entity);
@@ -55,9 +58,12 @@ var Screen = Entity.extend(function () {
 	};
 
 	this.respond('complete', function (_event) {
-		this.requiredQueue.remove(_event.behaviorTarget);
+		if (!this.has(_event.target)) return;
+		if (_event.targetScope === this) return;
 
-		if (!this.requiredQueue.length) this.complete();
+		if (this.requiredQueue.length) {
+			this.requiredQueue.ready(_event.behaviorTarget);
+		}
 	});
 
 });
