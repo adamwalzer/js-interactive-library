@@ -71,7 +71,7 @@
 				opacity: 1;
 			}
 
-		.screen button {
+		.screen > button {
 			position: absolute;
 			bottom: 0; right: 0;
 			border: none;
@@ -121,6 +121,10 @@
 		
 		// default behavior for all screens
 		this.screen(function () {
+
+			this.init = function () {
+				console.log('screen init', this.audio);
+			}
 
 			this.next = function () {
 				var nextScreen;
@@ -224,6 +228,12 @@
 		<div id="screens">
 
 			<section id="welcome" class="screen" pl-component="title"></section>
+
+			<section class="screen" pl-component="multiple-choice" pl-correct="1,3">
+				<article pl-pluck="content">
+					<img src="images/carousel_polar_bear2.png">
+				</article>
+			</section>
 
 			<section id="bears" class="screen">
 				<div class="score" pl-component="score" pl-max="5"></div>

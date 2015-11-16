@@ -250,6 +250,7 @@ var Entity = GlobalScope.extend(function () {
 
 	this.behavior('complete', function () {
 		this.isComplete = true;
+		this.addClass('COMPLETE');
 
 		return {
 			behaviorTarget: this

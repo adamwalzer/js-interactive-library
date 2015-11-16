@@ -54,7 +54,7 @@ var Screen = Entity.extend(function () {
 	};
 
 	this.completed = function () {
-		return !this.requiredQueue || this.requiredQueue.length === 0;
+		return this.isComplete || !this.requiredQueue || this.requiredQueue.length === 0;
 	};
 
 	this.respond('complete', function (_event) {

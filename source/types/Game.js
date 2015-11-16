@@ -135,9 +135,16 @@ var Game = GlobalScope.extend(function () {
 		});
 
 		this.on('audio-ended', function (_event) {
-			var index;
+			var index, scope;
 
-			playing.remove(playing.get(_event.audioType, 'type'));
+			playing.remove(playing.get(_event.target, 'audio'));
+			scope = $(_event.target).scope();
+
+			if (util.isSet(scope, scope.screen, scope.screen.requiredQueue)) {
+				if (scope.screen.requiredQueue.has(_event.target)) {
+					scope.screen.requiredQueue.ready(_event.target);
+				}
+			}
 
 			// console.log('stop: playing', playing);
 

@@ -1,0 +1,13 @@
+.multiple-choice-component {}
+	
+	.multiple-choice-component li {
+		list-style: circle;
+	}
+
+	.multiple-choice-component li.SELECTED {
+		list-style: disc;
+	}
+
+		.multiple-choice-component li button {
+			float: left;
+		}

@@ -83,6 +83,10 @@ var util = new (function () {
 		return _id && _id.replace(/[-\s]+/g, '_');
 	};
 
+	this.isSet = function () {
+		return [].every.call(arguments, function (_arg) { return _arg != null });
+	};
+
 });
 
 export default util;

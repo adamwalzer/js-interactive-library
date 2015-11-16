@@ -52,7 +52,10 @@ var Scope = jQProxy.extend(function () {
 				record = entity.actionables.item(target);
 
 				if (record) {
+					_event.targetScope = entity;
+					entity.event = _event;
 					evalAction(record.action, entity);
+					entity.event = null;
 				}
 			}
 		});
@@ -81,9 +84,40 @@ var Scope = jQProxy.extend(function () {
 		return _id && _id.replace(/[-\s]+/g, '_');
 	}
 
+	function captureDropables (_scope) {
+		var collection;
+
+		collection = [];
+
+		_scope.find('[pl-pluck]').each(function () {
+			var name;
+
+			name = $(this).attr('pl-pluck');
+
+			collection.push(this);
+			collection[name] = this;
+		});
+
+		return collection;
+	}
+
+	function pluckAndDrop (_dropables, _template) {
+		$(_template).find('[pl-drop]').each(function () {
+			var $node, name, dropable;
+
+			$node = $(this);
+			name = $node.attr('pl-drop');
+			dropable = _dropables[name];
+
+			if (dropable) {
+				$node.replaceWith(dropable.children);
+			}
+		});
+	}
+
 	// Protected
 	function loadComponentAssets (_name, _callback) {
-		var scope, path, totalRequests, transclideMode;
+		var scope, path, totalRequests, transclideMode, dropables;
 
 		function ready () {
 			ready.status +=1;
@@ -99,26 +133,34 @@ var Scope = jQProxy.extend(function () {
 		totalRequests = 0;
 		scope = this;
 		path = game.config('componentDirectory')+_name+'/';
-		transclideMode = this.properties.transclide || this.TRANSCLIDE_REPLACE;
+		dropables = captureDropables(this);
+		transclideMode = dropables.length ? this.TRANSCLIDE_PLUCK : (this.properties.transclide || this.TRANSCLIDE_REPLACE);
 		ready.status = 0;
 
-		if (!this.children().length || ~[this.TRANSCLIDE_APPEND, this.TRANSCLIDE_PREPEND].indexOf(transclideMode)) {
+		if (!this.children().length || ~[this.TRANSCLIDE_APPEND, this.TRANSCLIDE_PREPEND, this.TRANSCLIDE_PLUCK].indexOf(transclideMode)) {
 			totalRequests+=1;
 			$('<div>').load(path+'template.html', function () {
 				var memory;
 
 				memory = [];
 
-				if (transclideMode === scope.TRANSCLIDE_APPEND) {
-					scope.append(this.children);
-				}
+				switch (transclideMode) {
+					case scope.TRANSCLIDE_APPEND:
+						scope.append(this.children);
+						break;
 
-				else if (transclideMode === scope.TRANSCLIDE_PREPEND) {
-					scope.prepend(this.children);
-				}
+					case scope.TRANSCLIDE_PREPEND:
+						scope.prepend(this.children);
+						break;
+						
+					case scope.TRANSCLIDE_PLUCK:
+						pluckAndDrop(dropables, this);
+						scope.empty().append(this.children);
+						break;
 
-				else {
-					scope.html(this.innerHTML);
+					default:
+						scope.empty().append(this.children);
+						
 				}
 
 				scope.find('[pl-component]').each(function () {
@@ -332,6 +374,7 @@ var Scope = jQProxy.extend(function () {
 	this.TRANSCLIDE_REPLACE = 'replace';
 	this.TRANSCLIDE_PREPEND = 'prepend';
 	this.TRANSCLIDE_APPEND = 'append';
+	this.TRANSCLIDE_PLUCK = 'pluck';
 
 	this.baseType = 'TYPE_SCOPE';
 	this.actionables = null;
@@ -342,6 +385,7 @@ var Scope = jQProxy.extend(function () {
 	this.properties = null;
 	this.propertyHandlers = null;
 	this.assetQueue = null;
+	this.event = null;
 	
 	this.initialize = function (_node_selector, _componentName) {
 		var scope;
