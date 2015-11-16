@@ -8,7 +8,6 @@ pl.game.component('cannon', function () {
 	});
 
 	this.launch = function () {
-		// debugger;
 		this.ball.removeClass('RELOAD').addClass('LAUNCHED');
 	};
 

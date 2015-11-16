@@ -1,13 +1,13 @@
 pl.game.component('multiple-choice', function () {
 
-	function validateAnswer () {
+	function validateAnswer (_scope) {
 		var answers;
 
-		if (this.properties.correct) {
-			answers = this.properties.correct.split(/\s*,\s*/);
-
-			if (~answers.indexOf(String(this.selected().index()))) {
-				this.complete();
+		if (_scope.properties.correct) {
+			answers = _scope.properties.correct.split(/\s*,\s*/);
+			console.log('selected', _scope.getSelected());
+			if (~answers.indexOf(String(_scope.getSelected().index()))) {
+				_scope.complete();
 			}
 		}
 
@@ -18,24 +18,18 @@ pl.game.component('multiple-choice', function () {
 		this.screen.require(this);
 	};
 
-	this.select = function (_data) {
-		var $li;
-		console.log('select');
+	this.answer = function () {
 		if (this.event) {
 			$li = $(this.event.target).closest('li');
 
-			if ($li.length && !$li.hasClass('SELECTED')) {
-				$li.parent().find('.SELECTED').removeClass('SELECTED');
-				$li.addClass('SELECTED');
-				validateAnswer.call(this);
+			if (this.select($li)) {
+				validateAnswer(this);
 			}
 		}
+	}
 
-		return this;
-	};
-
-	this.selected = function () {
-		return this.find('> ul > .SELECTED');
-	};
+	// this.selected = function () {
+	// 	return this.find('> ul > .SELECTED');
+	// };
 
 });

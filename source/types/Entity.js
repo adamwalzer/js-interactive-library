@@ -46,7 +46,6 @@ var Entity = GlobalScope.extend(function () {
 
 	this.baseType = 'TYPE_ENTITY';
 	this.STATE = {
-		SELECTED: 'SELECTED',
 		PLAYING: 'PLAYING',
 		BACKGROUND: 'BACKGROUND',
 		VOICE_OVER: 'VOICE-OVER'
@@ -106,8 +105,6 @@ var Entity = GlobalScope.extend(function () {
 			if (result) {
 				behaviorEvent = util.mixin(behaviorEvent, result);
 			}
-
-			// console.log('BEHAVIOR', _name, this.id());
 
 			this.trigger($.Event('behavior', behaviorEvent));
 
@@ -189,13 +186,14 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.state = function (_flag, _definition, _imp) {
-		var flag, def, opperations;
+		var flag, tester, setter, getter, STATE, def, opperations, names;
 
 		if (!_definition) {
 			return this.proto(_flag);
 		}
 
 		def = _definition.split(/\s+/);
+		names = _flag.split(/\s+/);
 		opperations = [];
 
 		def.forEach(this.bind(function (_opp) {
@@ -210,22 +208,30 @@ var Entity = GlobalScope.extend(function () {
 
 			if (method === 'addClass') {
 				flag = _opp.slice(1);
-				this.STATE[util.transformId(flag)] = flag;
+				STATE = util.transformId(flag);
+				this.STATE[STATE] = flag;
 			}
 		}));
 
-		
+		setter = names[0];
+		tester = names[1];
 
-		this[_flag] = function (_target) {
+		this[setter] = function (_target) {
 			var target, uiStateEvent;
 
 			target = resolveTarget.call(this, _target);
-			uiStateEvent = $.Event('ui-'+_flag, {
+			uiStateEvent = $.Event('ui-'+setter, {
 				target: target.jquery ? target[0] : target,
 				targetScope: this
 			});
 
+			if (target.hasClass(this.STATE[STATE])) return false;
+
 			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
+
+			if (_imp && _imp.shouldSet && _imp.shouldSet.apply(this, arguments) === false) {
+				return false;
+			}
 
 			opperations.forEach(function (_record) {
 				target[_record.method](_record.flag);
@@ -236,6 +242,22 @@ var Entity = GlobalScope.extend(function () {
 			this.trigger(uiStateEvent);
 
 			return target;
+		};
+
+		if (tester) {
+			getter = 'get' + tester.slice(0, 1).toUpperCase() + tester.slice(1);
+
+			this[tester] = function (_target) {
+				var target;
+
+				target = resolveTarget.call(this, _target);
+
+				return target.hasClass(this.STATE[STATE]);
+			};
+
+			this[getter] = function () {
+				return this.findOwn('.'+this.STATE[STATE]);
+			};
 		}
 	};
 
@@ -260,15 +282,35 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
-	this.state('open', '+OPEN -LEAVE');
+	this.state('open opened', '+OPEN -LEAVE');
 	this.state('close', '-OPEN');
 	this.state('leave', '+LEAVE', {
 		willSet: function (_target) {
 			this.close(_target);
 		}
 	});
+
 	this.state('enable', '+ENABLED -DISABLED');
 	this.state('disable', '+DISABLED -ENABLED');
+	this.state('select selected', '+SELECTED', {
+		willSet: function (_target) {
+			var target, $parent;
+			
+			target = resolveTarget.call(this, _target);
+			$parent = target.parent();
+
+			$parent.find('> .SELECTED').each(this.bind(function (_index, _node) {
+				this.deselect(_node);
+			}));
+			$parent.find('> .HIGHLIGHTED').each(this.bind(function (_index, _node) {
+				this.unhighlight(_node);
+			}));
+		}
+	});
+
+	this.state('deselect', '-SELECTED');
+	this.state('highlight', '+HIGHLIGHTED');
+	this.state('unhighlight', '-HIGHLIGHTED');
 
 });
 
