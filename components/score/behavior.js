@@ -19,7 +19,7 @@ pl.game.component('score', function () {
 
 	this.init = function () {
 		this.screen.require(this);
-	}
+	};
 
 	this.ready = function () {
 		this.board.render();

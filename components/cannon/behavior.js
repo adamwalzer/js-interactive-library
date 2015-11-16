@@ -1,13 +1,14 @@
 pl.game.component('cannon', function () {
 
 	this.behavior('fire', function () {
-		this.launch()
+		this.launch();
 		return {
 			message: this.properties.fire
 		};
 	});
 
 	this.launch = function () {
+		// debugger;
 		this.ball.removeClass('RELOAD').addClass('LAUNCHED');
 	};
 

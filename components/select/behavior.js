@@ -16,10 +16,4 @@ pl.game.component('select', function () {
 		return this;
 	};
 
-	this.open = function (_target) {
-		console.log('component open', _target);
-
-		return this.sup(_target);
-	};
-
 });

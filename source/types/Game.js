@@ -23,7 +23,6 @@ var Game = GlobalScope.extend(function () {
 		this.addClass('pl-game');
 
 		this.captureScreens();
-		// this.captureAudioAssets();
 		this.watchAudio();
 
 		return this;
@@ -64,39 +63,34 @@ var Game = GlobalScope.extend(function () {
 	};
 
 	this.captureScreens = function () {
-		var scope, screenSelector, prototype, collection;
+		var screenSelector, prototype, collection;
 
 		if (!this.hasOwnProperty('screens')) return this;
 
-		scope = this;
 		screenSelector = pl.game.config('screenSelector');
 		prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
 		collection = [];
 		
-		this.find(screenSelector).each(function (_index) {
+		this.findOwn(screenSelector).each(this.bind(function (_index, _node) {
 			var $node, screen, record, key, id, index, component;
 
-			// Skip screens that are nested. They will be initialized by their parent scope.
-			if (!scope === $(this).scope()) return;
-
-			$node = $(this);
+			$node = $(_node);
 			id = $node.id();
 			key = (id) ? 'name' : (id = _index, 'index');
-			record = scope.screens.get(id, key);
+			record = this.screens.get(id, key);
+			component = $node.attr('pl-component');
 			screen = createEntity.call(prototype, $node, record && record.implementation);
 			screen.screen = screen;
-			screen.game = scope;
-
-			// console.log('capture', screen.id());
+			screen.game = this;
 
 			collection.push(screen);
 			
-			if (id||component) scope[util.transformId(id||component)] = screen;
-		});
+			if (key === 'name' || component) {
+				this[ util.transformId((key === 'name' && id) || component) ] = screen;
+			}
+		}));
 
 		if (collection.length) this.screens = collection;
-
-		scope = null;
 
 		return this;
 	};

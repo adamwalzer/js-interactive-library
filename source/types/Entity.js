@@ -24,7 +24,7 @@ var Entity = GlobalScope.extend(function () {
 
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
-				if (!record.ability.call(this, _event)) {
+				if (record.ability.call(this, _event) === false) {
 					_event.stopPropagation();
 				}
 			}
@@ -220,7 +220,10 @@ var Entity = GlobalScope.extend(function () {
 			var target, uiStateEvent;
 
 			target = resolveTarget.call(this, _target);
-			uiStateEvent = $.Event('ui-'+_flag, { targetScope: this });
+			uiStateEvent = $.Event('ui-'+_flag, {
+				target: target.jquery ? target[0] : target,
+				targetScope: this
+			});
 
 			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
 

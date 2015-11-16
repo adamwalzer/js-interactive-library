@@ -29,6 +29,7 @@ pl.game.component('reval', function () {
 		var vo, index;
 
 		this.close(this.find('li.OPEN'));
+			console.log('item', _id);
 
 		if (typeof _id === 'number') {
 			this.open(this.find('li').eq(_id));

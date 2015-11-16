@@ -89,7 +89,7 @@ var Scope = jQProxy.extend(function () {
 
 		collection = [];
 
-		_scope.find('[pl-pluck]').each(function () {
+		_scope.find('> [pl-pluck]').each(function () {
 			var name;
 
 			name = $(this).attr('pl-pluck');
@@ -117,7 +117,7 @@ var Scope = jQProxy.extend(function () {
 
 	// Protected
 	function loadComponentAssets (_name, _callback) {
-		var scope, path, totalRequests, transclideMode, dropables;
+		var scope, path, totalRequests, transcludeMode, dropables;
 
 		function ready () {
 			ready.status +=1;
@@ -125,7 +125,6 @@ var Scope = jQProxy.extend(function () {
 			if (ready.status === totalRequests) {
 				if (_callback) {
 					_callback.call(scope, _name);
-					// scope.assetQueue.ready(_name);
 				}
 			}
 		}
@@ -134,32 +133,45 @@ var Scope = jQProxy.extend(function () {
 		scope = this;
 		path = game.config('componentDirectory')+_name+'/';
 		dropables = captureDropables(this);
-		transclideMode = dropables.length ? this.TRANSCLIDE_PLUCK : (this.properties.transclide || this.TRANSCLIDE_REPLACE);
+		transcludeMode = dropables.length ? this.TRANSCLUDE_PLUCK : this.properties.transclude;
 		ready.status = 0;
 
-		if (!this.children().length || ~[this.TRANSCLIDE_APPEND, this.TRANSCLIDE_PREPEND, this.TRANSCLIDE_PLUCK].indexOf(transclideMode)) {
+		if (!this.children().length || transcludeMode) {
 			totalRequests+=1;
 			$('<div>').load(path+'template.html', function () {
 				var memory;
 
 				memory = [];
 
-				switch (transclideMode) {
-					case scope.TRANSCLIDE_APPEND:
+				switch (transcludeMode) {
+					case scope.TRANSCLUDE_APPEND:
 						scope.append(this.children);
 						break;
 
-					case scope.TRANSCLIDE_PREPEND:
+					case scope.TRANSCLUDE_PREPEND:
 						scope.prepend(this.children);
 						break;
 						
-					case scope.TRANSCLIDE_PLUCK:
+					case scope.TRANSCLUDE_PLUCK:
 						pluckAndDrop(dropables, this);
 						scope.empty().append(this.children);
 						break;
 
-					default:
+					case scope.TRANSCLUDE_REPLACE:
 						scope.empty().append(this.children);
+						break;
+
+					default:
+						if (transcludeMode) {
+							pluckAndDrop(new (function () {
+								this[transcludeMode] = scope.node();
+							}), this);
+							scope.empty().append(this.children);
+						}
+
+						else {
+							scope.empty().append(this.children);
+						}
 						
 				}
 
@@ -173,10 +185,8 @@ var Scope = jQProxy.extend(function () {
 					memory.push(name);
 
 					totalRequests+=1;
-					// scope.assetQueue.add(name);
 
 					game.component.load(name, function () {
-						// scope.assetQueue.ready(name);
 						ready();
 					});
 				});
@@ -191,7 +201,7 @@ var Scope = jQProxy.extend(function () {
 				.appendTo(document.body);
 		}
 
-		// if (totalRequests) this.assetQueue.add(_name);
+		if (!totalRequests) _callback && _callback.call(this, _name);
 
 		return this;
 	}
@@ -371,10 +381,10 @@ var Scope = jQProxy.extend(function () {
 
 	}).call([]);
 
-	this.TRANSCLIDE_REPLACE = 'replace';
-	this.TRANSCLIDE_PREPEND = 'prepend';
-	this.TRANSCLIDE_APPEND = 'append';
-	this.TRANSCLIDE_PLUCK = 'pluck';
+	this.TRANSCLUDE_REPLACE = 'replace';
+	this.TRANSCLUDE_PREPEND = 'prepend';
+	this.TRANSCLUDE_APPEND = 'append';
+	this.TRANSCLUDE_PLUCK = 'pluck';
 
 	this.baseType = 'TYPE_SCOPE';
 	this.actionables = null;
@@ -491,20 +501,22 @@ var Scope = jQProxy.extend(function () {
 
 		scope = this;
 
+		// if (this.is('#bears')) debugger;
+
 		this.assetQueue.on('complete', function () {
 			scope.assetQueue.off();
 			ready.call(scope);
 		});
 
 		this.on('ready', function (_event) {
-			// console.log('* ready:', this.id()||this.address(), ', target:', _event.targetScope.id());
+			// console.log('* ready:', this.address(), ', target:', _event.targetScope.address());
 
-			if (this.has(_event.targetScope.$els) && this.assetQueue.has(_event.targetScope)) {
-				// console.log('** update queue', this.assetQueue.length, this.assetQueue.join(', '));
+			if (this.has(_event.targetScope) && this.assetQueue.has(_event.targetScope)) {
+				// console.log('** update queue', _event.targetScope.address(), this.assetQueue.length);
 				this.assetQueue.ready(_event.targetScope);
 			}
 
-			if (!this.assetQueue.length) this.off('ready');
+			if (!this.assetQueue.length && this.isReady) this.off('ready');
 		});
 
 		return this;
@@ -561,6 +573,10 @@ var Scope = jQProxy.extend(function () {
 						}
 						scope.trigger($.Event('audio-'+_event.type, { target: $node[0], targetScope: scope, audioType: _type }));
 					});
+
+					if ($node.attr('pl-required') != null) {
+						scope.screen.require($node[0]);
+					}
 
 					scope.audio[map[_type]].push($node[0]);
 
@@ -624,33 +640,6 @@ var Scope = jQProxy.extend(function () {
 		return this;
 	};
 
-	// Wraps you function 'this' to the scope.
-	// 
-	this.bind = function (_handler) {
-		var scope;
-
-		scope = this;
-
-		return function () {
-			return _handler.apply(scope, arguments);
-		};
-	};
-
-	this.isMemberSafe = function (_name) {
-		var owner;
-
-		if (this[_name] == null) return false;
-		if (this.hasOwnProperty(_name)) return true;
-
-		owner = util.getOwner(this, this[_name]);
-
-		if (Object.getPrototypeOf(this) === owner.object && !owner.object.hasOwnProperty('$els')) {
-			return true;
-		}
-
-		return false;
-	};
-
 	this.toString = function () {
 		var type;
 
@@ -698,6 +687,13 @@ var Scope = jQProxy.extend(function () {
 			}
 
 			this.actionables.add(_node, _value);
+		};
+
+		this.required = function (_node, _name, _value, _property) {
+			if (this.is(_node)) {
+				console.log('**', this.screen.id(), 'require', this.id());
+				this.screen.require(this);
+			}
 		};
 
 	});

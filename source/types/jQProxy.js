@@ -7,6 +7,7 @@
 *  that also targets the same elments. Testing needed.
 */
 
+import util from 'util';
 import Basic from 'types/Basic';
 
 var jQProxy = Basic.extend(function () {
@@ -80,6 +81,10 @@ var jQProxy = Basic.extend(function () {
 		this[method] = createProxyFunction(method);
 	}
 
+	this.node = function () {
+		return this.$els[0];
+	};
+
 	this.registerHandler = function (_definition) {
 		if (!this.hasOwnProperty('eventRegistry')) {
 			this.eventRegistry = [];
@@ -93,21 +98,60 @@ var jQProxy = Basic.extend(function () {
 
 		self = this;
 
-		if (this.hasOwnProperty('eventRegistry')) {
+			if (this.is('#be-bright .reval-component')) debugger;
+
+		if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
 			this.eventRegistry.forEach(function (_definition) {
 				self.on.apply(self, _definition);
 			});
 		}
 	};
 
-	this.findOwn = function (_selector) {
+	// Wraps you function 'this' to the scope.
+	// 
+	this.bind = function (_handler) {
 		var scope;
 
 		scope = this;
 
-		return this.find(_selector).filter(function () {
-			return $(this).scope() === scope;
-		});
+		return function () {
+			return _handler.apply(scope, arguments);
+		};
+	};
+
+	this.findOwn = function (_selector) {
+		return this.find(_selector).filter(this.bind(function (_index, _node) {
+			return $(_node).scope() === this;
+		}));
+	};
+
+	this.isMemberSafe = function (_name) {
+		var owner, elOwner, prototype;
+
+		// if (_name === 'init' && this.is('.board')) debugger;
+
+		if (this.hasOwnProperty(_name)) {
+			return true;
+		}
+
+		else {
+			prototype = Object.getPrototypeOf(this);
+			owner = util.getOwner(this, this[_name]);
+
+			if (owner.object.hasOwnProperty('$els') || prototype.hasOwnProperty('$els')) return false;
+
+			if (prototype.$els) {
+				elOwner = util.getOwner(prototype, prototype.$els);
+
+				if (owner.object.isPrototypeOf(elOwner.object)) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+
+		return false;
 	};
 });
 
