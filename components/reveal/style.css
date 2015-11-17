@@ -1,16 +1,16 @@
-.reval-component {}
+.reveal-component {}
 	
-	.reval-component ul {
+	.reveal-component ul {
 		position: relative;
 		padding: 0;
 	}
 
-		.reval-component li {
+		.reveal-component li {
 			list-style: none;
 			opacity: 0;
 			transition: opacity 0.5s;
 		}
 
-		.reval-component li.OPEN {
+		.reveal-component li.OPEN {
 			opacity: 1;
 		}

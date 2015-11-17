@@ -238,9 +238,19 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) return this;
 
 		this.entities.forEach(this.bind(function (_record, _index) {
-			var $node, instance, id;
+			var $node, instance, id, query, index;
 
 			$node = this.find(_record.selector);
+			query = ['[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']'];
+			index = 0;
+
+			while (!$node.length) {
+				if (index === query.length) {
+					throw new Error("Unable to locate entity with selector", _record.selector);
+				}
+				$node = this.find(query[index]);
+				index+=1;
+			}
 
 			if (!Scope.isPrototypeOf(_record)) {
 				instance = createEntity.call(this, $node, _record.implementation);
@@ -403,6 +413,7 @@ var Scope = jQProxy.extend(function () {
 		scope = this;
 
 		this.isReady = false;
+		this.event = null;
 		this.assetQueue = Queue.create();
 		this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
@@ -563,15 +574,19 @@ var Scope = jQProxy.extend(function () {
 					$node.on('play pause ended', function (_event) {
 						switch (_event.type) {
 							case 'play':
-								scope.addClass('PLAYING '+_type.toUpperCase());
+								scope.screen.addClass('PLAYING '+_type.toUpperCase());
 								break;
 
 							case 'puase':
 							case 'ended':
-								scope.removeClass('PLAYING '+_type.toUpperCase());
+								scope.screen.removeClass('PLAYING '+_type.toUpperCase());
 								break;
 						}
-						scope.trigger($.Event('audio-'+_event.type, { target: $node[0], targetScope: scope, audioType: _type }));
+						scope.trigger($.Event('audio-'+_event.type, {
+							target: $node[0],
+							targetScope: scope,
+							audioType: _type
+						}));
 					});
 
 					if ($node.attr('pl-required') != null) {
@@ -640,6 +655,14 @@ var Scope = jQProxy.extend(function () {
 		return this;
 	};
 
+	this.has = function (_child) {
+		var child;
+
+		child = Scope.isPrototypeOf(_child) ? _child.$els : _child;
+
+		return !!this.$els.has(child).length;
+	};
+
 	this.toString = function () {
 		var type;
 
@@ -647,14 +670,6 @@ var Scope = jQProxy.extend(function () {
 		type = type.slice(0,1)+type.slice(1).toLowerCase();
 
 		return ['[', this.id() || this.address(), ' ', type, ']'].join('');
-	};
-
-	this.has = function (_child) {
-		var child;
-
-		child = Scope.isPrototypeOf(_child) ? _child.$els : _child;
-
-		return !!this.$els.has(child).length;
 	};
 
 	this.handleProperty(function () {
@@ -691,7 +706,7 @@ var Scope = jQProxy.extend(function () {
 
 		this.required = function (_node, _name, _value, _property) {
 			if (this.is(_node)) {
-				console.log('**', this.screen.id(), 'require', this.id());
+				console.log('**', this.screen.id(), 'require', this.id(), this.screen);
 				this.screen.require(this);
 			}
 		};

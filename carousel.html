@@ -173,7 +173,7 @@
 					// }
 
 					// else {
-						this.reval.item($target.id());
+						this.reveal.item($target.id());
 					// }
 				}
 			});
@@ -213,6 +213,7 @@
 			<section id="welcome" class="screen" pl-component="title"></section>
 
 			<section class="screen" pl-component="screen-basic" pl-transclude="content">
+				<div pl-component="timer" pl-set="15s" pl-required></div>
 				<div pl-component="multiple-choice" pl-correct="1,3" pl-required>
 					<div pl-pluck="content">
 						<img src="images/carousel_polar_bear2.png">
@@ -223,7 +224,7 @@
 			<section id="be-bright" class="screen" pl-component="screen-basic" pl-transclude="content">
 				<audio pl-id="intro" class="voice-over" src="media/audio/header.mp3" preload pl-required></audio>
 				<h1>WHY DOES MR. ECO WANT YOU<br>TO TURN OFF THE LIGHTS?</h1>
-				<div id="bulbs" pl-component="select"></div>
+				<div id="bulbs" pl-component="selectable-reveal" pl-select-state="highlight"></div>
 			</section>
 
 			<section id="bears" class="screen" pl-component="screen-basic" pl-transclude="content">
@@ -239,7 +240,7 @@
 					<img pl-id="sun" src="images/carousel_sun_bear2.png">
 				</div>
 				<div pl-component="cannon" pl-fire="polar"></div>
-				<div pl-component="reval">
+				<div pl-component="reveal">
 					<audio class="voice-over" src="media/audio/messageOne.mp3" preload></audio>
 					<audio class="voice-over" src="media/audio/messageTwo.mp3" preload></audio>
 					<audio class="voice-over" src="media/audio/messageThree.mp3" preload></audio>

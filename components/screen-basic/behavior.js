@@ -13,7 +13,6 @@ pl.game.component('screen-basic', function () {
 	};
 
 	this.on('ui-open', function (_event) {
-			console.log('opened', this.address());
 		if (this.isReady && this === _event.targetScope) {
 			this.start();
 		}

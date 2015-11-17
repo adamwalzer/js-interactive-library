@@ -56,6 +56,7 @@ var Entity = GlobalScope.extend(function () {
 	this.responsibilities = null;
 	this.isComplete = false;
 	this.shouldInheritAbilities = true;
+	this.frameHandlers = null;
 
 	this.handleProperty(function () {
 		this.size = function (_node, _name, _value, _property) {
@@ -89,8 +90,8 @@ var Entity = GlobalScope.extend(function () {
 		return this;
 	};
 
-	this.behavior = function (_name, _method) {
-		this[_name] = function () {
+	this.behavior = function (_name, _behavior) {
+		_behavior.method = this[_name] = function () {
 			var behaviorEvent, result;
 
 			behaviorEvent = {
@@ -100,13 +101,15 @@ var Entity = GlobalScope.extend(function () {
 				behaviorTarget: this
 			};
 
-			result = _method.apply(this, arguments);
+			result = _behavior.apply(this, arguments);
 
-			if (result) {
+			if (typeof result === 'object') {
 				behaviorEvent = util.mixin(behaviorEvent, result);
 			}
 
-			this.trigger($.Event('behavior', behaviorEvent));
+			if (result !== false) {
+				this.trigger($.Event('behavior', behaviorEvent));	
+			}
 
 			return this;
 		};
@@ -171,6 +174,42 @@ var Entity = GlobalScope.extend(function () {
 		this.intervalID = setInterval(function() {
 			_cb.call(screen);
 		}, _time);
+	};
+
+	this.eachFrame = function (_handler, _on) {
+		var binder, frame;
+
+		if (!this.hasOwnProperty('frameHandlers')) {
+			frame = function (_time) {
+				var i, handler;
+
+				for (i=0; handler = this.frameHandlers[i]; i+=1) {
+					handler.call(this, _time);
+				}
+
+				if (this.frameHandlers.length) {
+					window.requestAnimationFrame(binder);
+				}
+			};
+
+			binder = this.bind(frame);
+
+			// allows methods passed as _handler's to
+			// be able to trace back for proto() callbacks.
+			frame.method = this.eachFrame;
+
+			this.frameHandlers = Collection.create();
+			window.requestAnimationFrame(binder);
+		}
+
+		if (_on !== false) {
+			this.frameHandlers.add(_handler);
+		}
+
+		else {
+			this.frameHandlers.remove(_handler);
+		}
+		
 	};
 
 	this.kill = function (_timer) {

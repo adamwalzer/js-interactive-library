@@ -2,10 +2,16 @@
 	
 	.multiple-choice-component li {
 		list-style: circle;
+		cursor: pointer;
+	}
+
+	.multiple-choice-component li:hover {
+		color: #05a;
 	}
 
 	.multiple-choice-component li.SELECTED {
 		list-style: disc;
+		font-weight: bold;
 	}
 
 		.multiple-choice-component li button {

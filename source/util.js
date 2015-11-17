@@ -87,6 +87,36 @@ var util = new (function () {
 		return [].every.call(arguments, function (_arg) { return _arg != null });
 	};
 
+	this.toMillisec = function (_source) {
+		var tokens, time, units;
+
+		tokens = _source.split(/\s+/);
+		time = 0;
+		units = {
+			d: 24*60*60*1000,
+			h: 60*60*1000,
+			m: 60*1000,
+			s: 1000
+		};
+
+		tokens.forEach(function (_token) {
+			var unit, value;
+
+			unit = (_token.match(/[dhms]/) || [])[0];
+
+			if (unit) {
+				value = Number(_token.slice(0, -1));
+				time += value * units[unit];
+			}
+			
+			else {
+				time += Number(_token);
+			}
+		});
+
+		return time;
+	};
+
 });
 
 export default util;

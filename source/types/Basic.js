@@ -72,12 +72,12 @@ var Basic = {
 	proto: function () {
 		var method, name, owner, prototype;
 
-		// Get the function which invoked sup() in the call stack.
-		method = this.proto.caller;
+		// Get the function which invoked proto() in the call stack.
+		// If the caller is a behavior then we retrieve the method.
+		method = this.proto.caller.method || this.proto.caller;
 
 		// Check to see if 'this' owns the method.
 		// NOTE: We may want to move this logic into getOwner().
-		// 
 		if (name = this.keyOf(method)) {
 			prototype = Object.getPrototypeOf(this);
 		}
@@ -92,7 +92,7 @@ var Basic = {
 		method = prototype[name];
 
 		if (!method) {
-			console.error('ReferenceError: Unable to locate prototype method.', this.sup.caller);
+			console.error('ReferenceError: Unable to locate prototype method.', this.proto.caller);
 			debugger;
 			return null;
 		}
