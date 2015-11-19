@@ -1,3 +1,6 @@
+import { Point, Size } from 'types/Dimensions';
+import Matrix from 'lib/matrix';
+
 /**
 *  @desc Extentions for jQuery objects.
 */
@@ -68,6 +71,92 @@
 		classes = (this.attr('class') || '').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
 
 		return classes && (classes.length === 1 ? classes[0] : classes);
+	};
+
+	this.absolutePosition = function () {
+		var offset;
+
+		if (!arguments.length) {
+			offset = this.offset();
+
+			return Point.create().set(offset.left, offset.top);
+		}
+
+		else {
+			offset = Point.set.apply(Point.create(), arguments);
+			
+			this.css({
+				position: 'absolute',
+				top: offset.y,
+				left: offset.x
+			});
+
+			return offset;
+		}
+	};
+
+	this.transform = function () {
+		var t, matrix, is3d;
+		
+		matrix = new Matrix();
+		
+		if (!arguments.length) {
+			t = this.css('transform');
+			is3d = !!~t.indexOf('matrix3d');
+
+			if (t !== 'none') {
+				t = ((t.match(/\(([,\d\.\s\-]+)\)/) || [])[1] || '').split(/\s*,\s*/);
+				if (is3d) {
+					t = (function (_matrix) {
+						var i, result;
+
+						result = [];
+
+						for (i=0; i < _matrix.length; i+=4) {
+							result = result.concat(_matrix.slice(i, i+2))
+						}
+						return result;
+					}(t));
+				}
+
+				t = t.map(parseFloat);
+
+				matrix.setTransform.apply(matrix, t);
+
+				return matrix;
+			}
+
+			return t;
+		}
+
+		matrix.setTransform.apply(matrix, arguments);
+
+		this.css('transform', matrix.toCSS());
+
+		return matrix;
+	};
+
+	this.transformPosition = function () {
+		var matrix, point;
+		
+		matrix = this.transform();
+		point = Point.create();
+
+		if (matrix !== 'none') {
+			if (!arguments.length) {
+				point.set(matrix.e, matrix.f);
+			}
+			
+			else{
+				matrix = new Matrix();
+
+				point.set.apply(point, arguments);
+				matrix.translate(point.x, point.y);
+
+			}
+		}
+
+		return point;
 	};
 
 }).call($.fn);

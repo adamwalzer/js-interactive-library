@@ -7,11 +7,12 @@
 import util from 'util';
 import GlobalScope from 'types/GlobalScope';
 import Collection from 'types/Collection';
+import { Point, Size } from 'types/Dimensions';
 
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
-		return _target ? (_target.jquery ? _target : $(_target)) : this
+		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? $(_target) : this)) : this
 	}
 
 	function ResponsibilityRecord (_name, _ability) {
@@ -21,6 +22,7 @@ var Entity = GlobalScope.extend(function () {
 
 	function behaviorGreeter (_event) {
 		var i, record;
+		console.log('on behavior', this.id(), _event.name);
 
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
@@ -38,10 +40,27 @@ var Entity = GlobalScope.extend(function () {
 			scope = this.provideBehaviorEventScope();
 			if (scope) {
 				scope.on('behavior', this.bind(behaviorGreeter));
+				scope.$els[0].addEventListener('behavior', this.bind(function (_event) {
+					console.log('<< Capture event', this.id(), _event.name);
+				}, true));
 			}
 		}
 
 		return this;
+	}
+
+	function dragGreeter (_event) {
+		switch (_event.type) {
+			case 'drag-move':
+				this.dragging(_event.state);
+				break;
+		}
+	}
+
+	function attachDragEvents () {
+		if (this.draggables && this.isMemberSafe('draggables') && this.draggables.length) {
+			this.on('drag-start drag-move drag-end', dragGreeter);
+		}
 	}
 
 	this.baseType = 'TYPE_ENTITY';
@@ -57,6 +76,7 @@ var Entity = GlobalScope.extend(function () {
 	this.isComplete = false;
 	this.shouldInheritAbilities = true;
 	this.frameHandlers = null;
+	this.draggables = null;
 
 	this.handleProperty(function () {
 		this.size = function (_node, _name, _value, _property) {
@@ -82,10 +102,19 @@ var Entity = GlobalScope.extend(function () {
 				});
 			}
 		};
+
+		this.draggable = function (_node, _name, _value, _property) {
+			if (!this.hasOwnProperty('draggables')) {
+				this.draggables = $();
+			}
+
+			this.draggables.push(_node);
+		};
 	});
 
 	this.__init = function () {
 		attachBehaviorEvent.call(this);
+		attachDragEvents.call(this);
 
 		return this;
 	};
@@ -146,6 +175,8 @@ var Entity = GlobalScope.extend(function () {
 		switch (typeof ability) {
 			case 'object':
 				for (name in ability) {
+					if (!ability.hasOwnProperty(name)) continue;
+
 					this.respond(name, ability[name]);
 				}
 				break;
@@ -264,13 +295,13 @@ var Entity = GlobalScope.extend(function () {
 				targetScope: this
 			});
 
-			if (target.hasClass(this.STATE[STATE])) return false;
-
-			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
+			// if (target.hasClass(this.STATE[STATE])) return false;
 
 			if (_imp && _imp.shouldSet && _imp.shouldSet.apply(this, arguments) === false) {
-				return false;
+				return !!(_imp && _imp.notSet) && _imp.notSet.apply(this, arguments);
 			}
+
+			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
 
 			opperations.forEach(function (_record) {
 				target[_record.method](_record.flag);
@@ -321,16 +352,32 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
+	this.behavior('dragging', function (_state) {
+		console.log('* dragging behavior', this.id());
+
+		return {
+			behaviorTarget: _state.$draggable
+		};
+	});
+
+	this.behavior('drop', function (_state) {
+		console.log('* drop behavior', _state);
+
+		return {
+			behaviorTarget: _state.$draggable
+		};
+	});
+
 	this.state('open opened', '+OPEN -LEAVE');
 	this.state('close', '-OPEN');
-	this.state('leave', '+LEAVE', {
+	this.state('leave left', '+LEAVE', {
 		willSet: function (_target) {
 			this.close(_target);
 		}
 	});
 
-	this.state('enable', '+ENABLED -DISABLED');
-	this.state('disable', '+DISABLED -ENABLED');
+	this.state('enable enabled', '+ENABLED -DISABLED');
+	this.state('disable disabled', '+DISABLED -ENABLED');
 	this.state('select selected', '+SELECTED', {
 		willSet: function (_target) {
 			var target, $parent;
@@ -348,8 +395,33 @@ var Entity = GlobalScope.extend(function () {
 	});
 
 	this.state('deselect', '-SELECTED');
-	this.state('highlight', '+HIGHLIGHTED');
+	this.state('highlight highlighted', '+HIGHLIGHTED');
 	this.state('unhighlight', '-HIGHLIGHTED');
+	this.state('draggable dragEnabled', '+DRAGGABLE', {
+		didSet: function (_target) {
+			this.translate( resolveTarget.call(this, _target) );
+		}
+	});
+	this.state('undraggable', '-DRAGGABLE');
+
+	this.state('translate translated', '+TRANSLATED', {
+		willSet: function (_target_point, _point) {
+			var point, target;
+			
+			target = resolveTarget.call(this, _target_point);
+			point = (!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point;
+
+			if (point) {
+				target.css('transform', 'translateX('+point.x+'px) translateY('+point.y+'px)');
+			}
+		}
+	});
+
+	this.state('untranslate', '-TRANSLATED', {
+		willSet: function () {
+			this.css('transform', 'none');
+		}
+	});
 
 });
 

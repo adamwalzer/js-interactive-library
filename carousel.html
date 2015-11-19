@@ -10,6 +10,7 @@
 
 	<link rel="stylesheet" type="text/css" href="style/reset.css">
 	<link rel="stylesheet" type="text/css" href="style/layout.css">
+	<link rel="stylesheet" type="text/css" href="style/theme.css">
 	<link rel="stylesheet" type="text/css" href="style/animate.css">
 
 	<style type="text/css">
@@ -126,6 +127,17 @@
 			font-weight: bold;
 		}
 
+		.draggables {
+			padding: 0;
+			list-style: none;
+			font-size: 3em;
+			text-align: center;
+		}
+
+			.draggables > li {
+				display: inline-block;
+			}
+
 	</style>
 
 	<script type="text/javascript">
@@ -211,6 +223,18 @@
 		<div id="screens">
 
 			<section id="welcome" class="screen" pl-component="title"></section>
+
+			<section id="dnd" class="screen" pl-component="screen-basic" pl-transclude="content">
+				<div pl-component="timer" pl-set="15s" pl-required></div>
+				<h1>Yo got 15 seconds to drop all the items. GO!</h1>
+				<ul class="draggables">
+					<li pl-draggable="clone">😁</li>
+					<li pl-draggable="pluck">😈</li>
+					<li pl-draggable>😉</li>
+					<li pl-draggable>😃</li>
+				</ul>
+				<div pl-component="dropzone"></div>
+			</section>
 
 			<section class="screen" pl-component="screen-basic" pl-transclude="content">
 				<div pl-component="timer" pl-set="15s" pl-required></div>

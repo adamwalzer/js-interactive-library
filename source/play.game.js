@@ -1,4 +1,5 @@
 import component from 'play.game.component';
+import manager from 'play.game.manager';
 import util from 'util';
 import Events from 'types/Events';
 import { default as SCOPE } from 'types/GlobalScope';
@@ -59,6 +60,7 @@ READY_QUEUE = [];
 (function () {
 
 	this.component = component;
+	this.manager = manager;
 	
 	util.mixin(game, Events);
 

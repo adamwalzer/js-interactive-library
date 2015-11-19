@@ -4,10 +4,9 @@
 *  @proto Array, Basic
 */
 
-import util from 'util';
-import Basic from 'types/Basic';
+import BasicArray from 'types/BasicArray';
 
-var Collection = (function () {
+var Collection = BasicArray.extend(function () {
 
 	function getRecord (_member, _key, _shouldCollect) {
 		var i, record, member, result;
@@ -87,11 +86,7 @@ var Collection = (function () {
 	this.filter = function (_member, _key) {
 		return getRecord.call(this, _member, _key, true);
 	};
-	
-	util.mixin(this, Basic);
 
-	return this;
-
-}).call([]);
+});
 
 export default Collection;
