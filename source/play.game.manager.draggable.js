@@ -29,6 +29,12 @@ function attachEvents () {
 
 				delete style.zIndex;
 				delete style.opacity;
+				delete style.cursor;
+				delete style.transition;
+				delete style.transitionDelay;
+				delete style.transitionDuration;
+				delete style.transitionProperty;
+				delete style.transitionTimingFunction;
 
 				state = {
 					mode: mode,
@@ -120,7 +126,7 @@ function attachEvents () {
 				});
 
 				state.progress.distance = distance;
-				state.progress.point = point;
+				state.progress.point = state.start.point.inc(point);
 				state.progress.transform = transform;
 
 				state.scope.translate(state.$helper, point);
@@ -147,7 +153,7 @@ function attachEvents () {
 				}
 
 				state.$helper
-					.removeClass('DRAGGING')
+					.removeClass('DRAG-START DRAGGING')
 					.addClass('DRAG-ENDED');
 
 				dragEndEvent = $.Event('drag-end', {

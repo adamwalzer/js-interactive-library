@@ -57,6 +57,16 @@ Dimension = BasicArray.extend(function () {
 	this.planeMap = null,
 	this.length = 2;
 
+	this.create = function (_argumentsArray) {
+		var instance;
+
+		instance = this.proto();
+
+		if (_argumentsArray) instance.set.apply(instance, _argumentsArray);
+
+		return instance;
+	};
+
 	// Incerement each plane by a value or specify each plane.
 	this.inc = function (_val, _plane2) {
 		var a,b;
@@ -166,7 +176,7 @@ Array.prototype.to = function (_Thing) {
 	if (typeof _Thing === 'string') {
 		return map[_Thing.toLowerCase()].create().set(this);
 	}
-	
+
 	else if (typeof _Thing === 'object' && ~[Point.set, Size.set].indexOf(_Thing.set)) {
 		if (!_Thing.isPrototypeOf(this)) {
 			return _Thing.set.apply(_Thing.create(), this);	

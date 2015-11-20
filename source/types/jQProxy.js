@@ -85,6 +85,7 @@ var jQProxy = Basic.extend(function () {
 		return this.$els[0];
 	};
 
+	// TODO: make this private
 	this.registerHandler = function (_definition) {
 		if (!this.hasOwnProperty('eventRegistry')) {
 			this.eventRegistry = [];
@@ -97,8 +98,6 @@ var jQProxy = Basic.extend(function () {
 		var self;
 
 		self = this;
-
-			if (this.is('#be-bright .reval-component')) debugger;
 
 		if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
 			this.eventRegistry.forEach(function (_definition) {
@@ -132,7 +131,7 @@ var jQProxy = Basic.extend(function () {
 			if ($node.hasClass('pl-scope')) {
 				return $node.parent().scope() === this;
 			}
-			
+
 			return $node.scope() === this;
 		}));
 	};

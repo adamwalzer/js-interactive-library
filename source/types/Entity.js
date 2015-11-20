@@ -8,13 +8,14 @@ import util from 'util';
 import GlobalScope from 'types/GlobalScope';
 import Collection from 'types/Collection';
 import { Point, Size } from 'types/Dimensions';
+import Queue from 'types/Queue';
 	
 function invokeResponsibilities (_scope, _event) {
 	if (_scope && _scope.isMemberSafe('responsibilities')) {
 		_scope.responsibilities.forEach(function (_record) {
 			if (_record.name === _event.name) {
 
-				console.log(_scope.id(), 'respond', _record.name, 'from', _event.targetScope.id());
+				// console.log(_scope.id(), 'respond', _record.name, 'from', _event.targetScope.id());
 				_record.ability.call(_scope, _event);
 			}
 		});
@@ -34,7 +35,7 @@ var Entity = GlobalScope.extend(function () {
 
 	function behaviorGreeter (_event) {
 		var i, record;
-		console.log('on behavior', this.id(), _event.name);
+		// console.log('on behavior', this.id(), _event.name);
 
 		for (i=0; record = this.responsibilities[i]; i+=1) {
 			if (record.name === _event.name) {
@@ -60,8 +61,16 @@ var Entity = GlobalScope.extend(function () {
 
 	function dragGreeter (_event) {
 		switch (_event.type) {
+			case 'drag-start':
+				this.grab(_event.state);
+				break;
+
 			case 'drag-move':
 				this.dragging(_event.state);
+				break;
+
+			case 'drag-end':
+				this.release(_event.state);
 				break;
 		}
 	}
@@ -86,6 +95,7 @@ var Entity = GlobalScope.extend(function () {
 	this.shouldInheritAbilities = true;
 	this.frameHandlers = null;
 	this.draggables = null;
+	this.requiredQueue = null;
 
 	this.handleProperty(function () {
 		this.size = function (_node, _name, _value, _property) {
@@ -131,6 +141,18 @@ var Entity = GlobalScope.extend(function () {
 		return this;
 	};
 
+	this.size = function () {
+		var size;
+
+		if (arguments.length) {
+			size = Size.create(arguments);
+			this.css(size);
+			return size;
+		}
+
+		return Size.create().set(this.width(), this.height());
+	};
+
 	this.propagateBehavior = function (_event) {
 		var ids;
 
@@ -142,13 +164,25 @@ var Entity = GlobalScope.extend(function () {
 		});
 
 		if (this.hasOwnProperty('entities') && this.entities.length) {
-			console.log(this.id(), 'propagate', _event.name, 'to', this.entities.length, 'nodes', ids);
+			// console.log(this.id(), 'propagate', _event.name, 'to', this.entities.length, 'nodes', ids);
 
 			this.entities.forEach(function (_scope) {
 				invokeResponsibilities(_scope, _event);
 				_scope.propagateBehavior(_event);
 			});
 		}
+	};
+
+	this.require = function (_entity) {
+		if (!this.hasOwnProperty('requiredQueue')) {
+			this.requiredQueue = Queue.create();
+			this.requiredQueue.on('complete', this.bind(function () {
+				console.log('** entity complete', this.id());
+				this.complete();
+			}))
+		}
+
+		this.requiredQueue.add(_entity);
 	};
 
 	this.behavior = function (_name, _behavior) {
@@ -376,8 +410,7 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.behavior('complete', function () {
-		if (this.isComplete) return false;
-		console.log(this.id(), 'behavior complete');
+		if (this.hasOwnProperty('isComplete') && this.isComplete) return false;
 
 		this.isComplete = true;
 		this.addClass('COMPLETE');
@@ -387,18 +420,21 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
-	this.behavior('dragging', function (_state) {
-		console.log('* dragging behavior', this.id());
-
+	this.behavior('grab', function (_state) {
 		return {
 			state: _state,
 			behaviorTarget: _state.$draggable
 		};
 	});
 
-	this.behavior('drop', function (_state) {
-		console.log('* drop behavior', _state);
+	this.behavior('dragging', function (_state) {
+		return {
+			state: _state,
+			behaviorTarget: _state.$draggable
+		};
+	});
 
+	this.behavior('release', function (_state) {
 		return {
 			state: _state,
 			behaviorTarget: _state.$draggable

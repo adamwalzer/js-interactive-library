@@ -13,29 +13,33 @@ html {
 	top: 0; left: 0;
 }
 
-[pl-draggable=pluck] {
-	/*transition: opacity 1s;*/
-}
-
 .PLUCKED {
 	opacity: 0;
 }
 
+.draggables .DRAG-START,
+.draggables .DRAGGING,
 .draggable-helper {
 	z-index: 1;
+	cursor: -webkit-grabbing;
 }
 
 .draggable-helper.PLUCKED {
 	opacity: 1;
 }
 
-.draggable-helper.DRAG-ENDED {
+.draggable-helper.RETURN {
 	opacity: 0;
 	/* One of the rare times I'll use important. This is to override an inline style. */
 	transform: translate3d(0,0,0) !important; 
-	transition: transform 0.5s cubic-bezier(0, 0.18, 0, 1.01), opacity 1s !important;
+	transition: transform 0.5s cubic-bezier(0, 0.18, 0, 1.01), opacity 1s;
 }
 
-.draggable-helper.DRAG-ENDED.PLUCKED {
+.draggable-helper.RETURN.PLUCKED {
 	opacity: 1;
+}
+
+.draggable-helper.DROPED {
+	opacity: 0;
+	transition: opacity 1s;
 }

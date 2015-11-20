@@ -134,8 +134,9 @@
 			text-align: center;
 		}
 
-			.draggables > li {
+			.draggables > * {
 				display: inline-block;
+				cursor: -webkit-grab;
 			}
 
 	</style>
@@ -229,11 +230,11 @@
 				<h1>Yo got 15 seconds to drop all the items. GO!</h1>
 				<ul class="draggables">
 					<li pl-draggable="clone">😁</li>
-					<li pl-draggable="pluck">😈</li>
-					<li pl-draggable>😉</li>
+					<li pl-id="demon" pl-draggable="pluck">😈</li>
+					<li pl-id="winky" pl-draggable>😉</li>
 					<li pl-draggable>😃</li>
 				</ul>
-				<div pl-component="dropzone"></div>
+				<div pl-component="dropzone" pl-take="demon winky" pl-required></div>
 			</section>
 
 			<section class="screen" pl-component="screen-basic" pl-transclude="content">

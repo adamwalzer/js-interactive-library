@@ -83,8 +83,8 @@ import Matrix from 'lib/matrix';
 		}
 
 		else {
-			offset = Point.set.apply(Point.create(), arguments);
-			
+			offset = Point.create(arguments);
+
 			this.css({
 				position: 'absolute',
 				top: offset.y,
