@@ -8,6 +8,18 @@ import util from 'util';
 import GlobalScope from 'types/GlobalScope';
 import Collection from 'types/Collection';
 import { Point, Size } from 'types/Dimensions';
+	
+function invokeResponsibilities (_scope, _event) {
+	if (_scope && _scope.isMemberSafe('responsibilities')) {
+		_scope.responsibilities.forEach(function (_record) {
+			if (_record.name === _event.name) {
+
+				console.log(_scope.id(), 'respond', _record.name, 'from', _event.targetScope.id());
+				_record.ability.call(_scope, _event);
+			}
+		});
+	}
+}
 
 var Entity = GlobalScope.extend(function () {
 
@@ -40,9 +52,6 @@ var Entity = GlobalScope.extend(function () {
 			scope = this.provideBehaviorEventScope();
 			if (scope) {
 				scope.on('behavior', this.bind(behaviorGreeter));
-				scope.$els[0].addEventListener('behavior', this.bind(function (_event) {
-					console.log('<< Capture event', this.id(), _event.name);
-				}, true));
 			}
 		}
 
@@ -113,10 +122,33 @@ var Entity = GlobalScope.extend(function () {
 	});
 
 	this.__init = function () {
-		attachBehaviorEvent.call(this);
+		// attachBehaviorEvent.call(this);
+		if (this.isMemberSafe('responsibilities')) {
+			this.screen.shouldWatchBehaviors = true;
+		}
 		attachDragEvents.call(this);
 
 		return this;
+	};
+
+	this.propagateBehavior = function (_event) {
+		var ids;
+
+		ids = [];
+
+		this.findOwn('.pl-scope').each(function (_index, _node) {
+			var $node = $(_node); 
+			ids.push($node.id() || $node.address());
+		});
+
+		if (this.hasOwnProperty('entities') && this.entities.length) {
+			console.log(this.id(), 'propagate', _event.name, 'to', this.entities.length, 'nodes', ids);
+
+			this.entities.forEach(function (_scope) {
+				invokeResponsibilities(_scope, _event);
+				_scope.propagateBehavior(_event);
+			});
+		}
 	};
 
 	this.behavior = function (_name, _behavior) {
@@ -344,6 +376,9 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.behavior('complete', function () {
+		if (this.isComplete) return false;
+		console.log(this.id(), 'behavior complete');
+
 		this.isComplete = true;
 		this.addClass('COMPLETE');
 
@@ -356,6 +391,7 @@ var Entity = GlobalScope.extend(function () {
 		console.log('* dragging behavior', this.id());
 
 		return {
+			state: _state,
 			behaviorTarget: _state.$draggable
 		};
 	});
@@ -364,6 +400,7 @@ var Entity = GlobalScope.extend(function () {
 		console.log('* drop behavior', _state);
 
 		return {
+			state: _state,
 			behaviorTarget: _state.$draggable
 		};
 	});
@@ -425,4 +462,4 @@ var Entity = GlobalScope.extend(function () {
 
 });
 
-export default Entity;
+export default { Entity, invokeResponsibilities };

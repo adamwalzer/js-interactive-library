@@ -19,6 +19,6 @@ pl.game.component('dropzone', function () {
 	};
 
 	this.respond('dragging', function (_event) {
-		console.log('** respond dragging', _event.state.point);
+		console.log('** respond dragging', _event.state.progress.distance);
 	});
 });

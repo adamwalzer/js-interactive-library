@@ -110,18 +110,30 @@ var jQProxy = Basic.extend(function () {
 	// Wraps you function 'this' to the scope.
 	// 
 	this.bind = function (_handler) {
-		var scope;
+		var scope, dataArgs;
 
 		scope = this;
+		dataArgs = [].slice.call(arguments, 1);
 
 		return function () {
-			return _handler.apply(scope, arguments);
+			var args;
+
+			args = [].slice.call(arguments, 0);
+			return _handler.apply(scope, args.concat(dataArgs));
 		};
 	};
 
 	this.findOwn = function (_selector) {
 		return this.find(_selector).filter(this.bind(function (_index, _node) {
-			return $(_node).scope() === this;
+			var $node;
+
+			$node = $(_node);
+
+			if ($node.hasClass('pl-scope')) {
+				return $node.parent().scope() === this;
+			}
+			
+			return $node.scope() === this;
 		}));
 	};
 

@@ -4,15 +4,36 @@
 *  @proto Entity
 */
 
-import Entity from 'types/Entity';
+import { Entity, invokeResponsibilities } from 'types/Entity';
 import Queue from 'types/Queue';
 
 var Screen = Entity.extend(function () {
+
+	function attachBehaviorEvent () {
+		this.on('behavior', function (_event) {
+			console.log('SCREEN GOT', _event.targetScope.id(), _event.name);
+
+			if (this !== _event.targetScope) {
+				invokeResponsibilities(this,  _event);
+			}
+			
+			this.propagateBehavior(_event);
+		});
+	}
 	
 	this.baseType = 'TYPE_SCREEN';
 	this.game = null;
 	this.screen = null;
 	this.requiredQueue = null;
+	this.shouldWatchBehaviors = false;
+
+	this.__init = function () {
+		this.proto();
+
+		if (this.hasOwnProperty('shouldWatchBehaviors') && this.shouldWatchBehaviors) {
+			attachBehaviorEvent.call(this);
+		}
+	};
 
 	this.start = function () {
 		return this;

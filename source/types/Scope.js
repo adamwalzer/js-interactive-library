@@ -254,7 +254,7 @@ var Scope = jQProxy.extend(function () {
 
 			if (!Scope.isPrototypeOf(_record)) {
 				instance = createEntity.call(this, $node, _record.implementation);
-				this.entities[_index] = instance;
+				// this.entities[_index] = instance;
 
 				if (!instance.isReady) {
 					this.assetQueue.add(instance);
@@ -338,9 +338,12 @@ var Scope = jQProxy.extend(function () {
 	}
 
 	function ready () {
-		var readyEvent;
+		var readyEvent, entities;
 
 		readyEvent = $.Event('ready', { targetScope: this });
+		entities = this.findOwn('.pl-scope').scope();
+
+		if (entities && entities.length) this.entities = entities;
 
 		this.isReady = true;
 		this.addClass('READY');
@@ -641,7 +644,7 @@ var Scope = jQProxy.extend(function () {
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
 			id = transformId(instance.id());
 
-			this.entities.push(instance);
+			// this.entities.push(instance);
 			if (id) this[id] = instance;
 		}
 
@@ -706,7 +709,6 @@ var Scope = jQProxy.extend(function () {
 
 		this.required = function (_node, _name, _value, _property) {
 			if (this.is(_node)) {
-				console.log('**', this.screen.id(), 'require', this.id(), this.screen);
 				this.screen.require(this);
 			}
 		};

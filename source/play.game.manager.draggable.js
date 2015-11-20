@@ -4,12 +4,6 @@ import { Point } from 'types/Dimensions';
 
 const COLLECTION_DRAGABLES = Collection.create();
 
-function DraggableRecord (_$draggable, _position, _offset) {
-	this.$draggable = _$draggable;
-	this.point = _position;
-	this.offset = _offset;
-}
-
 function boot () {
 	attachEvents();
 }
@@ -19,7 +13,7 @@ function attachEvents () {
 
 	$(document)
 		.on('mousedown', function (_event) {
-			var cursor, $draggable, offset, transform, point, mode, style, dragStartEvent;
+			var cursor, $draggable, transform, point, mode, style, dragStartEvent;
 
 			cursor = resolveEventPoint(_event);
 			$draggable = $(_event.target).closest('[pl-draggable]');
@@ -29,7 +23,6 @@ function attachEvents () {
 				mode = $draggable.attr('pl-draggable');
 				point = $draggable.absolutePosition();
 				transform = $draggable.transform();
-				offset = point.distance(cursor);
 				// TODO: Set these styles in a style node.
 				// That way I dont have to override them important :/
 				style = util.mixin({}, window.getComputedStyle($draggable[0]));
@@ -38,13 +31,22 @@ function attachEvents () {
 				delete style.opacity;
 
 				state = {
-					cursor: cursor,
+					mode: mode,
 					$draggable: $draggable,
-					$helper: null,
 					scope: $draggable.scope(),
-					point: point,
-					offset: offset,
-					transform: transform
+					$helper: null,
+
+					start: {
+						cursor: cursor,
+						point: point,
+						transform: transform
+					},
+
+					progress: {
+						distance: null,
+						point: null,
+						transform: null
+					}
 				};
 
 				switch (mode) {
@@ -92,11 +94,12 @@ function attachEvents () {
 
 			if (state) {
 				cursor = resolveEventPoint(_event);
-				distance = state.cursor.distance(cursor);
+				distance = state.start.cursor.distance(cursor);
 				point = Point.create();
+				transform = null;
 
-				if (state.transform !== 'none') {
-					transform = state.transform.clone();
+				if (state.start.transform !== 'none') {
+					transform = state.start.transform.clone();
 					transform.translate(distance.width, distance.height);
 					point.set(transform.applyToPoint(0, 0));
 				}
@@ -115,6 +118,10 @@ function attachEvents () {
 					state: state,
 					targetScope: state.scope
 				});
+
+				state.progress.distance = distance;
+				state.progress.point = point;
+				state.progress.transform = transform;
 
 				state.scope.translate(state.$helper, point);
 				state.scope.trigger(dragMoveEvent);
@@ -172,10 +179,6 @@ function resolveEventPoint (_event) {
 }
 
 var draggableManager = {
-
-	register: function (_entity) {
-		COLLECTION_DRAGABLES.add(_entity)
-	}
 
 };
 
