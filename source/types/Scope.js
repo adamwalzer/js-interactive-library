@@ -241,7 +241,7 @@ var Scope = jQProxy.extend(function () {
 			var $node, instance, id, query, index;
 
 			$node = this.find(_record.selector);
-			query = ['[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
+			query = ['#'+_record.selector, '[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
 			index = 0;
 
 			while (!$node.length) {

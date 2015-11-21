@@ -23,12 +23,11 @@ var Screen = Entity.extend(function () {
 	this.baseType = 'TYPE_SCREEN';
 	this.game = null;
 	this.screen = null;
-	this.shouldWatchBehaviors = false;
 
 	this.__init = function () {
 		this.proto();
 
-		if (this.hasOwnProperty('shouldWatchBehaviors') && this.shouldWatchBehaviors) {
+		if (this.hasClass('screen')) {
 			attachBehaviorEvent.call(this);
 		}
 	};
@@ -50,6 +49,10 @@ var Screen = Entity.extend(function () {
 	this.prev = function () {
 		// console.log('Screen prev()');
 		return this.game.screens[this.index()-1];
+	};
+
+	this.quit = function () {
+		this.game.quit.open();
 	};
 
 	this.nextSib = function () {

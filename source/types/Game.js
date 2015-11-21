@@ -148,6 +148,15 @@ var Game = GlobalScope.extend(function () {
 		});
 	};
 
+	this.flip = function () {
+		console.log('THATS A FLIP!');
+	};
+
+	this.exit = function () {
+		console.log('exit game!');
+		window.close();
+	};
+
 });
 
 export default Game;

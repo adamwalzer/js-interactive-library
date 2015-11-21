@@ -132,12 +132,7 @@ var Entity = GlobalScope.extend(function () {
 	});
 
 	this.__init = function () {
-		// attachBehaviorEvent.call(this);
-		if (this.isMemberSafe('responsibilities')) {
-			this.screen.shouldWatchBehaviors = true;
-		}
 		attachDragEvents.call(this);
-
 		return this;
 	};
 

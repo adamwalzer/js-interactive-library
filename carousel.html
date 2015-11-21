@@ -87,17 +87,34 @@
 			outline: none;
 			text-transform: uppercase;
 			cursor: pointer;
-			z-index: -1;
 			transition: opacity 0.5s;
+		}
+
+		.screen button.close {
+			position: static;
+			float: right;
+			border: none;
+
+			font-size: 2em;
+			opacity: 1;
+		}
+
+		.screen button.close:active{
+			transform: scale(0.8);
 		}
 
 		.screen.READY > button {
 			opacity: 0;
+			cursor: default;
+		}
+
+		.screen.READY button.close {
+			opacity: 1;
 		}
 
 		.screen.COMPLETE > button {
 			opacity: 1;
-			z-index: 1;
+			cursor: pointer;
 		}
 
 	#be-bright h1 {
@@ -213,6 +230,14 @@
 
 		});
 
+		this.screen('quit', function () {
+			
+			this.cancel = function () {
+				this.leave();
+			};
+
+		});
+
 	});
 
 	</script>
@@ -220,10 +245,15 @@
 </head>
 <body id="carousel">
 	<audio id="music" class="background" src="media/audio/Instrumentals.mp3" preload ></audio>
+
 	<div class="center">
 		<div id="screens">
 
 			<section id="welcome" class="screen" pl-component="title"></section>
+
+			<section id="yosemite" class="screen" pl-component="screen-basic" pl-transclude="content">
+				<div pl-component="carousel"></div>
+			</section>
 
 			<section id="dnd" class="screen" pl-component="screen-basic" pl-transclude="content">
 				<div pl-component="timer" pl-set="5s" pl-required></div>
@@ -283,10 +313,11 @@
 				</div>
 			</section>
 
-			<section id="yosemite" class="screen" pl-component="carousel"></section>
+			<section id="quit" class="screen" pl-component="screen-quit"></section>
 
 		</div>
 	</div>
+
 	
 </body>
 </html>
