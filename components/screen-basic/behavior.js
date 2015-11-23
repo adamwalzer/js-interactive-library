@@ -16,6 +16,10 @@ pl.game.component('screen-basic', function () {
 		if (this.isReady && this === _event.targetScope) {
 			this.start();
 		}
+
+		if (!this.requiredQueue || (this.hasOwnProperty('requiredQueue') && !this.requiredQueue.length)) {
+			this.complete();
+		}
 	});
 
 	this.on('ui-leave', function (_event) {

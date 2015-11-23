@@ -72,50 +72,41 @@
 				opacity: 1;
 			}
 
-		.screen > button {
-			position: absolute;
-			bottom: 0; right: 0;
+		.screen button {
 			border: none;
 			border-bottom: solid 1px;
 			margin: 8px;
 			padding: 0;
 			padding-bottom: 4px;
 
-			opacity: 0;
 			color: #05a;
 			background: none;
 			outline: none;
 			text-transform: uppercase;
 			cursor: pointer;
+		}
+
+		.screen button.next-screen {
+			position: absolute;
+			bottom: 0; right: 0;
+
+			opacity: 0;
 			transition: opacity 0.5s;
 		}
 
-		.screen button.close {
-			position: static;
-			float: right;
-			border: none;
-
-			font-size: 2em;
-			opacity: 1;
-		}
-
-		.screen button.close:active{
-			transform: scale(0.8);
-		}
-
-		.screen.READY > button {
+		.screen.READY button.next-screen {
 			opacity: 0;
 			cursor: default;
 		}
 
-		.screen.READY button.close {
-			opacity: 1;
-		}
-
-		.screen.COMPLETE > button {
+		.screen.COMPLETE button.next-screen {
 			opacity: 1;
 			cursor: pointer;
 		}
+
+	#yosemite .carousel-component {
+		height: 100%;
+	}
 
 	#be-bright h1 {
 		text-align: center;
@@ -177,6 +168,16 @@
 
 		});
 
+		this.screen('yosemite', function () {
+			this.start = function () {
+				this.carousel.start();
+			};
+
+			this.stop = function () {
+				this.carousel.stop();
+			};
+		});
+
 		this.screen('bears', function () {
 
 			this.points = 0;
@@ -213,7 +214,7 @@
 			});
 
 			this.start = function () {
-				if (!this.carousel.isPlaying) this.carousel.start();
+				this.carousel.start();
 			};
 
 			this.stop = function () {
@@ -230,14 +231,6 @@
 
 		});
 
-		this.screen('quit', function () {
-			
-			this.cancel = function () {
-				this.leave();
-			};
-
-		});
-
 	});
 
 	</script>
@@ -250,6 +243,10 @@
 		<div id="screens">
 
 			<section id="welcome" class="screen" pl-component="title"></section>
+
+			<section id="cards" class="screen" pl-component="screen-basic" pl-transclude="content">
+				<div pl-component="flip-card"></div>
+			</section>
 
 			<section id="yosemite" class="screen" pl-component="screen-basic" pl-transclude="content">
 				<div pl-component="carousel"></div>

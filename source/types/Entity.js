@@ -132,6 +132,7 @@ var Entity = GlobalScope.extend(function () {
 	});
 
 	this.__init = function () {
+		this.proto()
 		attachDragEvents.call(this);
 		return this;
 	};

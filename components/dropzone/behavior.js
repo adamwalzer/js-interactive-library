@@ -36,7 +36,7 @@ pl.game.component('dropzone', function () {
 
 	this.takes = function (_id) {
 		var takes = this.properties.take.split(/\s+/);
-		return _id ? !!~takes.indexOf(_id) : takes;
+		return arguments.length ? !!~takes.indexOf(_id) : takes;
 	};
 
 	this.isPointInBounds = function (_point, _y) {

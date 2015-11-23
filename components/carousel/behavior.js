@@ -14,17 +14,16 @@ pl.game.component('carousel', function () {
 	this.nodes = null;
 	this.shouldRandomize = false;
 	this.isPlaying = false;
-	this.delay = 3000;
-
-	this.handleProperty(function () {
-		this.delay = function (_node, _name, _value, _property) {
-			this.delay = Number(_value);
-		};
-	});
 
 	this.ready = function () {
 		this.$images = this.find('img');
 		this.shouldRandomize = this.properties.has('randomize');
+
+		if (this.TYPE.every(this.bind(function (_type) {
+			return !this.hasClass(_type);
+		}))) {
+			this.addClass(this.TYPE.CROSS_FADE);
+		}
 
 		if (this.$images.length) {
 			this.nodes = [];
@@ -48,10 +47,6 @@ pl.game.component('carousel', function () {
 		return this.current();
 	};
 
-	this.provideBehaviorEventScope = function () {
-		return this.parent().scope();
-	};
-
 	this.respond('fire', function (_event) {
 		this.hit(_event.message);
 	});
@@ -73,10 +68,14 @@ pl.game.component('carousel', function () {
 	});
 
 	this.start = function () {
-		if (this.isReady) {
+		var delay;
+
+		delay = pl.util.toMillisec(this.properties.delay) || 1000;
+
+		if (this.isReady && !this.isPlaying) {
 			this.isPlaying = true;
 			this.open(this.$images.first());
-			this.repeat(this.delay, this.next);
+			this.repeat(delay, this.next);
 		}
 		
 		else {
@@ -97,8 +96,6 @@ pl.game.component('carousel', function () {
 
 		$current = this.$images.first();
 		reload = this.reloadWithNode(this.$images[0]);
-
-		console.log()
 
 		$current.removeClass(this.STATE.LEAVE);
 		$current.remove();

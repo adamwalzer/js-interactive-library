@@ -1,3 +1,7 @@
+* {
+	/*transform-style: preserve-3d*/;
+}
+
 html, body {
 	margin: 0;
 	height: 100%;
@@ -7,4 +11,8 @@ button, textarea, input, select {
 	font-family: inherit;
 	font-size: inherit;
 	color: inherit;
+}
+
+ul, ol {
+	padding: 0;
 }

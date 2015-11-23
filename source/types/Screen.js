@@ -71,7 +71,7 @@ var Screen = Entity.extend(function () {
 		if (!this.has(_event.target)) return;
 		if (_event.targetScope === this) return;
 
-		if (this.requiredQueue.length) {
+		if (this.hasOwnProperty('requiredQueue') && this.requiredQueue.length) {
 			this.requiredQueue.ready(_event.behaviorTarget);
 		}
 	});
