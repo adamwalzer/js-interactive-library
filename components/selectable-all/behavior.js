@@ -111,7 +111,7 @@ pl.game.component('selectable-all', function () {
 			_item.shouldRecycel = false;
 			_item.$el.removeClass('LAUNCHED').css('transition', 'none');
 		});
-	}
+	};
 
 	this.behavior('pick', function (_$target) {
 		var message = _$target.attr('pl-message');

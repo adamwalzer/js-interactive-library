@@ -94,6 +94,7 @@ var Entity = GlobalScope.extend(function () {
 	this.isComplete = false;
 	this.shouldInheritAbilities = true;
 	this.frameHandlers = null;
+	this.frameRate = 60; // 60fps
 	this.draggables = null;
 	this.requiredQueue = null;
 
@@ -270,14 +271,27 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.eachFrame = function (_handler, _on) {
-		var binder, frame;
+		var binder, frame, lastTime, rate, frames;
+
+		rate = this.frameRate || 1000;
+		frames = 0;
+		lastTime = 0;
 
 		if (!this.hasOwnProperty('frameHandlers')) {
 			frame = function (_time) {
 				var i, handler;
 
-				for (i=0; handler = this.frameHandlers[i]; i+=1) {
-					handler.call(this, _time);
+				if (rate) {
+					if (_time - lastTime >= (1000/rate)) {
+						for (i=0; handler = this.frameHandlers[i]; i+=1) {
+							handler.call(this, _time, Math.round(1000/(_time - lastTime)), rate);
+						}
+
+						if (frames === rate) frames = 0;
+
+						frames+=1;
+						lastTime = _time;
+					}
 				}
 
 				if (this.frameHandlers.length) {

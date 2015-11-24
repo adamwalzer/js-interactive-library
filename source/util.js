@@ -128,6 +128,10 @@ var util = new (function () {
 		return time;
 	};
 
+	this.toArray = function (_collection) {
+		return Array.prototype.map.call(_collection, function (i) { return i; });
+	};
+
 });
 
 export default util;

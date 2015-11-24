@@ -158,6 +158,15 @@ Dimension = BasicArray.extend(function () {
 	this.map = function (_handler) {
 		return originalMap.call(this, _handler).to(Object.getPrototypeOf(this));
 	};
+
+	this.product = function () {
+		return this[0] * this[1];
+	};
+
+	this.dividend = function () {
+		return this[0] / this[1];
+	};
+	
 });
 
 // Array prototype extension

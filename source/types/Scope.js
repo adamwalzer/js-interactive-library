@@ -682,6 +682,15 @@ var Scope = jQProxy.extend(function () {
 		return ['[', this.id() || this.address(), ' ', type, ']'].join('');
 	};
 
+	this.log = function () {
+		var args;
+
+		args = util.toArray(arguments);
+
+		console.log.apply(console, [this.id() || this.address(), '-'].concat(args));
+		return this;
+	};
+
 	this.handleProperty(function () {
 		
 		this.component = function (_node, _name, _value, _property) {
