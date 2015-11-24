@@ -44,7 +44,6 @@
 			border-radius: 4px;
 			transform: translateZ(-300px);
 			transition: transform 1s, opacity 1s;
-			/*z-index: -1;*/
 		}
 
 		.screen.READY {
@@ -168,6 +167,16 @@
 
 		});
 
+		this.screen('floaters', function () {
+			this.start = function () {
+				this.baloons.start();
+			};
+
+			this.stop = function () {
+				this.baloons.stop();
+			};
+		});
+
 		this.screen('yosemite', function () {
 			this.start = function () {
 				this.carousel.start();
@@ -246,6 +255,10 @@
 
 			<section id="cards" class="screen" pl-component="screen-basic" pl-transclude="content">
 				<div pl-component="flip-card"></div>
+			</section>
+
+			<section id="floaters" class="screen" pl-component="screen-basic" pl-transclude="content">
+				<div pl-id="baloons" pl-component="selectable-all"></div>
 			</section>
 
 			<section id="yosemite" class="screen" pl-component="screen-basic" pl-transclude="content">

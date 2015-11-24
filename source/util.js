@@ -72,10 +72,19 @@ var util = new (function () {
 		};
 	};
 
-	this.random = function (_collection) {
-		var index;
+	this.random = function (_collection, _rangeB) {
+		var index, val;
+
 		index = Math.floor(Math.random()*_collection.length);
+
+		if (arguments.length === 2) {
+			val = Math.round(Math.random()*_rangeB);
+
+			return val < _collection ? _collection : val;
+		}
+
 		if (index === _collection.length) index = _collection.length-1;
+
 		return _collection && _collection[index];
 	};
 
