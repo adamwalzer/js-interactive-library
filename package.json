@@ -10,6 +10,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
+    "jsdoc": "^3.4.0",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   },

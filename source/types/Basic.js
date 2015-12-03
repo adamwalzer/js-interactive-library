@@ -1,28 +1,40 @@
 /**
-*  Basic
-*  @desc The base type for all objects which will act as prototypes.
-*/
+ * Base object type for 'classes' implementing methods for extention and super callbacks.
+ * @module
+ * @requires module:play~pl.util
+ */
 import util from 'util';
 
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Basic.create()` to get a new instance.
+ * @classdesc The base type for all objects which will act as prototypes.
+ * @class
+ */
 var Basic = {
-
+	/**
+	 * Objects with this as an own property will be identified as the root object.
+	 * @readonly
+	 * @default
+	 */
 	baseType: 'TYPE_BASIC',
 	
 	/**
-	*  @desc Creates a new object with the current object as its prototype.
-	*  @return (Object) The new instance.
-	*/
+	 * Creates a new object with the current object as its prototype.
+	 * @instance
+	 * @returns (Object) The new instance.
+	 */
 	create: function () {
 		return Object.create(this);
 	},
 
 	/**
-	*  @desc Creates a new object using a constructor function or object with the current object as its prototype.
-	*  @param _implementation (Function|Object) The implementation of the new type as either a constructor function or object to mixin.
-	*  @return (Basic) The new instance.
-	*
-	*  TODO: define constructor property
-	*/
+	 * Creates a new object using a constructor function or object with the current object as its prototype.
+	 * @instance
+	 * @arg {Function|Object} _implementation - The implementation of the new type as either a constructor function or object to mixin.
+	 * @returns {Basic} The new instance.
+	 *
+	 * @todo define constructor property
+	 */
 	extend: function (_implementation) {
 		var instance;
 
@@ -47,28 +59,31 @@ var Basic = {
 	},
 
 	/**
-	*  @desc Accepts one or more objects to combine their own properties to the instance.
-	*  @param _sources... (Object) The object(s) to join with the '_target'.
-	*  @return _target
-	*/
+	 * Accepts one or more objects to combine their own properties to the instance.
+	 * @instance
+	 * @arg {object} _sources... - The object(s) to join with the instance.
+	 * @returns this
+	 */
 	mixin: function () {
 		return util.mixin.apply(null, [this].concat([].slice.call(arguments, 0)));
 	},
 
 	/**
-	*  @desc Matches the name of the key which references the given pointer inside the instance. Like indexOf() for objects.
-	*  @param _member (*) The reference which is expected to be in the object as a property.
-	*  @return (String) The name of the key in the object matching '_member'.
-	*/
+	 * Matches the name of the key which references the given pointer inside the instance. Like indexOf() for objects.
+	 * @instance
+	 * @arg {*} _member - The reference which is expected to be in the object as a property.
+	 * @returns {string} The name of the key in the object matching '_member'.
+	 */
 	keyOf: function (_member) {
 		return util.keyOf(this, _member);
 	},
 
 	/**
-	*  @desc Performs a super callback of the function which called it. Allowing you to still invoke a method which was overridden.
-	*  @param ... (*) Whatever amount of arguments the caller takes.
-	*  @return (*) Whatever the caller returns.
-	*/
+	 * Performs a super callback of the function which called it. Allowing you to still invoke a method which was overridden.
+	 * @instance
+	 * @arg {*} _args... - Whatever amount of arguments the caller takes.
+	 * @returns {*} Whatever the caller returns.
+	 */
 	proto: function () {
 		var method, name, owner, prototype;
 
@@ -100,6 +115,12 @@ var Basic = {
 		return method.apply(this, arguments);
 	},
 
+	/**
+	 * Performs a super callback of the function which called it. Unlike `proto()` which looks for the overidden method, sup looks for the base class' implementation.
+	 * @instance
+	 * @arg {*} _args... - Whatever amount of arguments the caller takes.
+	 * @returns {*} Whatever the caller returns.
+	 */
 	sup: function () {
 		var method, name, owner, prototype;
 
@@ -127,6 +148,10 @@ var Basic = {
 		return method.apply(this, arguments);
 	},
 
+	/**
+	 * Provides the object type.
+	 * @instance
+	 */
 	toString: function () {
 		var type;
 		

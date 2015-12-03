@@ -1,13 +1,21 @@
 /**
-*  Collection
-*  @desc Contains...
-*  @proto Array, Basic
-*/
-
+ * Collections are iterables which hold a consistent interface throughout its indexes.
+ *
+ * @module
+ * @requires module:types/BasicArray
+ */
 import BasicArray from 'types/BasicArray';
 
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Collection.create()` to get a new instance.
+ * @classdesc Iterable holding record objects of the same interface.
+ * @class
+ * @extends module:types/BasicArray~BasicArray
+ */
 var Collection = BasicArray.extend(function () {
-
+	/**
+	 * 
+	 */
 	function getRecord (_member, _key, _shouldCollect) {
 		var i, record, member, result;
 
@@ -57,6 +65,12 @@ var Collection = BasicArray.extend(function () {
 		return result.length ? result : null;
 	}
 
+	/**
+	 * Objects with this as an own property will be identified as the root object.
+	 * @memberof module:types/Collection~Collection
+	 * @readonly
+	 * @default
+	 */
 	this.baseType = 'TYPE_COLLECTION';
 
 	this.add = function (_record) {

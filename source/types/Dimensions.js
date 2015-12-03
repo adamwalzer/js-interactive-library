@@ -1,45 +1,57 @@
-/*
-*  dimensions.js
-*
-*  Author: Micah Rolon <functionmicah@gmail.com>
-*  Created: 11/12/14
-*
-*  This file contains objects for containing values about a plane. i.e. x or width.
-*  Adds the convenience of keeping these values paired to passed around your application.
-*  It also includes methods which you perform on the values and returns a new object
-*  so the original values are maintained.
-*
-*  Usage:
-*
-*  New instances can be created by calling the create method.
-*  cursorLocation = Point.create();
-*
-*  Then call set() to apply your values.
-*  cursorLocation.set(event.clientX, event.clientY);
-*
-*  Then you can use the calculation methods to perform transformations.
-*  relativeCursor = cursorLocation.scale(zoom);
-*
-*
-*  DEVELOPER NOTES
-*
-*  If you want to change the value of one plane DO NOT just set the property.
-*  Dimensional objects are also arrays so they need their indexs set as well.
-*  i.e. point.width = 20; // DONT DO THIS, point[0] will not be set.
-*
-*  Use the setter. point.set('width', 10);
-*
-*
-*  When adding new methods make sure you are returning a new instance.
-*  Dimensional objects are meant to be immutable.
-*
-*  Follow this pattern:
-*
-*  this.method = function () {
-*      // set with your calculated values.
-*      return this.create().set( ... )
-*  }
-*/
+/**
+ * 
+ * @module
+ * @version 1.0
+ * @author Micah Rolon <functionmicah@gmail.com>
+ * @requires module:types/BasicArray~BasicArray
+ *
+ * @desc *Created: 11/12/14*
+ *
+ * This file contains objects for containing values about a plane. i.e. x or width.
+ * Adds the convenience of keeping these values paired to passed around your application.
+ * It also includes methods which you perform on the values and returns a new object
+ * so the original values are maintained.
+ *
+ * #### Usage
+ *
+ * New instances can be created by calling the create method.
+ * ```
+ * cursorLocation = Point.create();
+ * ```
+ *
+ * Then call `set()` to apply your values.
+ * ```
+ * cursorLocation.set(event.clientX, event.clientY);
+ * ```
+ *
+ * Then you can use the calculation methods to perform transformations.
+ * ```
+ * relativeCursor = cursorLocation.scale(zoom);
+ * ```
+ *
+ * #### Developer Notes
+ *
+ * If you want to change the value of one plane DO NOT just set the property.
+ * Dimensional objects are also arrays so they need their indexs set as well.
+ * i.e.
+ * ```
+ * // DONT DO THIS point[0] will not be set.
+ * point.width = 20;
+ * ```
+ *
+ * Use the setter. `point.set('width', 10);`
+ *
+ * When adding new methods make sure you are returning a new instance.
+ * Dimensional objects are meant to be immutable.
+ *
+ * Follow this pattern:
+ * ```
+ * this.method = function () {
+ *     // set with your calculated values.
+ *     return this.create().set( ... )
+ * }
+ * ```
+ */
 
 /*jslint browser: true, eqeq: true, nomen: true, sloppy: true, white: true */
 
@@ -47,7 +59,49 @@ import BasicArray from 'types/BasicArray';
 
 var Dimension, Size, Point;
 
-// Base class for dimensional objects consisting of 2 planes.
+/**
+ * The native Array
+ * @external Array
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
+ */
+
+/**
+ * Array prototype extension
+ * Creates an instance of `_Thing` and passes the array to its set function as its arguments.
+ * @function external:Array#to
+ * @arg {Point|Size|string} _Thing - A Dimension object or one the strings 'point'/'size'
+ * @example
+ * somePoint = [10, 10].to(Point);
+ * somePoint = [10, 10].to('point');
+ */
+Array.prototype.to = function (_Thing) {
+	var map;
+
+	map = {
+		point: Point,
+		size: Size
+	};
+
+	if (typeof _Thing === 'string') {
+		return map[_Thing.toLowerCase()].create().set(this);
+	}
+
+	else if (typeof _Thing === 'object' && ~[Point.set, Size.set].indexOf(_Thing.set)) {
+		if (!_Thing.isPrototypeOf(this)) {
+			return _Thing.set.apply(_Thing.create(), this);	
+		}
+	}
+		
+	return this;
+}
+
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Dimension.create()` to get a new instance.
+ * @class
+ * @classdesc Base class for dimensional objects consisting of 2 planes.<br>
+ * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
+ * @extends BasicArray
+ */
 Dimension = BasicArray.extend(function () {
 	var originalMap;
 
@@ -57,6 +111,11 @@ Dimension = BasicArray.extend(function () {
 	this.planeMap = null,
 	this.length = 2;
 
+	/**
+	 * Provides a new instance.
+	 * @arg {array} _argumentsArray - Create a new instace with an arguments array.
+	 * @returns {Dimension}
+	 */
 	this.create = function (_argumentsArray) {
 		var instance;
 
@@ -67,7 +126,12 @@ Dimension = BasicArray.extend(function () {
 		return instance;
 	};
 
-	// Incerement each plane by a value or specify each plane.
+	/**
+	 * Incerement each plane by a value or specify each plane.
+	 * @arg {number} _val - plane a of (a,b)
+	 * @arg {number} [_plane2] - plane b of (a,b)
+	 * @returns {Dimension}
+	 */
 	this.inc = function (_val, _plane2) {
 		var a,b;
 
@@ -91,7 +155,12 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
-	// Decerement each plane by a value or specify each plane.
+	/**
+	 * Decerement each plane by a value or specify each plane.
+	 * @arg {number} _val - plane a of (a,b)
+	 * @arg {number} [_plane2] - plane b of (a,b)
+	 * @returns {Dimension}
+	 */
 	this.dec = function (_val, _plane2) {
 		var a,b;
 
@@ -115,7 +184,12 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
-	// Multiply each plane by a value or specify each plane.
+	/**
+	 * Multiply each plane by a value or specify each plane.
+	 * @arg {number} _scale - plane a of (a,b)
+	 * @arg {number} [_plane2] - plane b of (a,b)
+	 * @returns {Dimension}
+	 */
 	this.scale = function (_scale, _plane2) {
 		return this.create().set(
 			this[0] * _scale,
@@ -123,10 +197,13 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
-	// Perfom a Math function on each plane
-	// _fun: a string of the function name in the JS Math object,
-	// followed by the whatever arguments the function take after first
-	// since the first argument is the plane value.
+	/**
+	 * Perfom a Math function on each plane
+	 * @arg {string} _fun - a string of the function name in the JS Math object,
+	 * followed by the whatever arguments the function takes after its first
+	 * since the first argument is the plane value.
+	 * @returns {Dimension}
+	 */
 	this.math = function (_fun) {
 		var args = [].slice.call(arguments, 1);
 
@@ -136,6 +213,10 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
+	/**
+	 * Takes each plane value and passes it to parseInt().
+	 * @returns {Dimension}
+	 */
 	this.parseInt = function () {
 		return this.create().set(
 			parseInt(this[0]),
@@ -143,6 +224,10 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
+	/**
+	 * Takes each plane value and passes it to parseFloat().
+	 * @returns {Dimension}
+	 */
 	this.parseFloat = function () {
 		return this.create().set(
 			parseFloat(this[0]),
@@ -150,57 +235,84 @@ Dimension = BasicArray.extend(function () {
 		);
 	};
 
+	/**
+	 * Resolves the name of the plane at the given index.
+	 * @arg {number} _index - The index of the plane.
+	 * @returns {string}
+	 */
 	this.planeOf = function (_index) {
 		if (isNaN(parseInt(_index))) return null;
 		return this.planeMap[_index];
 	};
 
+	/**
+	 * Make a new array by iterating over each plane.<br>
+	 * See [`Array.prototype.map()`]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map}
+	 * @arg {function} _handler - handler for each index.
+	 * @override
+	 * @returns {Dimension}
+	 */
 	this.map = function (_handler) {
 		return originalMap.call(this, _handler).to(Object.getPrototypeOf(this));
 	};
 
+	/**
+	 * Multiplies the planes.
+	 * @returns {number}
+	 */
 	this.product = function () {
 		return this[0] * this[1];
 	};
 
+	/**
+	 * Divides the planes.
+	 * @returns {number}
+	 */
 	this.dividend = function () {
 		return this[0] / this[1];
 	};
 	
 });
 
-// Array prototype extension
-// Creates an instance of _Thing and passes the array to _Things set function as its arguments
-// Example: somePoint = [10, 10].to(Point);
-// Example: somePoint = [10, 10].to('point');
-// 
-Array.prototype.to = function (_Thing) {
-	var map;
-
-	map = {
-		point: Point,
-		size: Size
-	};
-
-	if (typeof _Thing === 'string') {
-		return map[_Thing.toLowerCase()].create().set(this);
-	}
-
-	else if (typeof _Thing === 'object' && ~[Point.set, Size.set].indexOf(_Thing.set)) {
-		if (!_Thing.isPrototypeOf(this)) {
-			return _Thing.set.apply(_Thing.create(), this);	
-		}
-	}
-		
-	return this;
-}
-
-// 2 Dimensional object containing width and height.
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Size.create()` to get a new instance.
+ * @class
+ * @extends Dimension
+ * @classdesc 2 Dimensional object containing width and height.<br>
+ * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
+ * @prop {number} width - The width.
+ * @prop {number} height - The height.
+ */
 Size = Dimension.extend(function () {
-
+	/**
+	 * Maps the names of the indexs.<br>
+	 * See [Dimension#planeOf]{@link module:types/Dimensions~Dimension#planeOf} for resolving plane name.
+	 * @protected
+	 * @default ['width', 'height']
+	 */
 	this.planeMap = ['width', 'height'];
 	this.width = this.height = 0;
 
+	/**
+	 * Define the size with an object. (overloaded)
+	 * @function module:types/Dimensions~Size#set
+	 * @arg {object} _size - A size object {width, height}.
+	 * @returns {Size}
+	 */
+
+	/**
+	 * Define the size with an array. (overloaded)
+	 * @function module:types/Dimensions~Size#set
+	 * @arg {array} _size - A size array [width, height].
+	 * @returns {Size}
+	 */
+
+	/**
+	 * Define the size.
+	 * @arg {number} _width - The width.
+	 * @arg {number} _height - The height.
+	 * @returns {Size}
+	 */
 	this.set = function (_width, _height) {
 		if (arguments.length === 1) {
 			if (_width.width !== undefined && _width.height !== undefined) {
@@ -236,10 +348,20 @@ Size = Dimension.extend(function () {
 		return this;
 	};
 
+	/**
+	 * Calculates the hypotenuse.
+	 * @see {@link https://en.wikipedia.org/wiki/Hypotenuse}
+	 * @returns {number}
+	 */
 	this.hypotenuse = function () {
 		return Math.floor(Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2)));
 	};
 
+	/**
+	 * Sets width and height properties on the given object. If the object is an HTML node then it will be set on the nodes style object.
+	 * @arg {object|HTMLElement} - The object or DOM node.
+	 * @returns {this}
+	 */
 	this.applyTo = function (_object) {
 		if (_object.nodeType === document.ELEMENT_NODE) {
 			if (!(_object.width !== undefined || _object.height !== undefined)) {
@@ -258,12 +380,45 @@ Size = Dimension.extend(function () {
 
 });
 
-// Object containing coordinates on 2 dimensional cartesian plane.
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Point.create()` to get a new instance.
+ * @class
+ * @extends Dimension
+ * @classdesc Object containing coordinates on a 2-dimensional cartesian plane.<br>
+ * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
+ * @prop {number} x - The x coordinate.
+ * @prop {number} y - The y coordinate.
+ */
 Point = Dimension.extend(function () {
-
+	/**
+	 * Maps the names of the indexs.<br>
+	 * See [Dimension#planeOf]{@link module:types/Dimensions~Dimension#planeOf} for resolving plane name.
+	 * @protected
+	 * @default ['x', 'y']
+	 */
 	this.planeMap = ['x', 'y'];
 	this.x = this.y = 0;
 
+	/**
+	 * Define the point with an object. (overloaded)
+	 * @function module:types/Dimensions~Point#set
+	 * @arg {object} _point - A point object {x, y}.
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Define the point with an array. (overloaded)
+	 * @function module:types/Dimensions~Point#set
+	 * @arg {array} _point - A point array [x, y].
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Define the point.
+	 * @arg {number} _x - The x.
+	 * @arg {number} _y - The y.
+	 * @returns {Point}
+	 */
 	this.set = function (_x, _y) {
 		if (arguments.length === 1) {
 			if (_x.x !== undefined && _x.y !== undefined) {
@@ -299,6 +454,11 @@ Point = Dimension.extend(function () {
 		return this;
 	};
 
+	/**
+	 * Calculates the distance between the insatnce and a point object.
+	 * @arg {Point} _point - A point object {x,y}.
+	 * @returns {Size}
+	 */
 	this.distance = function (_point) {
 		if (_point.x !== undefined && _point.y !== undefined) {
 			return Size.create().set(
@@ -310,6 +470,11 @@ Point = Dimension.extend(function () {
 		return null;
 	};
 
+	/**
+	 * Sets x and y properties on the given object. If the object is an HTML node then the left and top properties will be set on the nodes style object.
+	 * @arg {object|HTMLElement} - The object or DOM node.
+	 * @returns {this}
+	 */
 	this.applyTo = function (_object) {
 		if (_object.nodeType === document.ELEMENT_NODE) {
 			_object.style.left = this.x;
@@ -324,6 +489,12 @@ Point = Dimension.extend(function () {
 		return this;
 	};
 
+	/**
+	 * Rotate the point based on an origin point and an angle in degrees.
+	 * @arg {Point} _origin - A point object {x,y}.
+	 * @arg {number} _angle - The angle of rotation in degrees.
+	 * @returns {this}
+	 */
 	this.rotate = function (_origin, _angle) {
 		var x, y, rad;
 
