@@ -14,7 +14,14 @@ import BasicArray from 'types/BasicArray';
  */
 var Collection = BasicArray.extend(function () {
 	/**
-	 * 
+	 * Gets the record object which has `_member` as a member.
+	 * @instance
+	 * @protected
+	 * @memberof module:types/Collection~Collection
+	 * @arg {*} _member - object reference to search for.
+	 * @arg {string} _key - the target key to test the `_member` against.
+	 * @arg {boolean} _shouldCollect - <span style="color: blue; font-weight: bold;">`true`</span>: collect all matching elements.<br>
+	 * <span style="color: blue; font-weight: bold;">`false`</span>: return first result.
 	 */
 	function getRecord (_member, _key, _shouldCollect) {
 		var i, record, member, result;

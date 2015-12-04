@@ -21,7 +21,7 @@ var Basic = {
 	/**
 	 * Creates a new object with the current object as its prototype.
 	 * @instance
-	 * @returns (Object) The new instance.
+	 * @returns {Basic} The new instance.
 	 */
 	create: function () {
 		return Object.create(this);

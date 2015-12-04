@@ -76,8 +76,16 @@ var util = new (function () {
 	};
 
 	/**
-	 * Given an iterable; provides a random item. Given a range; provides a random number in that range.
-	 * @arg {array|number} _collection_rangeA - The iterable or a number for low end of the range.
+	 * Given a range; provides a random number in that range.
+	 * @function random
+	 * @arg {number} _rangeA - The iterable or a number for low end of the range.
+	 * @arg {number} _rangeB - The top end of the range.
+	 * @returns {number|*} The resulting number in range or the member found at random.
+	 */
+
+	/**
+	 * Given an iterable; provides a random item.
+	 * @arg {array} _collection_rangeA - The iterable or a number for low end of the range.
 	 * @arg {number} _rangeB - The top end of the range.
 	 * @returns {number|*} The resulting number in range or the member found at random.
 	 */
