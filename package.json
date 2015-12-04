@@ -2,9 +2,13 @@
   "name": "js-interactive-library",
   "version": "0.1.0",
   "description": "CMWN Games Library (PlayJS)",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/ginasink/js-interactive-library.git"
+  },
   "main": "build/play.js",
   "scripts": {
-    "install": "gulp build"
+    "install": "gulp"
   },
   "devDependencies": {
     "babel": "^5.8.29",

@@ -1,16 +1,8 @@
 var gulp = require('gulp');
-var sourcemaps = require('gulp-sourcemaps');
 var watch = require('gulp-watch');
-//var buffer = require('vinyl-buffer');
-//var browserify = require('browserify');
-//var watchify = require('watchify');
-//var babel = require('babelify');
 var gutil = require("gulp-util");
 var webpack = require("webpack");
-var WebpackDevServer = require("webpack-dev-server");
 var webpackDevConfig = require("./webpack.config.dev.js");
-// var webpackProdConfig = require("./webpack.config.prod.js");
-var spawn = require('child_process').spawn;
 
 gulp.task("default", ["build-dev"]); 
 
@@ -52,7 +44,6 @@ gulp.task("webpack:build-dev", function(callback) {
         callback();
     });
 });
-
 
 gulp.task("watch", function(callback) {
     watch('source/**/*.js', function () {
