@@ -14,6 +14,17 @@ var Game = GlobalScope.extend(function () {
 
 	var screenPrototype;
 
+	function assignRef (_ref, _name) {
+		if (this[_name]) {
+			this[_name] = [this[_name]];
+			this[_name].push(_ref);
+		}
+
+		else {
+			this[_name] = _ref;
+		}
+	}
+
 	screenPrototype = Screen;
 
 	this.baseType = 'TYPE_GAME';
@@ -86,7 +97,7 @@ var Game = GlobalScope.extend(function () {
 			collection.push(screen);
 			
 			if (key === 'name' || component) {
-				this[ util.transformId((key === 'name' && id) || component) ] = screen;
+				assignRef.call(this, screen, util.transformId((key === 'name' && id) || component));
 			}
 		}));
 

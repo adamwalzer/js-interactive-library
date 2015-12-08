@@ -38,6 +38,17 @@ var Scope = jQProxy.extend(function () {
 
 	var Actionables;
 
+	function assignRef (_ref, _name) {
+		if (this[_name]) {
+			this[_name] = [this[_name]];
+			this[_name].push(_ref);
+		}
+
+		else {
+			this[_name] = _ref;
+		}
+	}
+
 	function attachActionHandler () {
 		var entity;
 
@@ -266,7 +277,7 @@ var Scope = jQProxy.extend(function () {
 			}
 			
 			id = transformId(instance.id());
-			if (id) this[id] = instance;
+			if (id) assignRef.call(this, instance, id);
 		}));
 
 		return this;
@@ -551,7 +562,7 @@ var Scope = jQProxy.extend(function () {
 			id = $node.attr('id') || $node.attr('pl-id');
 
 			if (!this[id]) {
-				this[id] = $node.data('pl-scope') || $node;
+				assignRef.call(this, $node.data('pl-scope') || $node, id);
 			}
 		}));
 	};
@@ -703,7 +714,7 @@ var Scope = jQProxy.extend(function () {
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
 					id = transformId(scope.id()) || _value;
-					this[id] = scope;
+					assignRef.call(this, scope, id);
 
 					this.assetQueue.add(scope);
 				}
