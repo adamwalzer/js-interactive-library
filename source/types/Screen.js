@@ -40,6 +40,10 @@ var Screen = Entity.extend(function () {
 		return this;
 	};
 
+	this.index = function () {
+		return this.game.screens.indexOf(this);
+	};
+
 	this.next = function () {
 		// console.log('Screen next()');
 		if (!this.completed()) return false;
