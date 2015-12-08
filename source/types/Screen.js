@@ -41,18 +41,17 @@ var Screen = Entity.extend(function () {
 	};
 
 	this.index = function () {
-		return this.game.screens.indexOf(this);
+		if (this === this.screen) return this.game.screens.indexOf(this);
+		return this.$els.index();
 	};
 
 	this.next = function () {
-		// console.log('Screen next()');
 		if (!this.completed()) return false;
-		return this.game.screens[this.index()+1];
+		return this.game.screens[this.screen.index()+1];
 	};
 
 	this.prev = function () {
-		// console.log('Screen prev()');
-		return this.game.screens[this.index()-1];
+		return this.game.screens[this.screen.index()-1];
 	};
 
 	this.quit = function () {
