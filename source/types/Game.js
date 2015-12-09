@@ -116,15 +116,7 @@ var Game = GlobalScope.extend(function () {
 
 			current = playing.filter(_event.audioType, 'type');
 
-			if (!current) {
-				playing.push({
-					audio: _event.target,
-					type: _event.audioType
-				});
-				// console.log('start: playing', playing.length, current);
-			}
-
-			else {
+			if (current) {
 				current.forEach(function (_record) {
 					// console.log('pause', current.length, _event.audioType, [_record.audio.paused, _record.audio.currentTime]);
 					_record.audio.pause();
@@ -133,25 +125,33 @@ var Game = GlobalScope.extend(function () {
 			}
 
 			if (_event.audioType === 'voice-over') {
-				if (playing.get('background', 'type')) {
+				if (playing.get(this.audio.background.music, 'audio')) {
 					this.audio.background.music.volume = 0.2;
 				}
 			}
+
+			playing.push({
+				audio: _event.target,
+				type: _event.audioType
+			});
+			console.log('start: playing', playing.length, current);
 		});
 
-		this.on('audio-ended', function (_event) {
-			var index, scope;
+		this.on('audio-ended audio-pause', function (_event) {
+			var current, scope;
 
-			playing.remove(playing.get(_event.target, 'audio'));
+			current = playing.get(_event.target, 'audio')
 			scope = $(_event.target).scope();
+
+			console.log(_event.type, _event.target, current);
+
+			playing.remove(current);
 
 			if (util.isSet(scope, scope.screen, scope.screen.requiredQueue)) {
 				if (scope.screen.requiredQueue.has(_event.target)) {
 					scope.screen.requiredQueue.ready(_event.target);
 				}
 			}
-
-			// console.log('stop: playing', playing);
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
 				this.audio.background.music.volume = 1;

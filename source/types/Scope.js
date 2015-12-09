@@ -598,7 +598,7 @@ var Scope = jQProxy.extend(function () {
 								scope.screen.addClass('PLAYING '+_type.toUpperCase());
 								break;
 
-							case 'puase':
+							case 'pause':
 							case 'ended':
 								scope.screen.removeClass('PLAYING '+_type.toUpperCase());
 								break;
@@ -658,6 +658,7 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) this.entities = [];
 
 		if (this.hasOwnProperty('$els')) {
+			debugger;
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
 			id = transformId(instance.id());
