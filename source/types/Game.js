@@ -118,7 +118,6 @@ var Game = GlobalScope.extend(function () {
 
 			if (current) {
 				current.forEach(function (_record) {
-					// console.log('pause', current.length, _event.audioType, [_record.audio.paused, _record.audio.currentTime]);
 					_record.audio.pause();
 					_record.audio.currentTime = 0;
 				});
@@ -134,7 +133,6 @@ var Game = GlobalScope.extend(function () {
 				audio: _event.target,
 				type: _event.audioType
 			});
-			console.log('start: playing', playing.length, current);
 		});
 
 		this.on('audio-ended audio-pause', function (_event) {
@@ -142,8 +140,6 @@ var Game = GlobalScope.extend(function () {
 
 			current = playing.get(_event.target, 'audio')
 			scope = $(_event.target).scope();
-
-			console.log(_event.type, _event.target, current);
 
 			playing.remove(current);
 
