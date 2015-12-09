@@ -109,7 +109,7 @@ var Scope = jQProxy.extend(function () {
 		if (_id && _camelCase) {
 			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
 				return RegExp.$1.toUpperCase();
-			})
+			});
 		}
 		return _id && _id.replace(/[-\s]+/g, '_');
 	}
@@ -577,6 +577,8 @@ var Scope = jQProxy.extend(function () {
 		this.findOwn('[id], [pl-id]').each(this.bind(function (_index, _node) {
 			var $node, id;
 
+			if (_node.nodeName === 'AUDIO') return;
+
 			$node = $(_node);
 			id = $node.attr('id') || $node.attr('pl-id');
 
@@ -605,16 +607,20 @@ var Scope = jQProxy.extend(function () {
 			audioTypes = ['background', 'voice-over', 'sfx'];
 
 			audioTypes.forEach(function (_type) {
+				var screen;
+
+				screen = typeof scope.screen === 'object' ? scope.screen : scope;
+
 				if ($node.hasClass(_type)) {
 					$node.on('play pause ended', function (_event) {
 						switch (_event.type) {
 							case 'play':
-								scope.screen.addClass('PLAYING '+_type.toUpperCase());
+								screen.addClass('PLAYING '+_type.toUpperCase());
 								break;
 
 							case 'pause':
 							case 'ended':
-								scope.screen.removeClass('PLAYING '+_type.toUpperCase());
+								screen.removeClass('PLAYING '+_type.toUpperCase());
 								break;
 						}
 						scope.trigger($.Event('audio-'+_event.type, {
@@ -625,7 +631,7 @@ var Scope = jQProxy.extend(function () {
 					});
 
 					if ($node.attr('pl-required') != null) {
-						scope.screen.require($node[0]);
+						screen.require($node[0]);
 					}
 
 					assignRef.call(scope.audio, $node[0], _type);
