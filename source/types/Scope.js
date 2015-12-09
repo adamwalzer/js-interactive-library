@@ -39,13 +39,27 @@ var Scope = jQProxy.extend(function () {
 	var Actionables;
 
 	function assignRef (_ref, _name) {
-		if (this[_name]) {
-			this[_name] = [this[_name]];
-			this[_name].push(_ref);
+		var name;
+
+		name = transformId(_name, true);
+
+		if (this[name]) {
+			if (this[name] && !this[name].__refCollction__) {
+				this[name] = [this[name]];
+
+				Object.defineProperty(this[name], '__refCollction__', {
+					value: true,
+					enumerable: false,
+					writeable: false,
+					configureable: false
+				});
+			}
+			
+			this[name].push(_ref);
 		}
 
 		else {
-			this[_name] = _ref;
+			this[name] = _ref;
 		}
 	}
 
@@ -91,7 +105,12 @@ var Scope = jQProxy.extend(function () {
 		if (~index) _collection.splice(index, 1);
 	}
 
-	function transformId (_id) {
+	function transformId (_id, _camelCase) {
+		if (_id && _camelCase) {
+			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
+				return RegExp.$1.toUpperCase();
+			})
+		}
 		return _id && _id.replace(/[-\s]+/g, '_');
 	}
 
@@ -568,27 +587,22 @@ var Scope = jQProxy.extend(function () {
 	};
 
 	this.captureAudioAssets = function () {
-		var scope, map;
+		var scope = this;
 
-		scope = this;
-		map = {
-			background: 'background',
-			'voice-over': 'voiceOver'
-		};
-
-		this.findOwn('audio').each(function () {
+		scope.findOwn('audio').each(function () {
 			var $node, id, audioTypes;
 
 			if (!scope.hasOwnProperty('audio')) {
 				scope.audio = {
-					background: [],
-					voiceOver: []
+					background: null,
+					voiceOver: null,
+					sfx: null
 				};
 			}
 
 			$node = $(this);
 			id = transformId($node.id());
-			audioTypes = ['background', 'voice-over'];
+			audioTypes = ['background', 'voice-over', 'sfx'];
 
 			audioTypes.forEach(function (_type) {
 				if ($node.hasClass(_type)) {
@@ -614,14 +628,13 @@ var Scope = jQProxy.extend(function () {
 						scope.screen.require($node[0]);
 					}
 
-					scope.audio[map[_type]].push($node[0]);
-
-					if (id) scope.audio[map[_type]][id] = $node[0];
+					assignRef.call(scope.audio, $node[0], _type);
+					if (id) assignRef.call(scope.audio[transformId(_type)], $node[0], id);
 				}
 			});
 		});
 
-		return this;
+		return scope;
 	};
 
 	this.handleProperty = function (_implementation) {
