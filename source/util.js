@@ -132,6 +132,52 @@ var util = new (function () {
 		return Array.prototype.map.call(_collection, function (i) { return i; });
 	};
 
+	/**
+	 * Resolves the value in the object at the given path.
+	 * @arg {object} _obj - The object to query.
+	 * @arg {string} _path - The path to the desired reference.
+	 * @returns {*} The resulting reference value.
+	 * @example
+	 * var user = {
+	 *   name: 'John',
+	 *   family: {
+	 *	   guardians: {David}, // property could be an array of multiple guardians.
+	 *     siblings: [{Jane}, {Thomas}] // collection of user objects.
+	 *   }
+	 * };
+	 *
+	 * pl.util.resolvePath(user, 'family.sliblings[2].name');
+	 * // Matches the `guardians` propery if `guardians[0]` is undefined when `?` is used.
+	 * pl.util.resolvePath(user, 'family.guardians[0]?.name'); 
+	 */
+	this.resolvePath = function (_obj, _path) {
+		var path, obj, i, name, index, testArray;
+
+		path = _path.split('.');
+		obj = _obj;
+		i = 0;
+
+		while (obj) {
+			testArray = (/\?$/).test(path[i]);
+			index = (path[i].match(/\[(\d+)\]/) || [])[1] || -1;
+			name = ~index ? path[i].slice(0, path[i].indexOf('[')) : path[i];
+
+			if (~index) {
+				obj = testArray ? (obj[name][index] || obj[name]) : obj[name][index];
+			}
+
+			else {
+				obj = obj[name];
+			}
+			
+			i+=1;
+
+			if (path.length === i) break;
+		}
+
+		return obj;
+	};
+
 });
 
 export default util;
