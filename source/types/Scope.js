@@ -264,7 +264,7 @@ var Scope = jQProxy.extend(function () {
 		this.entities.forEach(this.bind(function (_record, _index) {
 			var $node, instance, id, query, index;
 
-			$node = this.find(_record.selector);
+			$node = this.findOwn(_record.selector);
 			query = ['#'+_record.selector, '[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
 			index = 0;
 
@@ -272,7 +272,7 @@ var Scope = jQProxy.extend(function () {
 				if (index === query.length) {
 					throw new Error("Unable to locate entity with selector", _record.selector);
 				}
-				$node = this.find(query[index]);
+				$node = this.findOwn(query[index]);
 				index+=1;
 			}
 
@@ -520,8 +520,6 @@ var Scope = jQProxy.extend(function () {
 				};
 			}
 		}
-
-		// console.log('watchAssets', this.id(), this.html())
 
 		scope = this;
 		assetTypes = ['IMG', 'AUDIO', 'VIDEO'];
