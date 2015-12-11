@@ -7,6 +7,7 @@
 import jQProxy from 'types/jQProxy';
 import Basic from 'types/Basic';
 import Queue from 'types/Queue';
+import { Point } from 'types/Dimensions';
 import game from 'play.game';
 import util from 'util';
 import evalAction from 'evalAction';
@@ -41,7 +42,7 @@ var Scope = jQProxy.extend(function () {
 	function assignRef (_ref, _name) {
 		var name;
 
-		name = transformId(_name, true);
+		name = util.transformId(_name, true);
 
 		if (this[name]) {
 			if (this[name] && !this[name].__refCollction__) {
@@ -72,6 +73,8 @@ var Scope = jQProxy.extend(function () {
 			var target, record;
 
 			target = $(_event.target).closest('[pl-action]')[0];
+			// TODO: Resolve for touches
+			_event.cursor = Point.create().set(_event.clientX, _event.clientY);
 
 			if (target) {
 				record = entity.actionables.item(target);
@@ -103,15 +106,6 @@ var Scope = jQProxy.extend(function () {
 
 		index = _collection.indexOf(_record);
 		if (~index) _collection.splice(index, 1);
-	}
-
-	function transformId (_id, _camelCase) {
-		if (_id && _camelCase) {
-			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
-				return RegExp.$1.toUpperCase();
-			});
-		}
-		return _id && _id.replace(/[-\s]+/g, '_');
 	}
 
 	function captureDropables (_scope) {
@@ -253,7 +247,7 @@ var Scope = jQProxy.extend(function () {
 			// I explicitly want it to be at the beginning.
 			if (attr.name.indexOf('pl-') === 0) {
 				name = attr.name.slice(3);
-				collection[transformId(name)] = attr.value;
+				collection[util.transformId(name)] = attr.value;
 				
 				collection.push(name);
 			}
@@ -295,7 +289,7 @@ var Scope = jQProxy.extend(function () {
 				instance = _record;
 			}
 			
-			id = transformId(instance.id());
+			id = util.transformId(instance.id());
 			if (id) assignRef.call(this, instance, id);
 		}));
 
@@ -589,7 +583,10 @@ var Scope = jQProxy.extend(function () {
 	};
 
 	this.captureAudioAssets = function () {
-		var scope = this;
+		var scope, screen;
+
+		scope = this;
+		screen = typeof scope.screen === 'object' ? scope.screen : scope;
 
 		scope.findOwn('audio').each(function () {
 			var $node, id, audioTypes;
@@ -603,16 +600,16 @@ var Scope = jQProxy.extend(function () {
 			}
 
 			$node = $(this);
-			id = transformId($node.id());
+			id = util.transformId($node.id(), true);
 			audioTypes = ['background', 'voice-over', 'sfx'];
 
 			audioTypes.forEach(function (_type) {
-				var screen;
-
-				screen = typeof scope.screen === 'object' ? scope.screen : scope;
-
 				if ($node.hasClass(_type)) {
 					$node.on('play pause ended', function (_event) {
+						var screen;
+
+						screen = typeof scope.screen === 'object' ? scope.screen : scope;
+						
 						switch (_event.type) {
 							case 'play':
 								screen.addClass('PLAYING '+_type.toUpperCase());
@@ -634,8 +631,14 @@ var Scope = jQProxy.extend(function () {
 						screen.require($node[0]);
 					}
 
-					assignRef.call(scope.audio, $node[0], _type);
-					if (id) assignRef.call(scope.audio[transformId(_type)], $node[0], id);
+					// This property can be either an array of nodes or the node.
+					util.assignRef(scope.audio, _type, $node[0]);
+
+					// Makes sure the property is set on the final value of scope.audio[_type].
+					// This should be safe to run out of the callstack.
+					setTimeout(function () {
+						if (id) util.assignRef(scope.audio[util.transformId(_type, true)], id, $node[0]);
+					});
 				}
 			});
 		});
@@ -680,7 +683,7 @@ var Scope = jQProxy.extend(function () {
 			debugger;
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
-			id = transformId(instance.id());
+			id = util.transformId(instance.id());
 
 			// this.entities.push(instance);
 			if (id) this[id] = instance;
@@ -733,7 +736,7 @@ var Scope = jQProxy.extend(function () {
 
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
-					id = transformId(scope.id()) || _value;
+					id = util.transformId(scope.id()) || _value;
 					assignRef.call(this, scope, id);
 
 					this.assetQueue.add(scope);
