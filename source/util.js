@@ -88,7 +88,12 @@ var util = new (function () {
 		return _collection && _collection[index];
 	};
 
-	this.transformId = function (_id) {
+	this.transformId = function (_id, _camelCase) {
+		if (_id && _camelCase) {
+			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
+				return RegExp.$1.toUpperCase();
+			});
+		}
 		return _id && _id.replace(/[-\s]+/g, '_');
 	};
 
@@ -176,6 +181,31 @@ var util = new (function () {
 		}
 
 		return obj;
+	};
+
+	this.assignRef = function (_obj, _name, _ref) {
+		var name;
+
+		name = util.transformId(_name, true);
+
+		if (_obj[name]) {
+			if (_obj[name] && !_obj[name].__refCollction__) {
+				_obj[name] = [_obj[name]];
+
+				Object.defineProperty(_obj[name], '__refCollction__', {
+					value: true,
+					enumerable: false,
+					writeable: false,
+					configureable: false
+				});
+			}
+			
+			_obj[name].push(_ref);
+		}
+
+		else {
+			_obj[name] = _ref;
+		}
 	};
 
 });
