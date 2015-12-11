@@ -10,11 +10,13 @@
   "scripts": {
     "install": "gulp"
   },
+  "dependencies" : {
+    "babel-runtime": "^6.3.13"
+  },
   "devDependencies": {
     "babel": "^5.8.29",
     "babel-loader": "^5.3.3",
     "babel-plugin-dev-expression": "^0.1.0",
-    "babel-runtime": "^6.3.13",
     "gulp": "^3.9.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.7",
