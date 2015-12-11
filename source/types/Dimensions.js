@@ -163,8 +163,16 @@ Dimension = BasicArray.extend(function () {
 		return this[0] * this[1];
 	};
 
-	this.dividend = function () {
+	this.ratio = function () {
 		return this[0] / this[1];
+	};
+
+	this.quotient = function () {
+		return Math.floor(this[0] / this[1]);
+	};
+
+	this.remainder = function () {
+		return this[0] % this[1];
 	};
 	
 });
@@ -237,7 +245,7 @@ Size = Dimension.extend(function () {
 	};
 
 	this.hypotenuse = function () {
-		return Math.floor(Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2)));
+		return Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
 	};
 
 	this.applyTo = function (_object) {
