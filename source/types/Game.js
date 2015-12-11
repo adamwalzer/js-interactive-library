@@ -5,34 +5,101 @@
 */
 
 import util from 'util';
+import game from 'play.game';
 import GlobalScope from 'types/GlobalScope';
 import Screen from 'types/Screen';
 import Collection from 'types/Collection';
 import { createEntity } from 'types/Scope';
+import { Size } from 'types/Dimensions';
 
 var Game = GlobalScope.extend(function () {
 
-	var screenPrototype;
+	var Viewport, screenPrototype;
 
-	function assignRef (_ref, _name) {
-		if (this[_name]) {
-			this[_name] = [this[_name]];
-			this[_name].push(_ref);
+	/**
+	 * Scales the game view to fill the browser window.
+	 */
+	function scaleGame () {
+		var vpSize, gameDimensions, width, height, zoom;
+
+		vpSize = this.viewport.size();
+		gameDimensions = game.config('dimensions');
+		width = gameDimensions.width || this.width();
+		height = Math.round(gameDimensions.width / gameDimensions.ratio);
+		zoom = this.viewport.width / width;
+
+		if (Math.round(height * zoom) > this.viewport.height) {
+			zoom = this.viewport.height / height;
 		}
 
-		else {
-			this[_name] = _ref;
-		}
+		this.css({
+			width: width,
+			zoom: zoom
+		});
+
+		this.zoom = zoom;
 	}
 
 	screenPrototype = Screen;
 
 	this.baseType = 'TYPE_GAME';
 	this.screens = null;
+	this.zoom = 1;
+	this.viewport = new (function () {
+		
+		this.size = function () {
+			return Size.create().set(window.innerWidth, window.innerHeight);
+		};
+
+		Object.defineProperties(this, {
+			width: {
+				get: function () {
+					return window.innerWidth;
+				},
+
+				configurable: false
+			},
+
+			height: {
+				get: function () {
+					return window.innerHeight;
+				},
+
+				configurable: false
+			},
+
+			orientation: {
+				get: function () {
+					var ratio = this.size().ratio();
+
+					switch (true) {
+						case ratio > 0.9 && ratio < 1.1: return 'squareish';
+						case ratio > 1.1: return 'landscape';
+						case ratio < 0.9: return 'protrait';
+					}
+				}
+			}
+		});
+
+	});;
 
 	this.willInit = function () {
+		var $html;
+
+		$html = $('html');
+
+		$html.addClass(this.viewport.orientation);
 		this.addClass('pl-game');
 
+		$(window).on('resize', this.bind(function () {
+			if (!$html.hasClass(this.viewport.orientation)) {
+				$html
+					.removeClass('squareish landscape protrait')
+					.addClass(this.viewport.orientation);
+				}
+		}));
+
+		scaleGame.call(this);
 		this.captureScreens();
 		this.watchAudio();
 
@@ -97,7 +164,7 @@ var Game = GlobalScope.extend(function () {
 			collection.push(screen);
 			
 			if (key === 'name' || component) {
-				assignRef.call(this, screen, util.transformId((key === 'name' && id) || component));
+				util.assignRef(this, util.transformId((key === 'name' && id) || component), screen);
 			}
 		}));
 
@@ -112,9 +179,10 @@ var Game = GlobalScope.extend(function () {
 		playing = Collection.create();
 
 		this.on('audio-play', function (_event) {
-			var current;
+			var current, bgMusic;
 
 			current = playing.filter(_event.audioType, 'type');
+			bgMusic = util.resolvePath(this, 'audio.background.music');
 
 			if (current) {
 				current.forEach(function (_record) {
@@ -124,8 +192,8 @@ var Game = GlobalScope.extend(function () {
 			}
 
 			if (_event.audioType === 'voice-over') {
-				if (playing.get(this.audio.background.music, 'audio')) {
-					this.audio.background.music.volume = 0.2;
+				if (bgMusic && playing.get(bgMusic, 'audio')) {
+					bgMusic.volume = 0.2;
 				}
 			}
 
@@ -136,10 +204,11 @@ var Game = GlobalScope.extend(function () {
 		});
 
 		this.on('audio-ended audio-pause', function (_event) {
-			var current, scope;
+			var current, scope, bgMusic;
 
 			current = playing.get(_event.target, 'audio')
 			scope = $(_event.target).scope();
+			bgMusic = util.resolvePath(this, 'audio.background.music');
 
 			playing.remove(current);
 
@@ -150,7 +219,7 @@ var Game = GlobalScope.extend(function () {
 			}
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
-				this.audio.background.music.volume = 1;
+				if (bgMusic) bgMusic.volume = 1;
 			}
 		});
 	};
