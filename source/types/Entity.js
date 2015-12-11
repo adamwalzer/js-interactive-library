@@ -251,23 +251,25 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.delay = function (_time, _cb) {
-		var screen;
+		var screen, time;
 
 		screen = this;
+		time = util.toMillisec(_time);
 
 		this.timeoutID = setTimeout(function() {
 			_cb.call(screen);
-		}, _time);
+		}, time);
 	};
 
 	this.repeat = function (_time, _cb) {
-		var screen;
+		var screen, time;
 
 		screen = this;
+		time = util.toMillisec(_time);
 
 		this.intervalID = setInterval(function() {
 			_cb.call(screen);
-		}, _time);
+		}, time);
 	};
 
 	this.eachFrame = function (_handler, _on) {
