@@ -10,5 +10,3 @@ window.play = window.pl = play;
 
 
 document.addEventListener('DOMContentLoaded', run, false);
-
-export default play;
