@@ -2,7 +2,7 @@
   "name": "js-interactive-library",
   "version": "0.0.1",
   "description": "ChangeMyWorldNow Games Library",
-  "main": "index.html",
+  "main": "main.js",
   "devDependencies": {
     "babel": "^5.8.29",
     "babel-loader": "^5.3.3",
