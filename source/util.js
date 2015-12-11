@@ -105,6 +105,7 @@ var util = new (function () {
 		var tokens, time, units;
 
 		if (!_source) return;
+		if (typeof _source === 'number') return _source;
 
 		tokens = _source.split(/\s+/);
 		time = 0;
@@ -166,13 +167,10 @@ var util = new (function () {
 			testArray = (/\?$/).test(path[i]);
 			index = (path[i].match(/\[(\d+)\]/) || [])[1] || -1;
 			name = ~index ? path[i].slice(0, path[i].indexOf('[')) : path[i];
+			obj = obj[name];
 
-			if (~index) {
-				obj = testArray ? (obj[name][index] || obj[name]) : obj[name][index];
-			}
-
-			else {
-				obj = obj[name];
+			if (~index && obj) {
+				obj = testArray ? (obj[index] || obj) : obj[index];
 			}
 			
 			i+=1;
