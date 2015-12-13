@@ -1,8 +1,15 @@
 {
   "name": "js-interactive-library",
-  "version": "0.0.1",
-  "description": "ChangeMyWorldNow Games Library",
-  "main": "index.html",
+  "version": "0.1.0",
+  "description": "CMWN Games Library (PlayJS)",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/ginasink/js-interactive-library.git"
+  },
+  "main": "build/play.js",
+  "scripts": {
+    "install": "gulp"
+  },
   "devDependencies": {
     "babel": "^5.8.29",
     "babel-loader": "^5.3.3",
@@ -15,6 +22,6 @@
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   },
-  "author": "Max Rafferty",
+  "author": "Micah Rolon",
   "license": "ISC"
 }
