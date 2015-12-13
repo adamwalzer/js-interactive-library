@@ -49,10 +49,11 @@ gulp.task("webpack:build-dev", function(callback) {
 gulp.task("jsdoc", function () {
     var files, stream
 
-    files = [];
+    files = ['README.md'];
     stream = gulp.src('source/**/*.js');
 
     console.log('Generating documentation for:');
+    console.log('  - README.md');
 
     stream.on('data', function (_data) {
         var path;
@@ -60,7 +61,7 @@ gulp.task("jsdoc", function () {
         path = _data.path.replace(process.cwd()+'/', '');
 
         files.push(path);
-        console.log('    - ', path);
+        console.log('  -', path);
     });
 
     stream.on('end', function () {
@@ -86,7 +87,7 @@ gulp.task("jsdoc", function () {
 });
 
 gulp.task('jsdoc-watch', function () {
-    watch('source/**/*.js', function (_event) {
+    watch(['README.md' ,'source/**/*.js'], function (_event) {
         var path;
 
         path = _event.path.replace(process.cwd()+'/', '');

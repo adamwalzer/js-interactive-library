@@ -1,8 +1,8 @@
 /**
-*  Entity
-*  @desc Contains...
-*  @proto GlobalScope
-*/
+ * Base class for a scope acting as an "entity" with "states", "behaviors" and the ability to respond (responsibilities) to behaviors.
+ *
+ * @module
+ */
 
 import util from 'util';
 import GlobalScope from 'types/GlobalScope';
@@ -22,10 +22,16 @@ function invokeResponsibilities (_scope, _event) {
 	}
 }
 
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. use `Entity.create()` to get a new instance.
+ * @classdesc Base class for a scope acting as an "entity" with "states", "behaviors" and the ability to respond (responsibilities) to behaviors.
+ * @class
+ * @extends GlobalScope
+ */
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
-		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? $(_target) : this)) : this
+		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? this.findOwn(_target) : this)) : this
 	}
 
 	function ResponsibilityRecord (_name, _ability) {

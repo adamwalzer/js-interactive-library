@@ -1,9 +1,28 @@
+/**
+ * Defines the `component()` method for component behavior registration. This method is also a namesapce for methods to manage and load component behavior scripts.
+ *
+ * @module
+ * @author Micah Rolon <micah@ginasink.com>
+ *
+ * @requires play~pl.util
+ * @requires types/Events
+ */
 import util from 'util';
 import Events from 'types/Events';
 
+/**
+ * Collection of component behavior records
+ * @const
+ */
 var COMPONENTS;
 
-export default function component (_name, _implementation) {
+/**
+ * Registers a component behavior.
+ * @arg {string} _name - The name for the component.
+ * @arg {function|object} _implementation - Constructor function or object with the behavior's implementation.
+ * @returns {@link module:play~pl.game}
+ */
+function component (_name, _implementation) {
 	if (!component.get(_name)) {
 		COMPONENTS.push({
 			name: _name,
@@ -17,10 +36,22 @@ export default function component (_name, _implementation) {
 
 COMPONENTS = [];
 
+/**
+ * Methods to manage and load component behavior scripts.
+ * @namespace component
+ * @memberof module:play~pl.game
+ * @mixes Events
+ */
 (function () {
 	
 	util.mixin(this, Events);
 
+	/**
+	 * Given a name; provides the component record. `{name, implementation}`
+	 * @memberof module:play~pl.game.component
+	 * @arg {string} _name - The name of the component.
+	 * @returns {object} The record.
+	 */
 	this.get = function (_name) {
 		var i, record;
 
@@ -31,9 +62,15 @@ COMPONENTS = [];
 		return null;
 	};
 
-	// This only loads the script for the component. The markup and
-	// css will be loaded when the compent scope initalizes.
-	// 
+	/**
+	 * Loads the script for the component. The HTML and CSS will be loaded when the component scope initalizes.<br>
+	 * The path of the script file is resolved `{pl.game.config.componentDirectory}/{_name}/behavior.js`.
+	 * @memberof module:play~pl.game.component
+	 * @arg {string} _name - The name of the component.
+	 * @arg {function} _callback - Callback for load success.
+	 * @todo Implement Promises.
+	 * @returns `this`
+	 */
 	this.load = function (_name, _callback) {
 		var path
 
@@ -52,6 +89,13 @@ COMPONENTS = [];
 		return this;
 	};
 
+	/**
+	 * Loads all the component scripts for HTML elements with `pl-component` attributes.
+	 * @memberof module:play~pl.game.component
+	 * @arg {function} _callback - Callback for load success.
+	 * @todo Implement Promises.
+	 * @returns `this`
+	 */
 	this.loadAll = function (_callback) {
 		var queue;
 
@@ -84,3 +128,5 @@ COMPONENTS = [];
 	// this.config = function () {};
 
 }).call(component);
+
+export default component;
