@@ -1,7 +1,7 @@
 /**
  * 
  * @module
- * @version 1.0
+ * @version 1.1
  * @author Micah Rolon <functionmicah@gmail.com>
  * @requires module:types/BasicArray~BasicArray
  *
@@ -31,16 +31,6 @@
  *
  * #### Developer Notes
  *
- * If you want to change the value of one plane DO NOT just set the property.
- * Dimensional objects are also arrays so they need their indexs set as well.
- * i.e.
- * ```
- * // DONT DO THIS point[0] will not be set.
- * point.width = 20;
- * ```
- *
- * Use the setter. `point.set('width', 10);`
- *
  * When adding new methods make sure you are returning a new instance.
  * Dimensional objects are meant to be immutable.
  *
@@ -51,6 +41,10 @@
  *     return this.create().set( ... )
  * }
  * ```
+ *
+ * #### Change Log
+ * *v1.1 - 12/13/15*
+ * - Defined setter/getter properties for unique planes keys. You can now do `point.width = 10`.
  */
 
 /*jslint browser: true, eqeq: true, nomen: true, sloppy: true, white: true */
@@ -285,13 +279,34 @@ Dimension = BasicArray.extend(function () {
  */
 Size = Dimension.extend(function () {
 	/**
-	 * Maps the names of the indexs.<br>
+	 * Maps the names of the indexes.<br>
 	 * See [Dimension#planeOf]{@link module:types/Dimensions~Dimension#planeOf} for resolving plane name.
 	 * @protected
 	 * @default ['width', 'height']
 	 */
 	this.planeMap = ['width', 'height'];
-	this.width = this.height = 0;
+
+	Object.defineProperties(this, {
+		width: {
+			get: function () {
+				return this[0];
+			},
+
+			set: function (_val) {
+				this[0] = Number(_val);
+			}
+		},
+
+		height: {
+			get: function () {
+				return this[1];
+			},
+
+			set: function (_val) {
+				this[1] = Number(_val);
+			}
+		}
+	});
 
 	/**
 	 * Define the size with an object. (overloaded)
@@ -316,33 +331,19 @@ Size = Dimension.extend(function () {
 	this.set = function (_width, _height) {
 		if (arguments.length === 1) {
 			if (_width.width !== undefined && _width.height !== undefined) {
-				this.width = this[0] = parseFloat(_width.width);
-				this.height = this[1] = parseFloat(_width.height);
+				this[0] = Number(_width.width);
+				this[1] = Number(_width.height);
 			}
 
 			else if (_width.length === 2) {
-				this.width = this[0] = parseFloat(_width[0]);
-				this.height = this[1] = parseFloat(_width[1]);
+				this[0] = Number(_width[0]);
+				this[1] = Number(_width[1]);
 			}
 		}
 
 		else {
-			if (typeof _width === 'string' && ~['width', 'height'].indexOf(_width)) {
-				this[_width] = parseFloat(_height);
-
-				if (_width === 'width') {
-					this[0] = parseFloat(_height);
-				}
-
-				else {
-					this[1] = parseFloat(_height);
-				}
-			}
-
-			else {
-				this.width = this[0] = parseFloat(_width);
-				this.height = this[1] = parseFloat(_height);
-			}
+			this[0] = Number(_width);
+			this[1] = Number(_height);
 		}
 		
 		return this;
@@ -391,13 +392,34 @@ Size = Dimension.extend(function () {
  */
 Point = Dimension.extend(function () {
 	/**
-	 * Maps the names of the indexs.<br>
+	 * Maps the names of the indexes.<br>
 	 * See [Dimension#planeOf]{@link module:types/Dimensions~Dimension#planeOf} for resolving plane name.
 	 * @protected
 	 * @default ['x', 'y']
 	 */
 	this.planeMap = ['x', 'y'];
-	this.x = this.y = 0;
+
+	Object.defineProperties(this, {
+		x: {
+			get: function () {
+				return this[0];
+			},
+
+			set: function (_val) {
+				this[0] = Number(_val);
+			}
+		},
+
+		y: {
+			get: function () {
+				return this[1];
+			},
+
+			set: function (_val) {
+				this[1] = Number(_val);
+			}
+		}
+	});
 
 	/**
 	 * Define the point with an object. (overloaded)
@@ -422,33 +444,19 @@ Point = Dimension.extend(function () {
 	this.set = function (_x, _y) {
 		if (arguments.length === 1) {
 			if (_x.x !== undefined && _x.y !== undefined) {
-				this.x = this[0] = parseFloat(_x.x);
-				this.y = this[1] = parseFloat(_x.y);
+				this[0] = Number(_x.x);
+				this[1] = Number(_x.y);
 			}
 
 			else if (_x.length === 2) {
-				this.x = this[0] = parseFloat(_x[0]);
-				this.y = this[1] = parseFloat(_x[1]);
+				this[0] = Number(_x[0]);
+				this[1] = Number(_x[1]);
 			}
 		}
 
 		else {
-			if (typeof _x === 'string' && ~['x', 'y'].indexOf(_x)) {
-				this[_x] = _y;
-
-				if (_x === 'x') {
-					this[0] = parseFloat(_y);
-				}
-
-				else {
-					this[1] = parseFloat(_y);
-				}
-			}
-			
-			else {
-				this.x = this[0] = parseFloat(_x);
-				this.y = this[1] = parseFloat(_y);
-			}
+			this[0] = Number(_x);
+			this[1] = Number(_y);
 		}
 		
 		return this;
