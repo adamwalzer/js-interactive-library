@@ -3,6 +3,7 @@ var watch = require('gulp-watch');
 var gutil = require("gulp-util");
 var webpack = require("webpack");
 var webpackDevConfig = require("./webpack.config.dev.js");
+var spawn = require('child_process').spawn;
 
 gulp.task("default", ["build-dev"]); 
 
