@@ -77,17 +77,16 @@ var util = new (function () {
 
 	/**
 	 * Given a range; provides a random number in that range.
-	 * @function random
-	 * @arg {number} _rangeA - The iterable or a number for low end of the range.
+	 * @function play~pl.util.random
+	 * @arg {number} _rangeA - A number for the low end of the range.
 	 * @arg {number} _rangeB - The top end of the range.
 	 * @returns {number|*} The resulting number in range or the member found at random.
 	 */
 
 	/**
 	 * Given an iterable; provides a random item.
-	 * @arg {array} _collection_rangeA - The iterable or a number for low end of the range.
-	 * @arg {number} _rangeB - The top end of the range.
-	 * @returns {number|*} The resulting number in range or the member found at random.
+	 * @arg {array} _collection - The iterable.
+	 * @returns {number|*} The member found at random.
 	 */
 	this.random = function (_collection_rangeA, _rangeB) {
 		var index, val;

@@ -1,5 +1,5 @@
 /**
- * Defines the 'game' method for registering and initi game scopes. This method also acts as a namespace for game level functions (See: [pl.game]{@link module:play~pl.game}).
+ * Defines the 'game' method for registration and initialization of game scopes. This method also acts as a namespace for game level functions (See: [pl.game]{@link module:play~pl.game}).
  *
  * @module game
  * @author Micah Rolon <micah@ginasink.com>
@@ -114,6 +114,7 @@ READY_QUEUE = [];
 
 	/**
 	 * Starts the dominos falling
+	 * @function run
 	 * @memberof module:play~pl.game
 	 */
 	this.run = function () {
@@ -128,12 +129,20 @@ READY_QUEUE = [];
 		});
 	};
 
+	
 	/**
 	 * Getter/Setter for game level configuration.
-	 * @arg {string|object} _key_mixin - _key: The key to retrieve. _mixin: Object to set properties on configuration.
+	 * @function module:play~pl.game.config
+	 * @arg {string} _key - The key to retrieve
 	 * @returns {this}
-	 *
+	 */
+
+	/**
+	 * Getter/Setter for game level configuration.
+	 * @function config
 	 * @memberof module:play~pl.game
+	 * @arg {object} _mixin - Object to set properties on configuration.
+	 * @returns {this}
 	 */
 	this.config = function (_key_mixin) {
 		switch (typeof _key_mixin) {
@@ -146,6 +155,7 @@ READY_QUEUE = [];
 	};
 
 	/**
+	 * @function provideEntityType
 	 * @deprecated
 	 * @memberof module:play~pl.game
 	 */
@@ -154,6 +164,7 @@ READY_QUEUE = [];
 	};
 
 	/**
+	 * @function provideScreenType
 	 * @deprecated
 	 * @memberof module:play~pl.game
 	 */
@@ -163,6 +174,7 @@ READY_QUEUE = [];
 
 	/**
 	 * Augments the global scope.
+	 * @function scope
 	 * @arg {function|object} _mixin - Object or constructor to define members.
 	 * @returns {this}
 	 *
@@ -181,6 +193,7 @@ READY_QUEUE = [];
 	};
 
 	/**
+	 * @function queue
 	 * @deprecated
 	 * @memberof module:play~pl.game
 	 */

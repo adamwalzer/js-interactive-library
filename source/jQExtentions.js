@@ -136,12 +136,12 @@ import Matrix from 'lib/matrix';
 	/**
 	 * Sets a CSS matrix transform on all nodes in the collection. (overloaded)
 	 * @function external:jQuery#transform
-     * @arg {number} [_scaleX] - scale x
-     * @arg {number} [_shearY] - shear y
-     * @arg {number} [_shearX] - shear x
-     * @arg {number} [_scaleY] - scale y
-     * @arg {number} [_translateX] - translate x
-     * @arg {number} [_translateY] - translate y
+	 * @arg {number} [_scaleX] - scale x
+	 * @arg {number} [_shearY] - shear y
+	 * @arg {number} [_shearX] - shear x
+	 * @arg {number} [_scaleY] - scale y
+	 * @arg {number} [_translateX] - translate x
+	 * @arg {number} [_translateY] - translate y
 	 * @returns {Matrix}
 	 */
 
