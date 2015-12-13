@@ -1,14 +1,27 @@
+/**
+ * Extentions to jQuery used by the library.
+ * 
+ * @module
+ * @author Micah Rolon <micah@ginasink.com>
+ *
+ * @requires types/Dimensions
+ * @requires Matrix
+ */
 import { Point, Size } from 'types/Dimensions';
 import Matrix from 'lib/matrix';
 
 /**
-*  @desc Extentions for jQuery objects.
-*/
+ * jQuery's prototype
+ * @external jQuery
+ * @see {@link http://api.jquery.com/}
+ */
+
 (function () {
 	/**
-	*  @desc Resolves the scope for each of the set of matched elements.
-	*  @return (Scope|Array) Returns the scope for 1 result and an array of scopes for multiple elements.
-	*/
+	 * Resolves the scope for each of the set of matched nodes.
+	 * @function external:jQuery#scope
+	 * @returns {Scope|array} Scope - for 1 result. array - for multiple.
+	 */
 	this.scope = function () {
 		var result;
 
@@ -30,8 +43,13 @@ import Matrix from 'lib/matrix';
 		return (result.length > 1) ? result : result[0];
 	};
 
+	/**
+	 * Resolves the id on the first node in the collection. The id can be sourced from a node's 'id', 'pl-id' or 'pl-component' arguments.
+	 * @function external:jQuery#id
+	 * @arg {string} [_set] Name to set as the node's id.
+	 * @returns {string} The resolved id.
+	 */
 	this.id = function (_set) {
-
 		if (_set !== undefined) {
 			// Remove attribute.
 			if (~['', null].indexOf(_set)) {
@@ -39,7 +57,7 @@ import Matrix from 'lib/matrix';
 				return this;
 			}
 
-			// If document already has the id defined then set as a 'play' id.
+			// If document already has the id defined then set as a unique library id.
 			if ($(_set).length) {
 				this.attr('pl-id', _set);
 			}
@@ -49,10 +67,18 @@ import Matrix from 'lib/matrix';
 			}
 		}
 
-
 		return this.attr('id') || this.attr('pl-id') || this.attr('pl-component');
 	};
 
+	/**
+	 * Provides the 'relative' CSS selector for the first node in the collection.
+	 * @function external:jQuery#address
+	 * @returns {string}
+	 *
+	 * @example
+	 * // HTML: <div id="sweater" class="wide"></div>
+	 * $('#sweater').address() // div#sweater.wide
+	 */
 	this.address = function () {
 		var tag, id, classes;
 
@@ -63,16 +89,28 @@ import Matrix from 'lib/matrix';
 		return tag+(id ? '#'+id : '')+classes;
 	};
 
+	/**
+	 * Provides a node's UPPER CASE class names. Given '_test' it will check if the node has the class.
+	 * @function external:jQuery#state
+	 * @arg {string} [_test] The UPPER CASE class name to test on the first node in the collection.
+	 * @returns {string|array|boolean} string - for one result. array - for multiple. boolean - for tests.
+	 */
 	this.state = function (_test) {
 		var classes;
 
-		if (_test) return this.hasClass(_test);
+		if (_test) return this.hasClass(_test.toUpperCase());
 
 		classes = (this.attr('class') || '').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
 
 		return classes && (classes.length === 1 ? classes[0] : classes);
 	};
 
+	/**
+	 * Provides the jQuery offset for the first node in the collection.
+	 * Given a point, all nodes in the collection will get {position: absolute;} to the corrdinates.
+	 * @function external:jQuery#absolutePosition
+	 * @returns {Point}
+	 */
 	this.absolutePosition = function () {
 		var offset;
 
@@ -94,7 +132,24 @@ import Matrix from 'lib/matrix';
 			return offset;
 		}
 	};
+	
+	/**
+	 * Sets a CSS matrix transform on all nodes in the collection. (overloaded)
+	 * @function external:jQuery#transform
+	 * @arg {number} [_scaleX] - scale x
+	 * @arg {number} [_shearY] - shear y
+	 * @arg {number} [_shearX] - shear x
+	 * @arg {number} [_scaleY] - scale y
+	 * @arg {number} [_translateX] - translate x
+	 * @arg {number} [_translateY] - translate y
+	 * @returns {Matrix}
+	 */
 
+	/**
+	 * Provides the CSS matrix transform for the first node in the collection.
+	 * @function external:jQuery#transform
+	 * @returns {Matrix}
+	 */
 	this.transform = function () {
 		var t, matrix, is3d;
 		
@@ -136,6 +191,20 @@ import Matrix from 'lib/matrix';
 		return matrix;
 	};
 
+	/**
+	 * Getter/Setter for the CSS transform translation. (overloaded)
+	 * @function external:jQuery#transformPosition
+	 * @arg {Point} _point - A point object {x,y}
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Getter/Setter for the CSS transform translation.
+	 * @function external:jQuery#transformPosition
+	 * @arg {number} _x - x coordinate
+	 * @arg {number} _y - y coordinate
+	 * @returns {Point}
+	 */
 	this.transformPosition = function () {
 		var matrix, point;
 		
