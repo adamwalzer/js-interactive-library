@@ -1,9 +1,8 @@
 /**
-*  Entity
-*  @desc Contains...
-*  @proto GlobalScope
-*/
-
+ * Base class for a scope acting as an "entity" with "states", "behaviors" and the ability to respond (responsibilities) to behaviors.
+ *
+ * @module
+ */
 import util from 'util';
 import GlobalScope from 'types/GlobalScope';
 import Collection from 'types/Collection';
@@ -22,10 +21,49 @@ function invokeResponsibilities (_scope, _event) {
 	}
 }
 
+/**
+ * <span class="note important">NOTE: This is NOT a constructor. Use `Entity.create()` to get a new instance.</span>
+ * @classdesc Base class for a scope acting as an "entity" with "states", "behaviors" and the ability to respond (responsibilities) to behaviors. For more information on these terms read [this]{@link module:types/Entity}.
+ * <style>
+ * .tag {
+ *   padding: 1px 4px;
+ *   border-radius: 4px;
+ *
+ *   color: #fff;
+ *   background-color: #aaa;
+ * }
+ *
+ * .tag.behavior {
+ *	 background-color: #0ba;
+ * }
+ *
+ * .tag.state {
+ *	 background-color: #ba0;
+ * }
+ *
+ * .note {
+ *   border: solid 1px;
+ *   border-radius: 4px;
+ *   padding: 1px 4px;
+ *   color: #aaa;
+ *   background-color: #eee;
+ * }
+ * 
+ * .note.important {
+ *   color: #b55;
+ *   background-color: #fee;
+ * }
+ * </style>
+ *
+ * @class
+ * @prop {module:types/Collection~Collection} responsibilities - A collection of ResponsibilityRecords for the scope.
+ * @prop {boolean} isComplete - Marks a scope as "complete" via the [`complete()`]{@link module:types/Entity~Entity#complete} behavior.
+ * @extends GlobalScope
+ */
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
-		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? $(_target) : this)) : this
+		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? this.findOwn(_target) : this)) : this
 	}
 
 	function ResponsibilityRecord (_name, _ability) {
@@ -419,6 +457,12 @@ var Entity = GlobalScope.extend(function () {
 		return !!owner && owner.object;
 	};
 
+	/**
+	 * <span class="tag behavior">Behavior</span>
+	 * Marks a scope "complete" by seting `isComplete` to `true` and add the `COMPLETE` state flag.
+	 * @function module:types/Entity~Entity#complete
+	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
+	 */
 	this.behavior('complete', function () {
 		if (this.hasOwnProperty('isComplete') && this.isComplete) return false;
 
@@ -430,6 +474,15 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
+	/**
+	 * <span class="tag behavior">Behavior</span>
+	 * Reports a drggable has been grabbed for dragging.
+	 * @function module:types/Entity~Entity#grab
+	 * @arg {object} _state - An object containing the state of a draggable.
+	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
+	 *
+	 * @see module:play~pl.game.manager.draggable for more info on draggable state.
+	 */
 	this.behavior('grab', function (_state) {
 		return {
 			state: _state,
@@ -437,6 +490,15 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
+	/**
+	 * <span class="tag behavior">Behavior</span>
+	 * Reports a draggable as being dragged.
+	 * @function module:types/Entity~Entity#dragging
+	 * @arg {object} _state - An object containing the state of a draggable.
+	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
+	 *
+	 * @see module:play~pl.game.manager.draggable for more info on draggable state.
+	 */
 	this.behavior('dragging', function (_state) {
 		return {
 			state: _state,
@@ -444,6 +506,15 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
+	/**
+	 * <span class="tag behavior">Behavior</span>
+	 * Reports a drggable as released or droped.
+	 * @function module:types/Entity~Entity#release
+	 * @arg {object} _state - An object containing the state of a draggable.
+	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
+	 *
+	 * @see module:play~pl.game.manager.draggable for more info on draggable state.
+	 */
 	this.behavior('release', function (_state) {
 		return {
 			state: _state,
@@ -451,16 +522,148 @@ var Entity = GlobalScope.extend(function () {
 		};
 	});
 
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds `OPEN` and removes the `LEAVE` CSS class names from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#open
+	 * @fires Entity#ui-open
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `OPEN` class name.
+	 * @function module:types/Entity~Entity#opened
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Open'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `OPEN` class name.
+	 * @function module:types/Entity~Entity#getOpened
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('open opened', '+OPEN -LEAVE');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Removes the `OPEN` CSS class name from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#close
+	 * @fires Entity#ui-close
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
 	this.state('close', '-OPEN');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `LEAVE` CSS class name to the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#leave
+	 * @fires Entity#ui-leave
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `LEAVE` class name.
+	 * @function module:types/Entity~Entity#left
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Leave'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `LEAVE` class name.
+	 * @function module:types/Entity~Entity#getLeft
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('leave left', '+LEAVE', {
 		willSet: function (_target) {
 			this.close(_target);
 		}
 	});
 
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds `ENABLED` and removes the `DISABLED` CSS class names from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#enable
+	 * @fires Entity#ui-enable
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `ENABLED` class name.
+	 * @function module:types/Entity~Entity#enabled
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Enabled'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `ENABLED` class name.
+	 * @function module:types/Entity~Entity#getEnabled
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('enable enabled', '+ENABLED -DISABLED');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds `DISABLED` and removes the `ENABLED` CSS class names from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#disable
+	 * @fires Entity#ui-disable
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `DISABLED` class name.
+	 * @function module:types/Entity~Entity#disabled
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Disabled'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `DISABLED` class name.
+	 * @function module:types/Entity~Entity#getDisabled
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('disable disabled', '+DISABLED -ENABLED');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `SELECTED` CSS class name to the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#select
+	 * @fires Entity#ui-select
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `SELECTED` class name.
+	 * @function module:types/Entity~Entity#selected
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Selected'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `SELECTED` class name.
+	 * @function module:types/Entity~Entity#getDisabled
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('select selected', '+SELECTED', {
 		willSet: function (_target) {
 			var target, $parent;
@@ -477,16 +680,126 @@ var Entity = GlobalScope.extend(function () {
 		}
 	});
 
+	/**
+	 * <span class="tag state">State</span>
+	 * Removes the `SELECTED` CSS class name from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#deselect
+	 * @fires Entity#ui-deselect
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
 	this.state('deselect', '-SELECTED');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `HIGHLIGHTED` CSS class name to the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#highlight
+	 * @fires Entity#ui-highlight
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `HIGHLIGHTED` class name.
+	 * @function module:types/Entity~Entity#highlighted
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Highlighted'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `HIGHLIGHTED` class name.
+	 * @function module:types/Entity~Entity#getHighlighted
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('highlight highlighted', '+HIGHLIGHTED');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Removes the `HIGHLIGHTED` CSS class name from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#unhighlight
+	 * @fires Entity#ui-unhighlight
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
 	this.state('unhighlight', '-HIGHLIGHTED');
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `DRAGGABLE` CSS class name to the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#draggable
+	 * @fires Entity#ui-draggable
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `DRAGGABLE` class name.
+	 * @function module:types/Entity~Entity#dragEnabled
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Draggable'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `DRAGGABLE` class name.
+	 * @function module:types/Entity~Entity#getDragEnabled
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('draggable dragEnabled', '+DRAGGABLE', {
 		didSet: function (_target) {
 			this.translate( resolveTarget.call(this, _target) );
 		}
 	});
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Removes the `DRAGGABLE` CSS class name from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#undraggable
+	 * @fires Entity#ui-undraggable
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
 	this.state('undraggable', '-DRAGGABLE');
 
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `TRANSLATED` CSS class name to the scope or the given `_target`. The target also gets a 2d transform at the given `_point`.
+	 * @function module:types/Entity~Entity#translate
+	 * @fires Entity#ui-translate
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @arg {module:types/Dimensions~Point} _point - Point object with coordinates {x,y}.
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Adds the `TRANSLATED` CSS class name to the scope. The scope also gets a 2d transform at the given `_point`.
+	 * @function module:types/Entity~Entity#translate
+	 * @fires Entity#ui-translate
+	 * @arg {module:types/Dimensions~Point} _point - Point object with coordinates {x,y}.
+	 * @returns `this`
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Tests if the scope or given `_target` has the `TRANSLATED` class name.
+	 * @function module:types/Entity~Entity#translated
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns {Boolean} Translate'ness.
+	 */
+
+	/**
+	 * <span class="tag state">State</span>
+	 * Provides the elements with the `TRANSLATED` class name.
+	 * @function module:types/Entity~Entity#getTranslated
+	 * @returns {jQuery} jQuery collection of matched nodes.
+	 * @todo Return scope if available.
+	 */
 	this.state('translate translated', '+TRANSLATED', {
 		willSet: function (_target_point, _point) {
 			var point, target;
@@ -500,6 +813,14 @@ var Entity = GlobalScope.extend(function () {
 		}
 	});
 
+	/**
+	 * <span class="tag state">State</span>
+	 * Removes the `TRANSLATED` CSS class name and CSS transform from the scope or the given `_target`.
+	 * @function module:types/Entity~Entity#untranslate
+	 * @fires Entity#ui-untranslate
+	 * @arg {string|Scope|jQuery|HTMLElement} _target - A CSS selector, DOM node reference or context object (i.e. Scope/jQuery).
+	 * @returns `this`
+	 */
 	this.state('untranslate', '-TRANSLATED', {
 		willSet: function () {
 			this.css('transform', 'none');

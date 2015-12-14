@@ -4,7 +4,6 @@
  * @module
  *
  * @author Micah Rolon <micah@ginasink.com>
- * @version 0.1.0
  *
  * @requires jQExtentions
  * @requires play
