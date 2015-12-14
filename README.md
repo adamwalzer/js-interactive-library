@@ -1,4 +1,5 @@
 # Play.js
+*v0.1.1*
 
 To make this buld work. Strict mode needs to be disabled for the ES6 modules.
 
