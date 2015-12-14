@@ -88,7 +88,13 @@ var jQProxy = Basic.extend(function () {
 	// TODO: make this private
 	this.registerHandler = function (_definition) {
 		if (!this.hasOwnProperty('eventRegistry')) {
-			this.eventRegistry = [];
+			if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
+				this.eventRegistry = this.eventRegistry.slice(0);
+			}
+
+			else {
+				this.eventRegistry = [];
+			}
 		}
 
 		this.eventRegistry.push(_definition);
