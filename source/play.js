@@ -26,7 +26,7 @@ import { Point, Size } from 'types/Dimensions';
  * @prop {object} util - Namespace for utility functions.
  */
 var pl = {
-	Basic, Point, Size,
+	Basic, Point, Size, Queue,
 	game,
 	util,
 	
