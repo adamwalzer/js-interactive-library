@@ -21,7 +21,7 @@
  * @prop {CanvasRenderingContext2D|null} [context=null] - set or get current canvas context
  * @constructor
  */
-export default function Matrix(context) {
+function Matrix(context) {
 
     var me = this;
     me._t = me.transform;
@@ -726,3 +726,5 @@ Matrix.prototype = {
         return me;
     }
 };
+
+export default Matrix;

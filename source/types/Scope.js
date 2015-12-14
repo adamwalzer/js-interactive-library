@@ -1,9 +1,17 @@
 /**
-*  Scope
-*  @desc Scopes are packages which contain a reference to a DOM element wrapped in a jQuery object.
-*        This enables properties and methods to be in context of the DOM node and its descendants.
-*  @proto jQProxy
-*/
+ * Scopes are packages which contain a reference to a DOM element wrapped in a jQuery object.
+ * This enables properties and methods to be in context of the DOM node and its descendants.
+ *
+ * @module
+ * @requires types/jQProxy
+ * @requires types/Basic
+ * @requires types/Queue
+ * @requires play.game
+ * @requires util
+ * @requires evalAction
+ *
+ * @exports createEntity
+ */
 import jQProxy from 'types/jQProxy';
 import Basic from 'types/Basic';
 import Queue from 'types/Queue';
@@ -12,6 +20,16 @@ import game from 'play.game';
 import util from 'util';
 import evalAction from 'evalAction';
 
+/**
+ * Creates a new Enitiy instance with a context node and implementation.
+ * The instance is prototyped from the parent scope.
+ *
+ * @memberof module:types/Scope~Scope#createEntity
+ * @protected
+ * @arg {jQuery} _$node - jQuery object with a single node in the collection.
+ * @arg {function|object} _implementation - Constructor function or object with the entity behavior.
+ * @returns {module:types/Scope~Scope}
+ */
 function createEntity (_$node, _implementation) {
 	var component, prototype, componentRecord, instance;
 
@@ -35,8 +53,21 @@ function createEntity (_$node, _implementation) {
 	return instance.initialize(_$node, component);
 }
 
+/**
+ * <span class="important">NOTE:</span> This is NOT a constructor. Use `Scope.create()` to get a new instance.
+ * @classdesc A package which contains a reference to a DOM node wrapped in a jQuery object. For more information on scopes read [this]{@link module:types/Scope}.
+ * @class
+ * @extends module:types/jQProxy~jQProxy
+ */
 var Scope = jQProxy.extend(function () {
 
+	/**
+	 * Collection of records pairing a node with its action.
+	 * @memberof module:types/Scope~Scope
+	 * @static
+	 * @protected
+	 * @todo Convert to types/Collection
+	 */
 	var Actionables;
 
 	function attachActionHandler () {
