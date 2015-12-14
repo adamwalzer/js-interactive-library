@@ -187,7 +187,7 @@ var util = new (function () {
 		name = util.transformId(_name, true);
 
 		if (_obj[name]) {
-			if (_obj[name] && !_obj[name].__refCollction__) {
+			if (!_obj[name].__refCollction__) {
 				_obj[name] = [_obj[name]];
 
 				Object.defineProperty(_obj[name], '__refCollction__', {

@@ -39,31 +39,6 @@ var Scope = jQProxy.extend(function () {
 
 	var Actionables;
 
-	function assignRef (_ref, _name) {
-		var name;
-
-		name = util.transformId(_name, true);
-
-		if (this[name]) {
-			if (this[name] && !this[name].__refCollction__) {
-				this[name] = [this[name]];
-
-				Object.defineProperty(this[name], '__refCollction__', {
-					value: true,
-					enumerable: false,
-					writeable: false,
-					configureable: false
-				});
-			}
-			
-			this[name].push(_ref);
-		}
-
-		else {
-			this[name] = _ref;
-		}
-	}
-
 	function attachActionHandler () {
 		var entity;
 
@@ -290,7 +265,7 @@ var Scope = jQProxy.extend(function () {
 			}
 			
 			id = util.transformId(instance.id());
-			if (id) assignRef.call(this, instance, id);
+			if (id) util.assignRef.call(this, id, instance);
 		}));
 
 		return this;
@@ -575,7 +550,7 @@ var Scope = jQProxy.extend(function () {
 			id = $node.attr('id') || $node.attr('pl-id');
 
 			if (!this[id]) {
-				assignRef.call(this, $node.data('pl-scope') || $node, id);
+				util.assignRef.call(this, id, $node.data('pl-scope') || $node);
 			}
 		}));
 	};
@@ -735,7 +710,7 @@ var Scope = jQProxy.extend(function () {
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
 					id = util.transformId(scope.id()) || _value;
-					assignRef.call(this, scope, id);
+					util.assignRef.call(this, id, scope);
 
 					this.assetQueue.add(scope);
 				}
