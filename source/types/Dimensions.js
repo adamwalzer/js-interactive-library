@@ -94,7 +94,7 @@ Array.prototype.to = function (_Thing) {
  * @class
  * @classdesc Base class for dimensional objects consisting of 2 planes.<br>
  * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
- * @extends BasicArray
+ * @extends module:types/BasicArray~BasicArray
  */
 Dimension = BasicArray.extend(function () {
 	var originalMap;
@@ -271,7 +271,7 @@ Dimension = BasicArray.extend(function () {
 /**
  * <span class="important">NOTE:</span> This is NOT a constructor. use `Size.create()` to get a new instance.
  * @class
- * @extends Dimension
+ * @extends module:types/Dimensions~Dimension
  * @classdesc 2 Dimensional object containing width and height.<br>
  * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
  * @prop {number} width - The width.
@@ -384,7 +384,7 @@ Size = Dimension.extend(function () {
 /**
  * <span class="important">NOTE:</span> This is NOT a constructor. use `Point.create()` to get a new instance.
  * @class
- * @extends Dimension
+ * @extends module:types/Dimensions~Dimension
  * @classdesc Object containing coordinates on a 2-dimensional cartesian plane.<br>
  * <span class="important">NOTE:</span> This is an immutable class. Methods return a new object with the original as its prototype.
  * @prop {number} x - The x coordinate.
