@@ -15,6 +15,7 @@
 import jQProxy from 'types/jQProxy';
 import Basic from 'types/Basic';
 import Queue from 'types/Queue';
+import { Point } from 'types/Dimensions';
 import game from 'play.game';
 import util from 'util';
 import evalAction from 'evalAction';
@@ -78,6 +79,8 @@ var Scope = jQProxy.extend(function () {
 			var target, record;
 
 			target = $(_event.target).closest('[pl-action]')[0];
+			// TODO: Resolve for touches
+			_event.cursor = Point.create().set(_event.clientX, _event.clientY);
 
 			if (target) {
 				record = entity.actionables.item(target);
@@ -109,10 +112,6 @@ var Scope = jQProxy.extend(function () {
 
 		index = _collection.indexOf(_record);
 		if (~index) _collection.splice(index, 1);
-	}
-
-	function transformId (_id) {
-		return _id && _id.replace(/[-\s]+/g, '_');
 	}
 
 	function captureDropables (_scope) {
@@ -254,7 +253,7 @@ var Scope = jQProxy.extend(function () {
 			// I explicitly want it to be at the beginning.
 			if (attr.name.indexOf('pl-') === 0) {
 				name = attr.name.slice(3);
-				collection[transformId(name)] = attr.value;
+				collection[util.transformId(name)] = attr.value;
 				
 				collection.push(name);
 			}
@@ -271,7 +270,7 @@ var Scope = jQProxy.extend(function () {
 		this.entities.forEach(this.bind(function (_record, _index) {
 			var $node, instance, id, query, index;
 
-			$node = this.find(_record.selector);
+			$node = this.findOwn(_record.selector);
 			query = ['#'+_record.selector, '[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
 			index = 0;
 
@@ -279,7 +278,7 @@ var Scope = jQProxy.extend(function () {
 				if (index === query.length) {
 					throw new Error("Unable to locate entity with selector", _record.selector);
 				}
-				$node = this.find(query[index]);
+				$node = this.findOwn(query[index]);
 				index+=1;
 			}
 
@@ -296,8 +295,8 @@ var Scope = jQProxy.extend(function () {
 				instance = _record;
 			}
 			
-			id = transformId(instance.id());
-			if (id) this[id] = instance;
+			id = util.transformId(instance.id());
+			if (id) util.assignRef.call(this, id, instance);
 		}));
 
 		return this;
@@ -528,8 +527,6 @@ var Scope = jQProxy.extend(function () {
 			}
 		}
 
-		// console.log('watchAssets', this.id(), this.html())
-
 		scope = this;
 		assetTypes = ['IMG', 'AUDIO', 'VIDEO'];
 
@@ -578,49 +575,53 @@ var Scope = jQProxy.extend(function () {
 		this.findOwn('[id], [pl-id]').each(this.bind(function (_index, _node) {
 			var $node, id;
 
+			if (_node.nodeName === 'AUDIO') return;
+
 			$node = $(_node);
 			id = $node.attr('id') || $node.attr('pl-id');
 
 			if (!this[id]) {
-				this[id] = $node.data('pl-scope') || $node;
+				util.assignRef.call(this, id, $node.data('pl-scope') || $node);
 			}
 		}));
 	};
 
 	this.captureAudioAssets = function () {
-		var scope, map;
+		var scope, screen;
 
 		scope = this;
-		map = {
-			background: 'background',
-			'voice-over': 'voiceOver'
-		};
+		screen = typeof scope.screen === 'object' ? scope.screen : scope;
 
-		this.findOwn('audio').each(function () {
+		scope.findOwn('audio').each(function () {
 			var $node, id, audioTypes;
 
 			if (!scope.hasOwnProperty('audio')) {
 				scope.audio = {
-					background: [],
-					voiceOver: []
+					background: null,
+					voiceOver: null,
+					sfx: null
 				};
 			}
 
 			$node = $(this);
-			id = transformId($node.id());
-			audioTypes = ['background', 'voice-over'];
+			id = util.transformId($node.id(), true);
+			audioTypes = ['background', 'voice-over', 'sfx'];
 
 			audioTypes.forEach(function (_type) {
 				if ($node.hasClass(_type)) {
 					$node.on('play pause ended', function (_event) {
+						var screen;
+
+						screen = typeof scope.screen === 'object' ? scope.screen : scope;
+						
 						switch (_event.type) {
 							case 'play':
-								scope.screen.addClass('PLAYING '+_type.toUpperCase());
+								screen.addClass('PLAYING '+_type.toUpperCase());
 								break;
 
-							case 'puase':
+							case 'pause':
 							case 'ended':
-								scope.screen.removeClass('PLAYING '+_type.toUpperCase());
+								screen.removeClass('PLAYING '+_type.toUpperCase());
 								break;
 						}
 						scope.trigger($.Event('audio-'+_event.type, {
@@ -631,17 +632,22 @@ var Scope = jQProxy.extend(function () {
 					});
 
 					if ($node.attr('pl-required') != null) {
-						scope.screen.require($node[0]);
+						screen.require($node[0]);
 					}
 
-					scope.audio[map[_type]].push($node[0]);
+					// This property can be either an array of nodes or the node.
+					util.assignRef(scope.audio, _type, $node[0]);
 
-					if (id) scope.audio[map[_type]][id] = $node[0];
+					// Makes sure the property is set on the final value of scope.audio[_type].
+					// This should be safe to run out of the callstack.
+					setTimeout(function () {
+						if (id) util.assignRef(scope.audio[util.transformId(_type, true)], id, $node[0]);
+					});
 				}
 			});
 		});
 
-		return this;
+		return scope;
 	};
 
 	this.handleProperty = function (_implementation) {
@@ -678,9 +684,10 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) this.entities = [];
 
 		if (this.hasOwnProperty('$els')) {
+			debugger;
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
-			id = transformId(instance.id());
+			id = util.transformId(instance.id());
 
 			// this.entities.push(instance);
 			if (id) this[id] = instance;
@@ -733,8 +740,8 @@ var Scope = jQProxy.extend(function () {
 
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
-					id = transformId(scope.id()) || _value;
-					this[id] = scope;
+					id = util.transformId(scope.id()) || _value;
+					util.assignRef.call(this, id, scope);
 
 					this.assetQueue.add(scope);
 				}

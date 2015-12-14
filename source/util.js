@@ -110,6 +110,12 @@ var util = new (function () {
 	 * @returns {string}
 	 */
 	this.transformId = function (_id) {
+		if (_id && _camelCase) {
+			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
+				return RegExp.$1.toUpperCase();
+			});
+		}
+
 		return _id && _id.replace(/[-\s]+/g, '_');
 	};
 
@@ -130,6 +136,7 @@ var util = new (function () {
 		var tokens, time, units;
 
 		if (!_source) return;
+		if (typeof _source === 'number') return _source;
 
 		tokens = _source.split(/\s+/);
 		time = 0;
@@ -165,6 +172,74 @@ var util = new (function () {
 	 */
 	this.toArray = function (_collection) {
 		return Array.prototype.map.call(_collection, function (i) { return i; });
+	};
+
+	/**
+	 * Resolves the value in the object at the given path.
+	 * @arg {object} _obj - The object to query.
+	 * @arg {string} _path - The path to the desired reference.
+	 * @returns {*} The resulting reference value.
+	 * @example
+	 * var user = {
+	 *   name: 'John',
+	 *   family: {
+	 *	   guardians: {David}, // property could be an array of multiple guardians.
+	 *     siblings: [{Jane}, {Thomas}] // collection of user objects.
+	 *   }
+	 * };
+	 *
+	 * pl.util.resolvePath(user, 'family.sliblings[2].name');
+	 * // Matches the `guardians` propery if `guardians[0]` is undefined when `?` is used.
+	 * pl.util.resolvePath(user, 'family.guardians[0]?.name'); 
+	 */
+	this.resolvePath = function (_obj, _path) {
+		var path, obj, i, name, index, testArray;
+
+		path = _path.split('.');
+		obj = _obj;
+		i = 0;
+
+		while (obj) {
+			testArray = (/\?$/).test(path[i]);
+			index = (path[i].match(/\[(\d+)\]/) || [])[1] || -1;
+			name = ~index ? path[i].slice(0, path[i].indexOf('[')) : path[i];
+			obj = obj[name];
+
+			if (~index && obj) {
+				obj = testArray ? (obj[index] || obj) : obj[index];
+			}
+			
+			i+=1;
+
+			if (path.length === i) break;
+		}
+
+		return obj;
+	};
+
+	this.assignRef = function (_obj, _name, _ref) {
+		var name;
+
+		name = util.transformId(_name, true);
+
+		if (_obj[name]) {
+			if (!_obj[name].__refCollction__) {
+				_obj[name] = [_obj[name]];
+
+				Object.defineProperty(_obj[name], '__refCollction__', {
+					value: true,
+					enumerable: false,
+					writeable: false,
+					configureable: false
+				});
+			}
+			
+			_obj[name].push(_ref);
+		}
+
+		else {
+			_obj[name] = _ref;
+		}
 	};
 
 });

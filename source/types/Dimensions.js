@@ -262,8 +262,16 @@ Dimension = BasicArray.extend(function () {
 	 * Divides the planes.
 	 * @returns {number}
 	 */
-	this.dividend = function () {
+	this.ratio = function () {
 		return this[0] / this[1];
+	};
+
+	this.quotient = function () {
+		return Math.floor(this[0] / this[1]);
+	};
+
+	this.remainder = function () {
+		return this[0] % this[1];
 	};
 	
 });
@@ -355,7 +363,7 @@ Size = Dimension.extend(function () {
 	 * @returns {number}
 	 */
 	this.hypotenuse = function () {
-		return Math.floor(Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2)));
+		return Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
 	};
 
 	/**

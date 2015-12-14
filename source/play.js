@@ -11,7 +11,8 @@
  */
 import game from 'play.game';
 import util from 'util';
-import Basic from 'types/Basic'
+import Basic from 'types/Basic';
+import Queue from 'types/Queue';
 import { Point, Size } from 'types/Dimensions';
 
 /**

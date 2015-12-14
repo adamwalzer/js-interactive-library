@@ -75,14 +75,14 @@ COMPONENTS = [];
 		var path
 
 		if (component.get(_name)) {
-			if (_callback) _callback.apply(component, arguments);
+			if (_callback) _callback.call(component, _name);
 			return null;
 		}
 
 		path = pl.game.config('componentDirectory')+_name+'/behavior.js';
 
 		$.getScript(path, function () {
-			if (_callback) _callback.apply(component, arguments);
+			if (_callback) _callback.call(component, _name);
 			component.trigger('loaded', [_name]);
 		});
 
@@ -97,24 +97,26 @@ COMPONENTS = [];
 	 * @returns `this`
 	 */
 	this.loadAll = function (_callback) {
-		var queue;
+		var $components, queue;
 
+		$components = $('[pl-component]');
 		queue = [];
 
-		$('[pl-component]').each(function () {
+		$components.each(function (_index) {
 			var name;
 
 			name = $(this).attr('pl-component');
 
 			if (~queue.indexOf(name)) return;
-			
-			// console.log('* loading', name, '(component source)');
 
 			queue.push(name);
-			component.load(name, function () {
+		});
+
+		queue.slice(0).forEach(function (_name) {
+			component.load(_name, function () {
 				var index;
 
-				index = queue.indexOf(name);
+				index = queue.indexOf(_name);
 				queue.splice(index, 1);
 
 				if (!queue.length && _callback) _callback.apply(component, arguments)
