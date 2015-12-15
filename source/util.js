@@ -107,9 +107,10 @@ var util = new (function () {
 	/**
 	 * Take string and makes it dot notation friendly.
 	 * @arg {string} _id - The string to transform.
+	 * @arg {boolean} _camelCase - Transform with camel case.
 	 * @returns {string}
 	 */
-	this.transformId = function (_id) {
+	this.transformId = function (_id, _camelCase) {
 		if (_id && _camelCase) {
 			return _id.replace(/[-\s]+([\w\d]?)/g, function (_match) {
 				return RegExp.$1.toUpperCase();

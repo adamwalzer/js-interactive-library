@@ -296,7 +296,7 @@ var Scope = jQProxy.extend(function () {
 			}
 			
 			id = util.transformId(instance.id());
-			if (id) util.assignRef.call(this, id, instance);
+			if (id) util.assignRef(this, id, instance);
 		}));
 
 		return this;
@@ -581,7 +581,7 @@ var Scope = jQProxy.extend(function () {
 			id = $node.attr('id') || $node.attr('pl-id');
 
 			if (!this[id]) {
-				util.assignRef.call(this, id, $node.data('pl-scope') || $node);
+				util.assignRef(this, id, $node.data('pl-scope') || $node);
 			}
 		}));
 	};
@@ -741,7 +741,7 @@ var Scope = jQProxy.extend(function () {
 				if (record) {
 					scope = this.extend(record.implementation).initialize(_node, _value);
 					id = util.transformId(scope.id()) || _value;
-					util.assignRef.call(this, id, scope);
+					util.assignRef(this, id, scope);
 
 					this.assetQueue.add(scope);
 				}

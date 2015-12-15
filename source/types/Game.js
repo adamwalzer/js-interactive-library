@@ -181,19 +181,21 @@ var Game = GlobalScope.extend(function () {
 		this.on('audio-play', function (_event) {
 			var current, bgMusic;
 
-			current = playing.filter(_event.audioType, 'type');
-			bgMusic = util.resolvePath(this, 'audio.background.music');
+			if (_event.audioType !== 'sfx') {
+				current = playing.filter(_event.audioType, 'type');
+				bgMusic = util.resolvePath(this, 'audio.background.music');
 
-			if (current) {
-				current.forEach(function (_record) {
-					_record.audio.pause();
-					_record.audio.currentTime = 0;
-				});
-			}
+				if (current) {
+					current.forEach(function (_record) {
+						_record.audio.pause();
+						_record.audio.currentTime = 0;
+					});
+				}
 
-			if (_event.audioType === 'voice-over') {
-				if (bgMusic && playing.get(bgMusic, 'audio')) {
-					bgMusic.volume = 0.2;
+				if (_event.audioType === 'voice-over') {
+					if (bgMusic && playing.get(bgMusic, 'audio')) {
+						bgMusic.volume = 0.2;
+					}
 				}
 			}
 
