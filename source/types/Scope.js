@@ -384,10 +384,11 @@ var Scope = jQProxy.extend(function () {
 
 		this.isReady = true;
 		this.addClass('READY');
-		this.trigger(readyEvent);
 
 		this.__ready();
 		invokeLocal.call(this, 'ready');
+		
+		this.trigger(readyEvent);
 	}
 
 	Actionables = (function () {
