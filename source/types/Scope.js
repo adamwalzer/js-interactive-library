@@ -387,7 +387,7 @@ var Scope = jQProxy.extend(function () {
 
 		this.__ready();
 		invokeLocal.call(this, 'ready');
-		
+
 		this.trigger(readyEvent);
 	}
 
@@ -753,7 +753,7 @@ var Scope = jQProxy.extend(function () {
 			}
 		};
 
-		this.action = function (_node, _name, _value, _property) {
+		this.action = function (_node, _name, _value) {
 			if (!this.hasOwnProperty('actionables')) {
 				this.actionables = Actionables.create();
 				attachActionHandler.call(this);	
@@ -762,9 +762,25 @@ var Scope = jQProxy.extend(function () {
 			this.actionables.add(_node, _value);
 		};
 
-		this.required = function (_node, _name, _value, _property) {
+		this.required = function (_node, _name, _value) {
 			if (this.is(_node)) {
 				this.screen.require(this);
+			}
+		};
+
+		this.require = function (_node, _name, _value) {
+			var query, $node;
+
+			if (this.is(_node)) {
+				query = '#_value, [pl-id=_value], [pl-component=_value]'.replace(/_value/g, _value);
+				$node = this.find(query);
+				$node.on('ready', this.bind(function (_event) {
+					if ($node.is(_event.target)) {
+						this.log('require', _event.targetScope.id());
+
+						this.require(_event.targetScope);
+					}
+				}));
 			}
 		};
 
