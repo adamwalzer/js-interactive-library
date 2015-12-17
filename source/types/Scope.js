@@ -772,16 +772,24 @@ var Scope = jQProxy.extend(function () {
 		this.require = function (_node, _name, _value) {
 			var query, $node;
 
+			// if the node with the attribute is the node for this scope
 			if (this.is(_node)) {
 				query = '#_value, [pl-id=_value], [pl-component=_value]'.replace(/_value/g, _value);
 				$node = this.find(query);
-				$node.on('ready', this.bind(function (_event) {
-					if ($node.is(_event.target)) {
-						this.log('require', _event.targetScope.id());
 
-						this.require(_event.targetScope);
-					}
-				}));
+				if ($node.is('audio, video')) {
+					$node.each(this.bind(function (_index, _node) {
+						this.require(_node);
+					}));
+				}
+				
+				else {
+					$node.on('ready', this.bind(function (_event) {
+						if ($node.is(_event.target)) {
+							this.require(_event.targetScope);
+						}
+					}));
+				}
 			}
 		};
 
