@@ -253,7 +253,7 @@ var Scope = jQProxy.extend(function () {
 			// I explicitly want it to be at the beginning.
 			if (attr.name.indexOf('pl-') === 0) {
 				name = attr.name.slice(3);
-				collection[util.transformId(name)] = attr.value;
+				collection[util.transformId(name, true)] = attr.value;
 				
 				collection.push(name);
 			}
@@ -295,7 +295,7 @@ var Scope = jQProxy.extend(function () {
 				instance = _record;
 			}
 			
-			id = util.transformId(instance.id());
+			id = util.transformId(instance.id(), true);
 			if (id) util.assignRef(this, id, instance);
 		}));
 
