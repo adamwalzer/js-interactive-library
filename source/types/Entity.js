@@ -63,7 +63,16 @@ function invokeResponsibilities (_scope, _event) {
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
-		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? this.findOwn(_target) : this)) : this
+		
+		switch (typeof _target) {
+			case 'string': return this.findOwn(_target);
+			case 'object':
+				if (_target.jquery) return _target;
+				if (Entity.isPrototypeOf(_target)) return _target;
+				if (_target.nodeType === document.ELEMENT_NODE) return $(_target);
+		}
+
+		return this;
 	}
 
 	function ResponsibilityRecord (_name, _ability) {
@@ -458,6 +467,10 @@ var Entity = GlobalScope.extend(function () {
 		return !!owner && owner.object;
 	};
 
+	this.completed = function () {
+		return (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
+	};
+
 	/**
 	 * <span class="tag behavior">Behavior</span>
 	 * Marks a scope "complete" by seting `isComplete` to `true` and add the `COMPLETE` state flag.
@@ -465,7 +478,7 @@ var Entity = GlobalScope.extend(function () {
 	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
 	 */
 	this.behavior('complete', function () {
-		if (this.hasOwnProperty('isComplete') && this.isComplete) return false;
+		if (this.completed()) return false;
 
 		this.isComplete = true;
 		this.addClass('COMPLETE');
