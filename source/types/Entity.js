@@ -478,7 +478,7 @@ var Entity = GlobalScope.extend(function () {
 	 * @returns {object} A messages object with `behaviorTarget` set to the scope performing the behavior.
 	 */
 	this.behavior('complete', function () {
-		if (this.completed()) return false;
+		if (this.hasOwnProperty('isComplete') && this.isComplete) return false;
 
 		this.isComplete = true;
 		this.addClass('COMPLETE');
