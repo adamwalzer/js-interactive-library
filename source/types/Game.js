@@ -176,6 +176,16 @@ var Game = GlobalScope.extend(function () {
 	this.watchAudio = function () {
 		var playing;
 
+		function deQueue (_scope, _item) {
+			[_scope, _scope.screen].forEach(function (_scope) {
+				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue')) {
+					if (_scope.requiredQueue.has(_item)) {
+						_scope.requiredQueue.ready(_item);
+					}					
+				}				
+			});
+		}
+
 		playing = Collection.create();
 
 		this.on('audio-play', function (_event) {
@@ -213,12 +223,7 @@ var Game = GlobalScope.extend(function () {
 			bgMusic = util.resolvePath(this, 'audio.background.music');
 
 			playing.remove(current);
-
-			if (util.isSet(scope, scope.screen, scope.screen.requiredQueue)) {
-				if (scope.screen.requiredQueue.has(_event.target)) {
-					scope.screen.requiredQueue.ready(_event.target);
-				}
-			}
+			deQueue(scope, _event.target);
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
 				if (bgMusic) bgMusic.volume = 1;
