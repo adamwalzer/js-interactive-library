@@ -733,22 +733,23 @@ var Scope = jQProxy.extend(function () {
 	this.handleProperty(function () {
 		
 		this.component = function (_node, _name, _value, _property) {
-			var self, record, scope, id;
+			var $node, record, scope, id;
 
-			if (!$(_node).data('pl-isComponent')) {
-				self = this;
+			$node = $(_node);
+			
+			if (!$node.data('pl-isComponent')) {
 				record = game.component.get(_value);
 
 				if (record) {
-					scope = this.extend(record.implementation).initialize(_node, _value);
-					id = util.transformId(scope.id()) || _value;
+					scope = createEntity.call(this, $node, record.implementation);
+					id = util.transformId(scope.id() || _value, true);
 					util.assignRef(this, id, scope);
 
-					this.assetQueue.add(scope);
+					if (!scope.isReady) this.assetQueue.add(scope);
 				}
 				
 				else {
-					debugger;
+					throw new Error('Ahh!');
 				}
 			}
 		};
