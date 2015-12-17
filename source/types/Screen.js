@@ -66,10 +66,6 @@ var Screen = Entity.extend(function () {
 		return $.fn.prev.apply(this.$els, arguments);
 	};
 
-	this.completed = function () {
-		return this.isComplete || !this.requiredQueue || this.requiredQueue.length === 0;
-	};
-
 });
 
 export default Screen;
