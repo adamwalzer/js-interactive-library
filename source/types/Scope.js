@@ -685,7 +685,7 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) this.entities = [];
 
 		if (this.hasOwnProperty('$els')) {
-			debugger;
+			throw new Error('Wait this hasn\'t been tested.');
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
 			id = util.transformId(instance.id());
