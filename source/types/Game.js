@@ -193,7 +193,7 @@ var Game = GlobalScope.extend(function () {
 
 			if (_event.audioType !== 'sfx') {
 				current = playing.filter(_event.audioType, 'type');
-				bgMusic = util.resolvePath(this, 'audio.background.music');
+				bgMusic = playing.filter('background', 'type');
 
 				if (current) {
 					current.forEach(function (_record) {
@@ -203,9 +203,9 @@ var Game = GlobalScope.extend(function () {
 				}
 
 				if (_event.audioType === 'voice-over') {
-					if (bgMusic && playing.get(bgMusic, 'audio')) {
-						bgMusic.volume = 0.2;
-					}
+					if (bgMusic) bgMusic.forEach(function (_record) {
+						_record.audio.volume = 0.2;
+					});
 				}
 			}
 
@@ -220,13 +220,15 @@ var Game = GlobalScope.extend(function () {
 
 			current = playing.get(_event.target, 'audio')
 			scope = $(_event.target).scope();
-			bgMusic = util.resolvePath(this, 'audio.background.music');
+			bgMusic = playing.filter('background', 'type');
 
 			playing.remove(current);
 			deQueue(scope, _event.target);
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
-				if (bgMusic) bgMusic.volume = 1;
+				if (bgMusic) bgMusic.forEach(function (_record) {
+					_record.audio.volume = 1;
+				});
 			}
 		});
 	};
