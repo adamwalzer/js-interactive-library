@@ -161,7 +161,7 @@ var Game = GlobalScope.extend(function () {
 			screen.screen = screen;
 			screen.game = this;
 
-			collection.push(screen);
+			if ($node.attr('pl-skip') == null) collection.push(screen);
 			
 			if (key === 'name' || component) {
 				util.assignRef(this, util.transformId((key === 'name' && id) || component, true), screen);
