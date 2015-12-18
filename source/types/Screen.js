@@ -66,6 +66,10 @@ var Screen = Entity.extend(function () {
 		return $.fn.prev.apply(this.$els, arguments);
 	};
 
+	this.isLast = function () {
+		return this.game.screens.indexOf(this.screen) === this.game.screens.length-1;
+	};
+
 });
 
 export default Screen;
