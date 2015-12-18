@@ -164,7 +164,7 @@ var Game = GlobalScope.extend(function () {
 			collection.push(screen);
 			
 			if (key === 'name' || component) {
-				util.assignRef(this, util.transformId((key === 'name' && id) || component), screen);
+				util.assignRef(this, util.transformId((key === 'name' && id) || component, true), screen);
 			}
 		}));
 
