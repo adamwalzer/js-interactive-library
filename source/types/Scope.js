@@ -253,7 +253,7 @@ var Scope = jQProxy.extend(function () {
 			// I explicitly want it to be at the beginning.
 			if (attr.name.indexOf('pl-') === 0) {
 				name = attr.name.slice(3);
-				collection[util.transformId(name)] = attr.value;
+				collection[util.transformId(name, true)] = attr.value;
 				
 				collection.push(name);
 			}
@@ -295,7 +295,7 @@ var Scope = jQProxy.extend(function () {
 				instance = _record;
 			}
 			
-			id = util.transformId(instance.id());
+			id = util.transformId(instance.id(), true);
 			if (id) util.assignRef(this, id, instance);
 		}));
 
@@ -384,10 +384,11 @@ var Scope = jQProxy.extend(function () {
 
 		this.isReady = true;
 		this.addClass('READY');
-		this.trigger(readyEvent);
 
 		this.__ready();
 		invokeLocal.call(this, 'ready');
+
+		this.trigger(readyEvent);
 	}
 
 	Actionables = (function () {
@@ -684,7 +685,7 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) this.entities = [];
 
 		if (this.hasOwnProperty('$els')) {
-			debugger;
+			throw new Error('Wait this hasn\'t been tested.');
 			prototype = (Entity.isPrototypeOf(this)) ? this : Entity;
 			instance = prototype.extend(_implementation).initialize(this.find(_selector));
 			id = util.transformId(instance.id());
@@ -732,27 +733,28 @@ var Scope = jQProxy.extend(function () {
 	this.handleProperty(function () {
 		
 		this.component = function (_node, _name, _value, _property) {
-			var self, record, scope, id;
+			var $node, record, scope, id;
 
-			if (!$(_node).data('pl-isComponent')) {
-				self = this;
+			$node = $(_node);
+			
+			if (!$node.data('pl-isComponent')) {
 				record = game.component.get(_value);
 
 				if (record) {
-					scope = this.extend(record.implementation).initialize(_node, _value);
-					id = util.transformId(scope.id()) || _value;
+					scope = createEntity.call(this, $node, record.implementation);
+					id = util.transformId(scope.id() || _value, true);
 					util.assignRef(this, id, scope);
 
-					this.assetQueue.add(scope);
+					if (!scope.isReady) this.assetQueue.add(scope);
 				}
 				
 				else {
-					debugger;
+					throw new Error('Ahh!');
 				}
 			}
 		};
 
-		this.action = function (_node, _name, _value, _property) {
+		this.action = function (_node, _name, _value) {
 			if (!this.hasOwnProperty('actionables')) {
 				this.actionables = Actionables.create();
 				attachActionHandler.call(this);	
@@ -761,9 +763,33 @@ var Scope = jQProxy.extend(function () {
 			this.actionables.add(_node, _value);
 		};
 
-		this.required = function (_node, _name, _value, _property) {
+		this.required = function (_node, _name, _value) {
 			if (this.is(_node)) {
 				this.screen.require(this);
+			}
+		};
+
+		this.require = function (_node, _name, _value) {
+			var query, $node;
+
+			// if the node with the attribute is the node for this scope
+			if (this.is(_node)) {
+				query = '#_value, [pl-id=_value], [pl-component=_value]'.replace(/_value/g, _value);
+				$node = this.find(query);
+
+				if ($node.is('audio, video')) {
+					$node.each(this.bind(function (_index, _node) {
+						this.require(_node);
+					}));
+				}
+				
+				else {
+					$node.on('ready', this.bind(function (_event) {
+						if ($node.is(_event.target)) {
+							this.require(_event.targetScope);
+						}
+					}));
+				}
 			}
 		};
 

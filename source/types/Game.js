@@ -161,10 +161,10 @@ var Game = GlobalScope.extend(function () {
 			screen.screen = screen;
 			screen.game = this;
 
-			collection.push(screen);
+			if ($node.attr('pl-skip') == null) collection.push(screen);
 			
 			if (key === 'name' || component) {
-				util.assignRef(this, util.transformId((key === 'name' && id) || component), screen);
+				util.assignRef(this, util.transformId((key === 'name' && id) || component, true), screen);
 			}
 		}));
 
@@ -176,6 +176,14 @@ var Game = GlobalScope.extend(function () {
 	this.watchAudio = function () {
 		var playing;
 
+		function deQueue (_scope, _item) {
+			[_scope, _scope.screen].forEach(function (_scope) {
+				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
+					_scope.requiredQueue.ready(_item);
+				}				
+			});
+		}
+
 		playing = Collection.create();
 
 		this.on('audio-play', function (_event) {
@@ -183,7 +191,7 @@ var Game = GlobalScope.extend(function () {
 
 			if (_event.audioType !== 'sfx') {
 				current = playing.filter(_event.audioType, 'type');
-				bgMusic = util.resolvePath(this, 'audio.background.music');
+				bgMusic = playing.filter('background', 'type');
 
 				if (current) {
 					current.forEach(function (_record) {
@@ -193,9 +201,9 @@ var Game = GlobalScope.extend(function () {
 				}
 
 				if (_event.audioType === 'voice-over') {
-					if (bgMusic && playing.get(bgMusic, 'audio')) {
-						bgMusic.volume = 0.2;
-					}
+					if (bgMusic) bgMusic.forEach(function (_record) {
+						_record.audio.volume = 0.2;
+					});
 				}
 			}
 
@@ -210,18 +218,15 @@ var Game = GlobalScope.extend(function () {
 
 			current = playing.get(_event.target, 'audio')
 			scope = $(_event.target).scope();
-			bgMusic = util.resolvePath(this, 'audio.background.music');
+			bgMusic = playing.filter('background', 'type');
 
 			playing.remove(current);
-
-			if (util.isSet(scope, scope.screen, scope.screen.requiredQueue)) {
-				if (scope.screen.requiredQueue.has(_event.target)) {
-					scope.screen.requiredQueue.ready(_event.target);
-				}
-			}
+			deQueue(scope, _event.target);
 
 			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
-				if (bgMusic) bgMusic.volume = 1;
+				if (bgMusic) bgMusic.forEach(function (_record) {
+					_record.audio.volume = 1;
+				});
 			}
 		});
 	};

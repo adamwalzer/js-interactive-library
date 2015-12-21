@@ -10,7 +10,7 @@ import { Point, Size } from 'types/Dimensions';
 import Queue from 'types/Queue';
 	
 function invokeResponsibilities (_scope, _event) {
-	if (_scope && _scope.isMemberSafe('responsibilities')) {
+	if (_scope && _scope.responsibilities && _scope.isMemberSafe('responsibilities')) {
 		_scope.responsibilities.forEach(function (_record) {
 			if (_record.name === _event.name) {
 
@@ -63,38 +63,21 @@ function invokeResponsibilities (_scope, _event) {
 var Entity = GlobalScope.extend(function () {
 
 	function resolveTarget (_target) {
-		return _target ? (_target.jquery ? _target : (_target.nodeType === document.ELEMENT_NODE ? this.findOwn(_target) : this)) : this
+		
+		switch (typeof _target) {
+			case 'string': return this.findOwn(_target);
+			case 'object':
+				if (_target.jquery) return _target;
+				if (Entity.isPrototypeOf(_target)) return _target;
+				if (_target.nodeType === document.ELEMENT_NODE) return $(_target);
+		}
+
+		return this;
 	}
 
 	function ResponsibilityRecord (_name, _ability) {
 		this.name = _name;
 		this.ability = _ability;
-	}
-
-	function behaviorGreeter (_event) {
-		var i, record;
-		// console.log('on behavior', this.id(), _event.name);
-
-		for (i=0; record = this.responsibilities[i]; i+=1) {
-			if (record.name === _event.name) {
-				if (record.ability.call(this, _event) === false) {
-					_event.stopPropagation();
-				}
-			}
-		}
-	}
-
-	function attachBehaviorEvent () {
-		var scope;
-
-		if (this.isMemberSafe('responsibilities')) {
-			scope = this.provideBehaviorEventScope();
-			if (scope) {
-				scope.on('behavior', this.bind(behaviorGreeter));
-			}
-		}
-
-		return this;
 	}
 
 	function dragGreeter (_event) {
@@ -206,6 +189,8 @@ var Entity = GlobalScope.extend(function () {
 				_scope.propagateBehavior(_event);
 			});
 		}
+
+		return this;
 	};
 
 	this.require = function (_entity) {
@@ -214,10 +199,22 @@ var Entity = GlobalScope.extend(function () {
 			this.requiredQueue.on('complete', this.bind(function () {
 				console.log('** entity complete', this.id());
 				this.complete();
-			}))
+			}));
+
+			this.respond('complete', function (_event) {
+				if (!this.has(_event.target)) return;
+				if (_event.targetScope === this) return;
+
+				this.log('complete', _event.targetScope.id() || _event.targetScope.address());
+
+				this.requiredQueue.ready(_event.behaviorTarget);
+			});
 		}
 
 		this.requiredQueue.add(_entity);
+		this.gate();
+
+		return this;
 	};
 
 	this.behavior = function (_name, _behavior) {
@@ -243,6 +240,8 @@ var Entity = GlobalScope.extend(function () {
 
 			return this;
 		};
+
+		return this;
 	};
 
 	this.respond = function () {
@@ -286,6 +285,8 @@ var Entity = GlobalScope.extend(function () {
 				this.responsibilities.add(new ResponsibilityRecord(name, ability));
 				break;
 		}
+
+		return this;
 	};
 
 	this.delay = function (_time, _cb) {
@@ -297,6 +298,8 @@ var Entity = GlobalScope.extend(function () {
 		this.timeoutID = setTimeout(function() {
 			_cb.call(screen);
 		}, time);
+
+		return this;
 	};
 
 	this.repeat = function (_time, _cb) {
@@ -308,6 +311,8 @@ var Entity = GlobalScope.extend(function () {
 		this.intervalID = setInterval(function() {
 			_cb.call(screen);
 		}, time);
+
+		return this;
 	};
 
 	this.eachFrame = function (_handler, _on) {
@@ -356,7 +361,8 @@ var Entity = GlobalScope.extend(function () {
 		else {
 			this.frameHandlers.remove(_handler);
 		}
-		
+
+		return this;
 	};
 
 	this.kill = function (_timer) {
@@ -445,6 +451,8 @@ var Entity = GlobalScope.extend(function () {
 				return this.findOwn('.'+this.STATE[STATE]);
 			};
 		}
+
+		return this;
 	};
 
 	this.provideBehaviorEventScope = function () {
@@ -457,6 +465,10 @@ var Entity = GlobalScope.extend(function () {
 		owner = util.getOwner(this, this.baseType);
 
 		return !!owner && owner.object;
+	};
+
+	this.completed = function () {
+		return (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
 	};
 
 	/**
@@ -828,6 +840,8 @@ var Entity = GlobalScope.extend(function () {
 			this.css('transform', 'none');
 		}
 	});
+
+	this.state('gate gated', '+GATED');
 
 });
 

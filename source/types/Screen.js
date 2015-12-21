@@ -66,18 +66,9 @@ var Screen = Entity.extend(function () {
 		return $.fn.prev.apply(this.$els, arguments);
 	};
 
-	this.completed = function () {
-		return this.isComplete || !this.requiredQueue || this.requiredQueue.length === 0;
+	this.isLast = function () {
+		return this.game.screens.indexOf(this.screen) === this.game.screens.length-1;
 	};
-
-	this.respond('complete', function (_event) {
-		if (!this.has(_event.target)) return;
-		if (_event.targetScope === this) return;
-
-		if (this.hasOwnProperty('requiredQueue') && this.requiredQueue.length) {
-			this.requiredQueue.ready(_event.behaviorTarget);
-		}
-	});
 
 });
 
