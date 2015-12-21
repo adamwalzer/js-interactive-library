@@ -46,6 +46,28 @@ var Game = GlobalScope.extend(function () {
 	this.screens = null;
 	this.zoom = 1;
 	this.viewport = new (function () {
+		var vp, $html, RESIZE_HANDLERS;
+
+		vp = this;
+		RESIZE_HANDLERS = [];
+		$html = $('html');
+		$html.addClass(this.orientation);
+
+		$(window).on('resize', function (_event) {
+			if (!$html.hasClass(vp.orientation)) {
+				$html
+					.removeClass('squareish landscape protrait')
+					.addClass(vp.orientation);
+			}
+
+			RESIZE_HANDLERS.forEach(function (_handler) {
+				_handler(_event);
+			});
+		});
+
+		this.LANDSCAPE = 'landscape';
+		this.PROTRAIT = 'protrait';
+		this.SQUAREISH = 'squareish';
 		
 		this.size = function () {
 			return Size.create().set(window.innerWidth, window.innerHeight);
@@ -81,27 +103,20 @@ var Game = GlobalScope.extend(function () {
 			}
 		});
 
+		this.onResize = function (_handler) {
+			RESIZE_HANDLERS.push(_handler);
+		};
+
 	});;
 
 	this.willInit = function () {
-		var $html;
-
-		$html = $('html');
-
-		$html.addClass(this.viewport.orientation);
 		this.addClass('pl-game');
-
-		$(window).on('resize', this.bind(function () {
-			if (!$html.hasClass(this.viewport.orientation)) {
-				$html
-					.removeClass('squareish landscape protrait')
-					.addClass(this.viewport.orientation);
-				}
-		}));
 
 		scaleGame.call(this);
 		this.captureScreens();
 		this.watchAudio();
+
+		this.viewport.onResize(this.bind(scaleGame));
 
 		return this;
 	};
