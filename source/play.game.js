@@ -21,6 +21,7 @@ import { default as SCOPE } from 'types/GlobalScope';
 import Entity from 'types/Entity';
 import Screen from 'types/Screen';
 import Game from 'types/Game';
+import platform from 'platform';
 
 var GAMES, CONFIG, READY_QUEUE;
 
@@ -112,6 +113,10 @@ READY_QUEUE = [];
 	
 	util.mixin(game, Events);
 
+	this.on('platform-event', function (_event) {
+		console.log('play.game -', _event.name, _event.gameData);
+	});
+
 	/**
 	 * Starts the dominos falling
 	 * @function run
@@ -127,6 +132,28 @@ READY_QUEUE = [];
 
 			GAMES = null;
 		});
+
+		platform.emit(platform.EVENT_INIT);
+	};
+
+	this.report = function (_name) {
+		platform.emit(_name);
+
+		return this.report;
+	};
+
+	this.report.exit = function (_gameScope) {
+		platform.saveGameState(_gameScope.progress());
+		platform.emit(platform.EVENT_EXIT);
+
+		return this;
+	};
+
+	this.report.flip = function (_gameScope) {
+		platform.saveGameState(_gameScope.progress());
+		platform.emit(platform.EVENT_FLIPPED);
+
+		return this;
 	};
 
 	
