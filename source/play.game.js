@@ -114,7 +114,7 @@ READY_QUEUE = [];
 	util.mixin(game, Events);
 
 	this.on('platform-event', function (_event) {
-		console.log(_event.name, _event.gameData);
+		console.log('play.game -', _event.name, _event.gameData);
 	});
 
 	/**
@@ -133,10 +133,27 @@ READY_QUEUE = [];
 			GAMES = null;
 		});
 
-		platform.getGameState();
-		platform.saveGameState({
-			screen: 12
-		});
+		platform.emit(platform.EVENT_INIT);
+	};
+
+	this.report = function (_name) {
+		platform.emit(_name);
+
+		return this.report;
+	};
+
+	this.report.exit = function (_gameScope) {
+		platform.saveGameState(_gameScope.progress());
+		platform.emit(platform.EVENT_EXIT);
+
+		return this;
+	};
+
+	this.report.flip = function (_gameScope) {
+		platform.saveGameState(_gameScope.progress());
+		platform.emit(platform.EVENT_FLIPPED);
+
+		return this;
 	};
 
 	

@@ -231,13 +231,20 @@ var Game = GlobalScope.extend(function () {
 		});
 	};
 
+	this.progress = function () {
+		return {
+			currentScreen: this.findOwn('.screen.OPEN').not('#quit').scope().index()
+		};
+	};
+
 	this.flip = function () {
 		console.log('THATS A FLIP!');
+		game.report.flip(this);
 	};
 
 	this.exit = function () {
-		console.log('exit game!');
-		window.close();
+		console.log('GOODBYE!');
+		game.report.exit(this);
 	};
 
 });

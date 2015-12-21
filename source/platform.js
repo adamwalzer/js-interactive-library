@@ -26,23 +26,20 @@ var platform = new (function () {
 
 		return eventObject;
 	}
-	
-	this.getGameState = function () {
-		var gameEvent;
 
-		gameEvent = createEvent('init');
+	this.EVENT_INIT = 'init';
+	this.EVENT_SAVE = 'save';
+	this.EVENT_EXIT = 'exit';
+	this.EVENT_FLIPPED = 'flipped';
 
-		window.frameElement.dispatchEvent(gameEvent);
+	this.emit = function (_name) {
+		window.frameElement.dispatchEvent(createEvent(_name));
 	};
 
 	this.saveGameState = function (_data) {
-		var gameEvent;
-
-		gameEvent = createEvent('save', {
+		window.frameElement.dispatchEvent(createEvent(this.EVENT_SAVE, {
 			gameData: _data
-		});
-
-		window.frameElement.dispatchEvent(gameEvent);
+		}));
 	};
 
 });
