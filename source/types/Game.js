@@ -178,10 +178,8 @@ var Game = GlobalScope.extend(function () {
 
 		function deQueue (_scope, _item) {
 			[_scope, _scope.screen].forEach(function (_scope) {
-				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue')) {
-					if (_scope.requiredQueue.has(_item)) {
-						_scope.requiredQueue.ready(_item);
-					}					
+				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
+					_scope.requiredQueue.ready(_item);
 				}				
 			});
 		}
