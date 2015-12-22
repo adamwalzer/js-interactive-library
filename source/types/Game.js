@@ -1,9 +1,6 @@
 /**
-*  Game
-*  @desc Contains...
-*  @proto GlobalScope
-*/
-
+ * Node scope for the top level game node.
+ */
 import util from 'util';
 import game from 'play.game';
 import GlobalScope from 'types/GlobalScope';
@@ -45,6 +42,7 @@ var Game = GlobalScope.extend(function () {
 	this.baseType = 'TYPE_GAME';
 	this.screens = null;
 	this.zoom = 1;
+	this.keyCommands = null;
 	this.viewport = new (function () {
 		var vp, $html, RESIZE_HANDLERS;
 
@@ -117,6 +115,112 @@ var Game = GlobalScope.extend(function () {
 		this.watchAudio();
 
 		this.viewport.onResize(this.bind(scaleGame));
+
+		return this;
+	};
+
+	/**
+	 * Watch for specific keys or combination of keys. NOTE: meta key commands DO NOT support chords (i.e. meta+K,B).
+	 * ### Key Names
+	 * - *meta*: Command (aka Apple ⌘ or win)
+	 * - *alt*: Alt (aka Option ⌥)
+	 * - *shift*: Shift ⇪
+	 * - *ctrl*: Control ^
+	 * - *enter*: Enter or Return
+	 * - *esc*: Escape
+	 *
+	 * ### Example
+	 * ```javascript
+	 * // Overriding print.
+	 * this.game.onKeys('cmd+P', printHandler);
+	 *
+	 * // Holding Control and pressing "K" then "B"
+	 * this.game.onKeys('ctrl+K,B', handler);
+	 * ```
+	 * @arg {string} _commands - The key or sequence of keys.
+	 * @arg {function} _handler - Your event handler for when you key pattern is matched.
+	 * @returns `this`
+	 */
+	this.onKeys = function (_commands, _handler) {
+		var sequence, chords, modifiers, map;
+
+
+		if (!this.keyCommands) {
+			this.keyCommands = {};
+
+			map = {
+				13: 'enter',
+				16: 'shift',
+				17: 'ctrl',
+				18: 'alt',
+				27: 'esc',
+				91: 'meta',
+				enter: 13,
+				shift: 16,
+				ctrl: 17,
+				alt: 18,
+				esc: 27,
+				meta: 91
+			};
+			modifiers = [13, 16, 17, 18, 91];
+			sequence = [];
+			chords = [];
+
+			this.on('keydown', function (_event) {
+				var command, modifier, key, handler;
+
+				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
+
+				if (~chords.indexOf(key) || ~sequence.indexOf(key)) return;
+
+				command = chords.length ?
+					(chords.push(key), chords.join(',')) :
+					(sequence.push(key), sequence.join('+'));
+
+				handler = this.keyCommands[command];
+
+				this.log('keydown', command, 'handler', this.keyCommands[command]);
+
+				if (handler) {
+					handler.call(this, _event, command);
+					sequence = [];
+					chords = [];
+					_event.preventDefault();
+				}
+			});
+
+			this.on('keyup', function (_event) {
+				var index, modifier, key;
+
+				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
+				index = sequence.indexOf(key);
+
+				if (key === modifier) {
+					sequence = [];
+					chords = [];
+				}
+
+				else {
+					if (sequence.length-1 === 1) {
+						if (~modifiers.indexOf(map[sequence[0]])) {
+							chords.push(sequence.join('+'));
+						}
+					}
+					
+					if (~index) sequence.splice(index, 1);
+
+					switch (sequence.length) {
+						case 0: chords = []; break;
+					}
+				}
+
+				this.log('keyup', sequence);
+			});
+		}
+
+		this.keyCommands[_commands] = _handler;
 
 		return this;
 	};
