@@ -154,23 +154,37 @@ var Game = GlobalScope.extend(function () {
 				17: 'ctrl',
 				18: 'alt',
 				27: 'esc',
+				37: 'left',
+				38: 'up',
+				39: 'right',
+				40: 'down',
 				91: 'meta',
 				enter: 13,
 				shift: 16,
-				ctrl: 17,
-				alt: 18,
-				esc: 27,
-				meta: 91
+				ctrl : 17,
+				alt  : 18,
+				esc  : 27,
+				left : 37,
+				up   : 38,
+				right: 39,
+				down : 40,
+				meta : 91
 			};
-			modifiers = [13, 16, 17, 18, 91];
+			modifiers = [16, 17, 18, 91];
 			sequence = [];
 			chords = [];
 
 			this.on('keydown', function (_event) {
-				var command, modifier, key, handler;
+				var command, modifier, key, handler, eventMods, currentMods;
 
 				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
 				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
+				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
+				currentMods = [];
+
+				eventMods.forEach(function (_modifierDown, _index) {
+					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
+				});
 
 				if (~chords.indexOf(key) || ~sequence.indexOf(key)) return;
 
@@ -180,30 +194,41 @@ var Game = GlobalScope.extend(function () {
 
 				handler = this.keyCommands[command];
 
-				this.log('keydown', command, 'handler', this.keyCommands[command]);
-
 				if (handler) {
 					handler.call(this, _event, command);
-					sequence = [];
+					sequence = currentMods.map(function (_key, _index) {
+						var key = sequence[_index];
+						return currentMods[currentMods.indexOf(key)];
+					});
 					chords = [];
 					_event.preventDefault();
 				}
 			});
 
 			this.on('keyup', function (_event) {
-				var index, modifier, key;
+				var index, modIndex, modifier, eventMods, currentMods, key;
 
-				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				modIndex = modifiers.indexOf(_event.keyCode);
+				modifier = (!!~modIndex) && map[_event.keyCode];
+				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
+				currentMods = [];
 				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
 				index = sequence.indexOf(key);
 
+				eventMods.forEach(function (_modifierDown, _index) {
+					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
+				});
+
 				if (key === modifier) {
-					sequence = [];
+					sequence = currentMods.map(function (_key, _index) {
+						var key = sequence[_index];
+						return currentMods[currentMods.indexOf(key)];
+					});;
 					chords = [];
 				}
 
 				else {
-					if (sequence.length-1 === 1) {
+					if (sequence.length > 1) {
 						if (~modifiers.indexOf(map[sequence[0]])) {
 							chords.push(sequence.join('+'));
 						}
@@ -215,8 +240,6 @@ var Game = GlobalScope.extend(function () {
 						case 0: chords = []; break;
 					}
 				}
-
-				this.log('keyup', sequence);
 			});
 		}
 
