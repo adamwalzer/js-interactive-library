@@ -43,6 +43,7 @@ var Game = GlobalScope.extend(function () {
 	this.screens = null;
 	this.zoom = 1;
 	this.keyCommands = null;
+	this.demoMode = false;
 	this.viewport = new (function () {
 		var vp, $html, RESIZE_HANDLERS;
 
@@ -390,8 +391,12 @@ var Game = GlobalScope.extend(function () {
 
 	this.progress = function () {
 		return {
-			currentScreen: this.findOwn('.screen.OPEN').not('#quit').scope().index()
+			currentScreen: this.currentScreen().index()
 		};
+	};
+
+	this.currentScreen = function () {
+		return this.findOwn('.screen.OPEN').not('#quit').scope();
 	};
 
 	this.flip = function () {
@@ -403,6 +408,60 @@ var Game = GlobalScope.extend(function () {
 		console.log('GOODBYE!');
 		game.report.exit(this);
 	};
+
+	/**
+	 * Demo mode key command
+	 */
+	this.onKeys('ctrl+D,M', function () {
+		// toggle
+		this.demoMode = !this.demoMode;
+		this[this.demoMode ? 'addClass' : 'removeClass']('DEMO');
+
+		console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
+	});
+
+	/**
+	 * Keyboard screen navigation
+	 */
+	this.onKeys('left', function () {
+		var current, prev;
+
+		if (!(current = this.currentScreen())) return;
+
+		if (this.demoMode) {
+			prev = Screen.prev.call(current);
+			
+			if (prev) {
+				current.close();
+				prev.open();
+			}
+		}
+
+		else {
+			current.prev();
+		}
+			
+	});
+
+	this.onKeys('right', function () {
+		var current, next;
+
+		if (!(current = this.currentScreen())) return;
+
+		if (this.demoMode) {
+			next = Screen.next.call(current);
+			
+			if (next) {
+				current.leave();
+				next.open();
+			}
+		}
+
+		else {
+			current.next();
+		}
+			
+	});
 
 });
 
