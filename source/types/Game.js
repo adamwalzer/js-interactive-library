@@ -148,7 +148,6 @@ var Game = GlobalScope.extend(function () {
 	this.onKeys = function (_commands, _handler) {
 		var sequence, chords, modifiers, map;
 
-
 		if (!this.keyCommands) {
 			this.keyCommands = {};
 
@@ -174,24 +173,29 @@ var Game = GlobalScope.extend(function () {
 				down : 40,
 				meta : 91
 			};
+
 			modifiers = [16, 17, 18, 91];
 			sequence = [];
 			chords = [];
 
 			this.on('keydown', function (_event) {
-				var command, modifier, key, handler, eventMods, currentMods;
+				var modifier, key, eventMods, currentMods, command, handler;
 
 				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
 				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
 				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
 				currentMods = [];
 
+				// Collect the modifiers the event says are still down.
 				eventMods.forEach(function (_modifierDown, _index) {
+					// use the modifier name
 					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
 				});
 
+				// Don't add keys we already have during rapid-fire events
 				if (~chords.indexOf(key) || ~sequence.indexOf(key)) return;
 
+				// Construct the command
 				command = chords.length ?
 					(chords.push(key), chords.join(',')) :
 					(sequence.push(key), sequence.join('+'));
@@ -200,49 +204,56 @@ var Game = GlobalScope.extend(function () {
 
 				if (handler) {
 					handler.call(this, _event, command);
+					// Keep current modifiers.
 					sequence = currentMods.map(function (_key, _index) {
 						var key = sequence[_index];
 						return currentMods[currentMods.indexOf(key)];
 					});
 					chords = [];
+
+					// Override original key command (i.e. meta+Q).
 					_event.preventDefault();
 				}
 			});
 
 			this.on('keyup', function (_event) {
-				var index, modIndex, modifier, eventMods, currentMods, key;
+				var key, index, modifier, eventMods, currentMods;
 
-				modIndex = modifiers.indexOf(_event.keyCode);
-				modifier = (!!~modIndex) && map[_event.keyCode];
-				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
-				currentMods = [];
 				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
 				index = sequence.indexOf(key);
+				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				// Follows the same index order as "modifiers" [16, 17, 18, 91]
+				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
+				currentMods = [];
 
+				// Collect the modifiers the event says are still down.
 				eventMods.forEach(function (_modifierDown, _index) {
+					// use the modifier name
 					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
 				});
 
+				// If the key released is a modifier...
 				if (key === modifier) {
+					// ...keep current modifiers...
 					sequence = currentMods.map(function (_key, _index) {
 						var key = sequence[_index];
 						return currentMods[currentMods.indexOf(key)];
-					});;
+					});
+					// ...clear registered chords.
 					chords = [];
 				}
 
 				else {
+					// If we had pressed more than one key...
 					if (sequence.length > 1) {
+						// Check if the first is a modifier then switch to chord capturing
 						if (~modifiers.indexOf(map[sequence[0]])) {
 							chords.push(sequence.join('+'));
 						}
 					}
 					
 					if (~index) sequence.splice(index, 1);
-
-					switch (sequence.length) {
-						case 0: chords = []; break;
-					}
+					if (!sequence.length) chords = [];
 				}
 			});
 		}
