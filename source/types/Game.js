@@ -128,6 +128,10 @@ var Game = GlobalScope.extend(function () {
 	 * - *ctrl*: Control ^
 	 * - *enter*: Enter or Return
 	 * - *esc*: Escape
+	 * - *left*: Left arrow
+	 * - *up*: Up arrow
+	 * - *right*: Right arrow
+	 * - *down*: Down arrow
 	 *
 	 * ### Example
 	 * ```javascript
