@@ -424,43 +424,19 @@ var Game = GlobalScope.extend(function () {
 	 * Keyboard screen navigation
 	 */
 	this.onKeys('left', function () {
-		var current, prev;
+		var current;
 
-		if (!(current = this.currentScreen())) return;
+		current = this.currentScreen();
 
-		if (this.demoMode) {
-			prev = Screen.prev.call(current);
-			
-			if (prev) {
-				current.close();
-				prev.open();
-			}
-		}
-
-		else {
-			current.prev();
-		}
-			
+		if (current) current.prev();
 	});
 
 	this.onKeys('right', function () {
-		var current, next;
+		var current;
 
-		if (!(current = this.currentScreen())) return;
-
-		if (this.demoMode) {
-			next = Screen.next.call(current);
-			
-			if (next) {
-				current.leave();
-				next.open();
-			}
-		}
-
-		else {
-			current.next();
-		}
-			
+		current = this.currentScreen();
+		
+		if (current) current.next();
 	});
 
 });
