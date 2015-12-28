@@ -1,9 +1,6 @@
 /**
-*  Game
-*  @desc Contains...
-*  @proto GlobalScope
-*/
-
+ * Node scope for the top level game node.
+ */
 import util from 'util';
 import game from 'play.game';
 import GlobalScope from 'types/GlobalScope';
@@ -45,6 +42,8 @@ var Game = GlobalScope.extend(function () {
 	this.baseType = 'TYPE_GAME';
 	this.screens = null;
 	this.zoom = 1;
+	this.keyCommands = null;
+	this.demoMode = false;
 	this.viewport = new (function () {
 		var vp, $html, RESIZE_HANDLERS;
 
@@ -117,6 +116,150 @@ var Game = GlobalScope.extend(function () {
 		this.watchAudio();
 
 		this.viewport.onResize(this.bind(scaleGame));
+
+		return this;
+	};
+
+	/**
+	 * Watch for specific keys or combination of keys. NOTE: meta key commands DO NOT support chords (i.e. meta+K,B).
+	 * ### Key Names
+	 * - *meta*: Command (aka Apple ⌘ or win)
+	 * - *alt*: Alt (aka Option ⌥)
+	 * - *shift*: Shift ⇪
+	 * - *ctrl*: Control ^
+	 * - *enter*: Enter or Return
+	 * - *esc*: Escape
+	 * - *left*: Left arrow
+	 * - *up*: Up arrow
+	 * - *right*: Right arrow
+	 * - *down*: Down arrow
+	 *
+	 * ### Example
+	 * ```javascript
+	 * // Overriding print.
+	 * this.game.onKeys('cmd+P', printHandler);
+	 *
+	 * // Holding Control and pressing "K" then "B"
+	 * this.game.onKeys('ctrl+K,B', handler);
+	 * ```
+	 * @arg {string} _commands - The key or sequence of keys.
+	 * @arg {function} _handler - Your event handler for when you key pattern is matched.
+	 * @returns `this`
+	 */
+	this.onKeys = function (_commands, _handler) {
+		var sequence, chords, modifiers, map;
+
+		if (!this.keyCommands) {
+			this.keyCommands = {};
+
+			map = {
+				13: 'enter',
+				16: 'shift',
+				17: 'ctrl',
+				18: 'alt',
+				27: 'esc',
+				37: 'left',
+				38: 'up',
+				39: 'right',
+				40: 'down',
+				91: 'meta',
+				enter: 13,
+				shift: 16,
+				ctrl : 17,
+				alt  : 18,
+				esc  : 27,
+				left : 37,
+				up   : 38,
+				right: 39,
+				down : 40,
+				meta : 91
+			};
+
+			modifiers = [16, 17, 18, 91];
+			sequence = [];
+			chords = [];
+
+			this.on('keydown', function (_event) {
+				var modifier, key, eventMods, currentMods, command, handler;
+
+				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
+				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
+				currentMods = [];
+
+				// Collect the modifiers the event says are still down.
+				eventMods.forEach(function (_modifierDown, _index) {
+					// use the modifier name
+					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
+				});
+
+				// Don't add keys we already have during rapid-fire events
+				if (~chords.indexOf(key) || ~sequence.indexOf(key)) return;
+
+				// Construct the command
+				command = chords.length ?
+					(chords.push(key), chords.join(',')) :
+					(sequence.push(key), sequence.join('+'));
+
+				handler = this.keyCommands[command];
+
+				if (handler) {
+					handler.call(this, _event, command);
+					// Keep current modifiers.
+					sequence = currentMods.map(function (_key, _index) {
+						var key = sequence[_index];
+						return currentMods[currentMods.indexOf(key)];
+					});
+					chords = [];
+
+					// Override original key command (i.e. meta+Q).
+					_event.preventDefault();
+				}
+			});
+
+			this.on('keyup', function (_event) {
+				var key, index, modifier, eventMods, currentMods;
+
+				key = (modifier) ? modifier : map[_event.keyCode] || String.fromCharCode(_event.keyCode);
+				index = sequence.indexOf(key);
+				modifier = (!!~modifiers.indexOf(_event.keyCode)) && map[_event.keyCode];
+				// Follows the same index order as "modifiers" [16, 17, 18, 91]
+				eventMods = [_event.shiftKey, _event.ctrlKey, _event.altKey, _event.metaKey];
+				currentMods = [];
+
+				// Collect the modifiers the event says are still down.
+				eventMods.forEach(function (_modifierDown, _index) {
+					// use the modifier name
+					if (_modifierDown) currentMods.push(map[modifiers[_index]]);
+				});
+
+				// If the key released is a modifier...
+				if (key === modifier) {
+					// ...keep current modifiers...
+					sequence = currentMods.map(function (_key, _index) {
+						var key = sequence[_index];
+						return currentMods[currentMods.indexOf(key)];
+					});
+					// ...clear registered chords.
+					chords = [];
+				}
+
+				else {
+					// If we had pressed more than one key...
+					if (sequence.length > 1) {
+						// Check if the first is a modifier then switch to chord capturing
+						if (~modifiers.indexOf(map[sequence[0]])) {
+							chords.push(sequence.join('+'));
+						}
+					}
+					
+					if (~index) sequence.splice(index, 1);
+					if (!sequence.length) chords = [];
+				}
+			});
+		}
+
+		this.keyCommands[_commands] = _handler;
 
 		return this;
 	};
@@ -248,8 +391,12 @@ var Game = GlobalScope.extend(function () {
 
 	this.progress = function () {
 		return {
-			currentScreen: this.findOwn('.screen.OPEN').not('#quit').scope().index()
+			currentScreen: this.currentScreen().index()
 		};
+	};
+
+	this.currentScreen = function () {
+		return this.findOwn('.screen.OPEN').not('#quit').scope();
 	};
 
 	this.flip = function () {
@@ -261,6 +408,36 @@ var Game = GlobalScope.extend(function () {
 		console.log('GOODBYE!');
 		game.report.exit(this);
 	};
+
+	/**
+	 * Demo mode key command
+	 */
+	this.onKeys('ctrl+D,M', function () {
+		// toggle
+		this.demoMode = !this.demoMode;
+		this[this.demoMode ? 'addClass' : 'removeClass']('DEMO');
+
+		console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
+	});
+
+	/**
+	 * Keyboard screen navigation
+	 */
+	this.onKeys('left', function () {
+		var current;
+
+		current = this.currentScreen();
+
+		if (current) current.prev();
+	});
+
+	this.onKeys('right', function () {
+		var current;
+
+		current = this.currentScreen();
+		
+		if (current) current.next();
+	});
 
 });
 
