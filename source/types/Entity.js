@@ -106,7 +106,8 @@ var Entity = GlobalScope.extend(function () {
 	this.STATE = {
 		PLAYING: 'PLAYING',
 		BACKGROUND: 'BACKGROUND',
-		VOICE_OVER: 'VOICE-OVER'
+		VOICE_OVER: 'VOICE-OVER',
+		SFX: 'SFX'
 	};
 
 	this.timeoutID = null;
