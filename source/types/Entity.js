@@ -820,7 +820,7 @@ var Entity = GlobalScope.extend(function () {
 			var point, target;
 			
 			target = resolveTarget.call(this, _target_point);
-			point = (!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point;
+			point = ((!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point).scale(1/this.game.zoom);
 
 			if (point) {
 				target.css('transform', 'translateX('+point.x+'px) translateY('+point.y+'px)');
