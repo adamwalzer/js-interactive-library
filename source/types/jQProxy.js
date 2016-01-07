@@ -145,8 +145,6 @@ var jQProxy = Basic.extend(function () {
 	this.isMemberSafe = function (_name) {
 		var owner, elOwner, prototype;
 
-		// if (_name === 'init' && this.is('.board')) debugger;
-
 		if (this.hasOwnProperty(_name)) {
 			return true;
 		}
@@ -169,6 +167,13 @@ var jQProxy = Basic.extend(function () {
 		}
 
 		return false;
+	};
+
+	this.is = function (_obj) {
+		if (!_obj) return false;
+		if (_obj.$els) return this.$els.is(_obj.$els);
+
+		return this.$els.is(_obj);
 	};
 });
 

@@ -205,7 +205,7 @@ var Scope = jQProxy.extend(function () {
 						
 				}
 
-				scope.find('[pl-component]').each(function () {
+				scope.findOwn('[pl-component]').each(function () {
 					var name;
 
 					name = $(this).attr('pl-component');
@@ -224,7 +224,7 @@ var Scope = jQProxy.extend(function () {
 			});
 		}
 
-		if (!$('style[pl-for-component="'+_name+'"]').length) {
+		if (!$('style[pl-for-component="'+_name+'"]').length && game.config('shouldLoadComponentStyles') !== false) {
 			totalRequests+=1;
 			$('<style type="text/css" pl-for-component="'+_name+'">')
 				.load(path+'style.css', ready)
