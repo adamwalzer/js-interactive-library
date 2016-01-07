@@ -508,11 +508,13 @@ var Scope = jQProxy.extend(function () {
 
 			eventMap = {
 				AUDIO: 'onloadeddata',
+				VIDEO: 'onloadeddata',
 				IMG: 'onload'
 			};
 
 			isNodeComplete = {
 				AUDIO: this.readyState === this.HAVE_ENOUGH_DATA,
+				VIDEO: this.readyState === this.HAVE_ENOUGH_DATA,
 				IMG: this.complete
 			};
 
