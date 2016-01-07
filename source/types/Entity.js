@@ -198,15 +198,13 @@ var Entity = GlobalScope.extend(function () {
 		if (!this.hasOwnProperty('requiredQueue')) {
 			this.requiredQueue = Queue.create();
 			this.requiredQueue.on('complete', this.bind(function () {
-				console.log('** entity complete', this.id());
+				this.log('entity complete');
 				this.complete();
 			}));
 
 			this.respond('complete', function (_event) {
 				if (!this.has(_event.target)) return;
 				if (_event.targetScope === this) return;
-
-				this.log('complete', _event.targetScope.id() || _event.targetScope.address());
 
 				this.requiredQueue.ready(_event.behaviorTarget);
 			});
@@ -410,15 +408,14 @@ var Entity = GlobalScope.extend(function () {
 		tester = names[1];
 
 		this[setter] = function (_target) {
-			var target, uiStateEvent;
+			var target, uiStateEvent, oppsPerformed;
 
 			target = resolveTarget.call(this, _target);
 			uiStateEvent = $.Event('ui-'+setter, {
 				target: target.jquery ? target[0] : target,
 				targetScope: this
 			});
-
-			// if (target.hasClass(this.STATE[STATE])) return false;
+			oppsPerformed = 0;
 
 			if (_imp && _imp.shouldSet && _imp.shouldSet.apply(this, arguments) === false) {
 				return !!(_imp && _imp.notSet) && _imp.notSet.apply(this, arguments);
@@ -427,14 +424,21 @@ var Entity = GlobalScope.extend(function () {
 			if (_imp && _imp.willSet) _imp.willSet.apply(this, arguments);
 
 			opperations.forEach(function (_record) {
+				// If we are adding or removing a class, test if the target already has/removed it.
+				// If so, then bump "oppsPerformed".
+				oppsPerformed += Number(target.hasClass(_record.flag) === !~_record.method.indexOf('add'));
 				target[_record.method](_record.flag);
 			});
 
 			if (_imp && _imp.didSet) _imp.didSet.apply(this, arguments);
 
-			this.trigger(uiStateEvent);
 
-			return target;
+			if (oppsPerformed) {
+				this.trigger(uiStateEvent);
+				return target;
+			}
+			
+			return false;
 		};
 
 		if (tester) {
@@ -469,7 +473,7 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.completed = function () {
-		return (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
+		return this.game.demoMode || (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
 	};
 
 	/**
@@ -818,11 +822,11 @@ var Entity = GlobalScope.extend(function () {
 	this.state('translate translated', '+TRANSLATED', {
 		willSet: function (_target_point, _point) {
 			var point, target;
+			
 			target = resolveTarget.call(this, _target_point);
 			point = (!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point;
 
 			if (point) {
-				point = point.scale(1/this.game.zoom);
 				target.css('transform', 'translateX('+point.x+'px) translateY('+point.y+'px)');
 			}
 		}

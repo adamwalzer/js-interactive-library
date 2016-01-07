@@ -454,11 +454,11 @@ var Scope = jQProxy.extend(function () {
 		scope = this;
 
 		this.isReady = false;
+		this.isComponent = !!_componentName;
 		this.event = null;
 		this.assetQueue = Queue.create();
 		this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
-		if (_componentName) this.isComponent = true;
 		if (!this.$els.length) {
 			throw new ReferenceError('Unable to locate the element with selector '+this.$els.selector+'.');
 		}
@@ -508,11 +508,13 @@ var Scope = jQProxy.extend(function () {
 
 			eventMap = {
 				AUDIO: 'onloadeddata',
+				VIDEO: 'onloadeddata',
 				IMG: 'onload'
 			};
 
 			isNodeComplete = {
 				AUDIO: this.readyState === this.HAVE_ENOUGH_DATA,
+				VIDEO: this.readyState === this.HAVE_ENOUGH_DATA,
 				IMG: this.complete
 			};
 

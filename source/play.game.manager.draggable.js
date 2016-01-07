@@ -129,7 +129,7 @@ function attachEvents () {
 				state.progress.point = state.start.point.inc(point);
 				state.progress.transform = transform;
 
-				state.scope.translate(state.$helper, point);
+				state.scope.translate(state.$helper, point.scale(1/state.scope.game.zoom));
 				state.scope.trigger(dragMoveEvent);
 			}
 		})
