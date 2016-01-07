@@ -170,6 +170,13 @@ var jQProxy = Basic.extend(function () {
 
 		return false;
 	};
+
+	this.is = function (_obj) {
+		if (!_obj) return false;
+		if (_obj.$els) return this.$els.is(_obj.$els);
+
+		return this.$els.is(_obj);
+	};
 });
 
 export default jQProxy;
