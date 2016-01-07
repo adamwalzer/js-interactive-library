@@ -145,8 +145,6 @@ var jQProxy = Basic.extend(function () {
 	this.isMemberSafe = function (_name) {
 		var owner, elOwner, prototype;
 
-		// if (_name === 'init' && this.is('.board')) debugger;
-
 		if (this.hasOwnProperty(_name)) {
 			return true;
 		}

@@ -205,7 +205,7 @@ var Scope = jQProxy.extend(function () {
 						
 				}
 
-				scope.find('[pl-component]').each(function () {
+				scope.findOwn('[pl-component]').each(function () {
 					var name;
 
 					name = $(this).attr('pl-component');
