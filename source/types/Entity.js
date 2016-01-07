@@ -818,12 +818,11 @@ var Entity = GlobalScope.extend(function () {
 	this.state('translate translated', '+TRANSLATED', {
 		willSet: function (_target_point, _point) {
 			var point, target;
-			
 			target = resolveTarget.call(this, _target_point);
 			point = (!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point;
 
 			if (point) {
-				point.scale(1/this.game.zoom);
+				point = point.scale(1/this.game.zoom);
 				target.css('transform', 'translateX('+point.x+'px) translateY('+point.y+'px)');
 			}
 		}
