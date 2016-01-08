@@ -347,6 +347,10 @@ var Scope = jQProxy.extend(function () {
 	}
 
 	function init () {
+		var initEvent;
+
+		initEvent = $.Event('initialize', { targetScope: this });
+
 		invokeLocal.call(this, 'willInit');
 
 		this.attachEvents();
@@ -360,6 +364,8 @@ var Scope = jQProxy.extend(function () {
 
 		this.__init();
 		invokeLocal.call(this, 'init');
+
+		this.trigger(initEvent);
 
 		if (!this.isReady) this.assetQueue.ready();
 
