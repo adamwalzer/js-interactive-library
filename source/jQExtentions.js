@@ -54,7 +54,6 @@ import Matrix from 'lib/matrix';
 			// Remove attribute.
 			if (~['', null].indexOf(_set)) {
 				this.attr('id', null);
-				return this;
 			}
 
 			// If document already has the id defined then set as a unique library id.
@@ -65,6 +64,8 @@ import Matrix from 'lib/matrix';
 			else {
 				this.attr('id', _set);
 			}
+			
+			return this;
 		}
 
 		return this.attr('id') || this.attr('pl-id') || this.attr('pl-component');
