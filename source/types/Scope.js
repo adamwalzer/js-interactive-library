@@ -316,7 +316,7 @@ var Scope = jQProxy.extend(function () {
 
 		if (this.propertyHandlers) {
 			for (property in this.propertyHandlers) {
-				// only exclide members on the base type
+				// Only exclide members on the base type.
 				if (Basic.hasOwnProperty(property)) continue;
 
 				handler = this.propertyHandlers[property];
@@ -496,10 +496,10 @@ var Scope = jQProxy.extend(function () {
 	this.init = function () { return this; };
 	this.ready = function () { return this; };
 
-	this.watchAssets = function () {
+	this.watchAssets = function (_nodes) {
 		var scope, assetTypes;
 
-		function watch () {
+		function watch (_node) {
 			var eventMap, isNodeComplete;
 
 			function createHandler (_node) {
@@ -519,19 +519,19 @@ var Scope = jQProxy.extend(function () {
 			};
 
 			isNodeComplete = {
-				AUDIO: this.readyState === this.HAVE_ENOUGH_DATA,
-				VIDEO: this.readyState === this.HAVE_ENOUGH_DATA,
-				IMG: this.complete
+				AUDIO: _node.readyState === _node.HAVE_ENOUGH_DATA,
+				VIDEO: _node.readyState === _node.HAVE_ENOUGH_DATA,
+				IMG: _node.complete
 			};
 
 			// console.log('found asset', this.nodeName);
 
-			if (isNodeComplete[this.nodeName]) return;
-			if (scope.assetQueue.add(this.src)) {
+			if (isNodeComplete[_node.nodeName]) return;
+			if (scope.assetQueue.add(_node.src)) {
 				// console.log('watch', this.nodeName, this.src, scope.id());
-				this[eventMap[this.nodeName]] = createHandler(this);
-				this.onerror = function () {
-					console.error('Image failed to load', this.src);
+				_node[eventMap[_node.nodeName]] = createHandler(_node);
+				_node.onerror = function () {
+					console.error('Image failed to load', _node.src);
 				};
 			}
 		}
@@ -539,14 +539,19 @@ var Scope = jQProxy.extend(function () {
 		scope = this;
 		assetTypes = ['IMG', 'AUDIO', 'VIDEO'];
 
+		if (_nodes) {
+			_nodes.forEach(watch);
+			return this;
+		}
+
 		this.each(function () {
 			if (~assetTypes.indexOf(this.nodeName)) {
-				watch.call(this);
+				watch(this);
 			}
 		});
 
 		this.findOwn(assetTypes.join(',')).each(function () {
-			watch.call(this);
+			watch(this);
 		});
 
 		return this;
