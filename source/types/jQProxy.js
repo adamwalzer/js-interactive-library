@@ -113,6 +113,36 @@ var jQProxy = Basic.extend(function () {
 		}
 	};
 
+	this.listen = function (_name, _isCapure_handler, _handler) {
+		var _isCapture, node;
+
+		_isCapture = false;
+
+		// resolve arguments
+		(typeof _isCapure_handler === 'boolean') ?
+			_isCapture = _isCapure_handler:
+			_handler = _isCapure_handler;
+
+		if (this.$els) {
+			node = this.$els[0];
+			if (node) return node.addEventListener(_name, _handler, _isCapture);
+		}
+
+		else {
+			return registerHandler([_name, _handler, _isCapture]);
+		}
+
+		return false;
+	};
+
+	this.ignore = function (argument) {
+		var node = this.$els && this.$els[0];
+
+		if (node) return node.removeEventListener.apply(node, arguments);
+
+		return false;
+	};
+
 	// Wraps you function 'this' to the scope.
 	// 
 	this.bind = function (_handler) {
