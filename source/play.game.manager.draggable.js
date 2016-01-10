@@ -20,7 +20,6 @@ function attachEvents () {
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
 
-
 			if ($draggable.length) {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);

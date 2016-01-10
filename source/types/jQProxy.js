@@ -26,7 +26,7 @@ var jQProxy = Basic.extend(function () {
 			// This makes sure your not calling any jQuery methods before initialization.
 			if (!this.hasOwnProperty('$els')) {
 				if (_name === 'on') {
-					this.registerHandler(arguments);
+					registerHandler.call(this, arguments);
 				}
 
 				else {
@@ -69,6 +69,22 @@ var jQProxy = Basic.extend(function () {
 		return _args;
 	}
 
+	function registerHandler (_definition) {
+		if (!this.hasOwnProperty('eventRegistry')) {
+			if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
+				this.eventRegistry = this.eventRegistry.slice(0);
+			}
+
+			else {
+				this.eventRegistry = [];
+			}
+		}
+
+		this.eventRegistry.push(_definition);
+
+		return true;
+	}
+
 	// We don't want jQuery methods overridding our base type's methods.
 	exclude = ['constructor'].concat(Object.keys(Basic));
 
@@ -83,21 +99,6 @@ var jQProxy = Basic.extend(function () {
 
 	this.node = function () {
 		return this.$els[0];
-	};
-
-	// TODO: make this private
-	this.registerHandler = function (_definition) {
-		if (!this.hasOwnProperty('eventRegistry')) {
-			if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
-				this.eventRegistry = this.eventRegistry.slice(0);
-			}
-
-			else {
-				this.eventRegistry = [];
-			}
-		}
-
-		this.eventRegistry.push(_definition);
 	};
 
 	this.attachEvents = function () {
