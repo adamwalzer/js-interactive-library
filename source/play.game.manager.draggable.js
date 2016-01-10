@@ -4,7 +4,10 @@ import { Point } from 'types/Dimensions';
 
 const COLLECTION_DRAGABLES = Collection.create();
 
+var draggableStyleSheet;
+
 function boot () {
+	createHelperStyleSheet();
 	attachEvents();
 }
 
@@ -13,19 +16,20 @@ function attachEvents () {
 
 	$(document)
 		.on('mousedown', function (_event) {
-			var cursor, $draggable, transform, point, mode, style, dragStartEvent;
+			var draggable, scope, cursor, $transform, point, mode, style, dragStartEvent, helperUUID;
 
-			cursor = resolveEventPoint(_event);
 			$draggable = $(_event.target).closest('[pl-draggable]');
 
-
 			if ($draggable.length) {
+				scope = $draggable.scope();
+				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
 				mode = $draggable.attr('pl-draggable');
 				point = $draggable.absolutePosition();
 				transform = $draggable.transform();
 				// TODO: Set these styles in a style node.
 				// That way I dont have to override them important :/
 				style = util.mixin({}, window.getComputedStyle($draggable[0]));
+				helperUUID = createUUID();
 
 				delete style.zIndex;
 				delete style.opacity;
@@ -36,10 +40,12 @@ function attachEvents () {
 				delete style.transitionProperty;
 				delete style.transitionTimingFunction;
 
+				draggableStyleSheet.html(provideSource(helperUUID, style));
+
 				state = {
 					mode: mode,
 					$draggable: $draggable,
-					scope: $draggable.scope(),
+					scope: scope,
 					$helper: null,
 
 					start: {
@@ -59,9 +65,9 @@ function attachEvents () {
 					case 'clone':
 						state.$helper = $draggable.clone();
 						state.$helper
+							.id(helperUUID)
 							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
-							.css(style) // preserves the style of the draggable.
 							.appendTo(document.body)
 							.absolutePosition(point);
 						break;
@@ -71,9 +77,9 @@ function attachEvents () {
 
 						state.$helper = $draggable.clone();
 						state.$helper
+							.id(helperUUID)
 							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
-							.css(style) // preserves the style of the draggable.
 							.appendTo(document.body)
 							.absolutePosition(point);
 						break;
@@ -88,10 +94,10 @@ function attachEvents () {
 
 				dragStartEvent = $.Event('drag-start', {
 					state: state,
-					targetScope: state.scope
+					targetScope: scope
 				});
 
-				state.scope.trigger(dragStartEvent);
+				scope.trigger(dragStartEvent);
 			}
 		})
 
@@ -99,7 +105,7 @@ function attachEvents () {
 			var cursor, $draggable, distance, point, transform, dragMoveEvent;
 
 			if (state) {
-				cursor = resolveEventPoint(_event);
+				cursor = resolveEventPoint(_event, 1/state.scope.game.zoom);
 				distance = state.start.cursor.distance(cursor);
 				point = Point.create();
 				transform = null;
@@ -168,8 +174,10 @@ function attachEvents () {
 		});
 }
 
-function resolveEventPoint (_event) {
-	var x, y;
+function resolveEventPoint (_event, _scale) {
+	var x, y, scale;
+
+	scale = _scale || 1;
 
 	if (_event.touches) {
 		x = _event.touches[0].clientX;
@@ -181,13 +189,40 @@ function resolveEventPoint (_event) {
 		y = _event.clientY;
 	}
 
-	return Point.create().set(x, y);
+	return Point.create().set(x * scale, y * scale);
+}
+
+function createHelperStyleSheet () {
+	draggableStyleSheet = $('<style id="draggable-helper-css" type="text/css"></style>').appendTo(document.body);
+}
+
+function provideSource (_uuid, _definition) {
+	var source, prop, value;
+
+	source = '#'+_uuid+'.draggable-helper {';
+
+	for (prop in _definition) {
+		if (!_definition.hasOwnProperty(prop)) continue;
+		value = _definition[prop];
+		source += prop.replace(/([A-Z]+)/g, '-$1').toLowerCase()+': '+value+';'
+	}
+
+	source += '}';
+
+	return source;
+};
+
+function createUUID () {
+	return 'xy-xyxy-y'.replace(/x|y/g, function (_token) {
+		if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
+		return Math.floor(Math.random() * Date.now()).toString(16).slice(2);
+	});
 }
 
 var draggableManager = {
 
 };
 
-boot();
+$(boot);
 
 export default draggableManager;

@@ -13,7 +13,7 @@ function evalAction (_source, _scope) {
 
 	function target (_selector) {
 		if (_scope.event) {
-			return _selector ? $(_scope.event.target).closest(_selector)[0] : $(_scope.event.target);
+			return _selector ? $(_scope.event.target).closest(_selector) : $(_scope.event.target);
 		}
 	}
 	

@@ -26,7 +26,7 @@ var jQProxy = Basic.extend(function () {
 			// This makes sure your not calling any jQuery methods before initialization.
 			if (!this.hasOwnProperty('$els')) {
 				if (_name === 'on') {
-					this.registerHandler(arguments);
+					registerHandler.call(this, arguments);
 				}
 
 				else {
@@ -69,6 +69,22 @@ var jQProxy = Basic.extend(function () {
 		return _args;
 	}
 
+	function registerHandler (_definition) {
+		if (!this.hasOwnProperty('eventRegistry')) {
+			if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
+				this.eventRegistry = this.eventRegistry.slice(0);
+			}
+
+			else {
+				this.eventRegistry = [];
+			}
+		}
+
+		this.eventRegistry.push(_definition);
+
+		return true;
+	}
+
 	// We don't want jQuery methods overridding our base type's methods.
 	exclude = ['constructor'].concat(Object.keys(Basic));
 
@@ -85,21 +101,6 @@ var jQProxy = Basic.extend(function () {
 		return this.$els[0];
 	};
 
-	// TODO: make this private
-	this.registerHandler = function (_definition) {
-		if (!this.hasOwnProperty('eventRegistry')) {
-			if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
-				this.eventRegistry = this.eventRegistry.slice(0);
-			}
-
-			else {
-				this.eventRegistry = [];
-			}
-		}
-
-		this.eventRegistry.push(_definition);
-	};
-
 	this.attachEvents = function () {
 		var self;
 
@@ -110,6 +111,36 @@ var jQProxy = Basic.extend(function () {
 				self.on.apply(self, _definition);
 			});
 		}
+	};
+
+	this.listen = function (_name, _isCapure_handler, _handler) {
+		var _isCapture, node;
+
+		_isCapture = false;
+
+		// resolve arguments
+		(typeof _isCapure_handler === 'boolean') ?
+			_isCapture = _isCapure_handler:
+			_handler = _isCapure_handler;
+
+		if (this.$els) {
+			node = this.$els[0];
+			if (node) return node.addEventListener(_name, _handler, _isCapture);
+		}
+
+		else {
+			return registerHandler([_name, _handler, _isCapture]);
+		}
+
+		return false;
+	};
+
+	this.ignore = function (argument) {
+		var node = this.$els && this.$els[0];
+
+		if (node) return node.removeEventListener.apply(node, arguments);
+
+		return false;
 	};
 
 	// Wraps you function 'this' to the scope.
