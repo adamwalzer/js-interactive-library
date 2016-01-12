@@ -26,13 +26,21 @@ var Game = GlobalScope.extend(function () {
 		zoom = this.viewport.width / width;
 
 		if (Math.round(height * zoom) > this.viewport.height) {
-			zoom = this.viewport.height / height;
+			zoom = (this.viewport.height / height).toPrecision(4);
 		}
 
-		this.css({
-			width: width,
+		util.mixin(this.node().style, {
+			width: width+'px',
 			zoom: zoom
 		});
+
+		if (!this.css('zoom')) {
+			this.css({
+				transform: 'scale('+zoom+')',
+				transformOrigin: (zoom < 1 ? '0px' : '50%')+' 0px 0px',
+				height: this.viewport.height / zoom
+			});
+		}
 
 		this.zoom = zoom;
 	}
