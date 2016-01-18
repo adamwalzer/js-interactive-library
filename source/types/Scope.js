@@ -604,7 +604,7 @@ var Scope = jQProxy.extend(function () {
 		var scope, screen;
 
 		scope = this;
-		screen_ = scope.screen != null ? scope.screen : scope;
+		screen = (scope.screen != null && typeof scope.screen === 'object') ? scope.screen : scope;
 
 		scope.findOwn('audio').each(function () {
 			var $node, id, audioTypes;
@@ -626,12 +626,12 @@ var Scope = jQProxy.extend(function () {
 					$node.on('play pause ended', function (_event) {
 						switch (_event.type) {
 							case 'play':
-								screen_.addClass('PLAYING '+_type.toUpperCase());
+								screen.addClass('PLAYING '+_type.toUpperCase());
 								break;
 
 							case 'pause':
 							case 'ended':
-								screen_.removeClass('PLAYING '+_type.toUpperCase());
+								screen.removeClass('PLAYING '+_type.toUpperCase());
 								break;
 						}
 						scope.trigger($.Event('audio-'+_event.type, {
@@ -642,7 +642,7 @@ var Scope = jQProxy.extend(function () {
 					});
 
 					if ($node.attr('pl-required') != null) {
-						screen_.require($node[0]);
+						screen.require($node[0]);
 					}
 
 					// This property can be either an array of nodes or the node.
