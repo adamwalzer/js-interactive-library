@@ -604,7 +604,7 @@ var Scope = jQProxy.extend(function () {
 		var scope, screen;
 
 		scope = this;
-		screen = typeof scope.screen === 'object' ? scope.screen : scope;
+		screen = (scope.screen != null && typeof scope.screen === 'object') ? scope.screen : scope;
 
 		scope.findOwn('audio').each(function () {
 			var $node, id, audioTypes;
@@ -624,10 +624,6 @@ var Scope = jQProxy.extend(function () {
 			audioTypes.forEach(function (_type) {
 				if ($node.hasClass(_type)) {
 					$node.on('play pause ended', function (_event) {
-						var screen;
-
-						screen = typeof scope.screen === 'object' ? scope.screen : scope;
-						
 						switch (_event.type) {
 							case 'play':
 								screen.addClass('PLAYING '+_type.toUpperCase());
