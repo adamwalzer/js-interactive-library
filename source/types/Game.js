@@ -11,7 +11,7 @@ import { Size } from 'types/Dimensions';
 
 var Game = GlobalScope.extend(function () {
 
-	var Viewport, screenPrototype;
+	var Viewport, screenPrototype, platformEventHandler;
 
 	/**
 	 * Scales the game view to fill the browser window.
@@ -37,7 +37,26 @@ var Game = GlobalScope.extend(function () {
 		this.zoom = zoom;
 	}
 
+	function demoMode (_set) {
+		this.demoMode = _set != null ? _set : !this.demoMode;
+		this[this.demoMode ? 'addClass' : 'removeClass']('DEMO');
+
+		console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
+	}
+
 	screenPrototype = Screen;
+	platformEventHandler = new (function () {
+		
+		this.invoke = function (_event, _ctx) {
+			if (typeof this[_event.name] === 'function') {
+				this[_event.name].call(_ctx, _event);
+			}
+		};
+
+		this['toggle-demo-mode'] = function (_set) {
+			demoMode.call(this);
+		};
+	});
 
 	this.baseType = 'TYPE_GAME';
 	this.screens = null;
@@ -116,6 +135,13 @@ var Game = GlobalScope.extend(function () {
 		this.watchAudio();
 
 		this.viewport.onResize(this.bind(scaleGame));
+
+		/**
+		 * 
+		 */
+		pl.game.on('platform-event', this.bind(function (_event) {
+			platformEventHandler.invoke(_event, this);
+		}));
 
 		return this;
 	};
@@ -413,11 +439,7 @@ var Game = GlobalScope.extend(function () {
 	 * Demo mode key command
 	 */
 	this.onKeys('ctrl+D,M', function () {
-		// toggle
-		this.demoMode = !this.demoMode;
-		this[this.demoMode ? 'addClass' : 'removeClass']('DEMO');
-
-		console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
+		demoMode.call(this);
 	});
 
 	/**
