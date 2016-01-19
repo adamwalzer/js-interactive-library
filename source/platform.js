@@ -42,6 +42,16 @@ var platform = new (function () {
 		}));
 	};
 
+	window.addEventListener('platform-event', function (_event) {
+		var platformEvent;
+
+		platformEvent = $.Event('platform-event', {
+			name: _event.name
+		});
+		
+		pl.game.trigger(platformEvent);
+	});
+
 });
 
 export default platform;
