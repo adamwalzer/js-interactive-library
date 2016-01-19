@@ -1,5 +1,5 @@
 # Play.js
-*v0.2.0*
+*v0.2.1*
 
 To make this buld work. Strict mode needs to be disabled for the ES6 modules.
 
@@ -127,3 +127,10 @@ pl.game('my-game', function () {
 ```
 
 See {@link module:types/Entity~Entity} for reference on the UIState methods available.
+
+## Change Log
+<font color="green">*v0.2.1*</font>
+ - Updates for Sea Turtle development. PR: [#15](https://github.com/ginasink/js-interactive-library/pull/15)
+ - Revert previous implementation of draggable zoom transformation. PR: [#16](https://github.com/ginasink/js-interactive-library/pull/16)
+ - BugFix: Do not override global screen variable, check for null. PR: [#18](https://github.com/ginasink/js-interactive-library/pull/18)
+ - GAME-128: Enable demo mode via platform-event. PR: [#19](https://github.com/ginasink/js-interactive-library/pull/19)
