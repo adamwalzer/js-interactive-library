@@ -40,7 +40,12 @@ function createEntity (_$node, _implementation) {
 		componentRecord = game.component.get(component);
 
 		if (componentRecord) {
-			prototype = this.extend(componentRecord.implementation);
+			// If a scope is being defined as an extention of a component before the component scope
+			// has been allocated, we construct the component first then pass it as the proto.
+			// But we need to make sure we are not allocating the component it self.
+			if (componentRecord.implementation !== _implementation) {
+				prototype = this.extend(componentRecord.implementation);
+			}
 		}
 
 		else {
