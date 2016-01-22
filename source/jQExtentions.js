@@ -222,8 +222,14 @@ import Matrix from 'lib/matrix';
 
 				point.set.apply(point, arguments);
 				matrix.translate(point.x, point.y);
-
+				this.css('transform', matrix.toCSS());
 			}
+		}
+
+		else {
+			point.set.apply(point, arguments);
+			matrix.translate(point.x, point.y);
+			this.css('transform', matrix.toCSS());
 		}
 
 		return point;

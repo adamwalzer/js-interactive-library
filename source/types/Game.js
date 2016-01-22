@@ -125,6 +125,12 @@ var Game = GlobalScope.extend(function () {
 			RESIZE_HANDLERS.push(_handler);
 		};
 
+		this.offResize = function (_handler) {
+			var index = RESIZE_HANDLERS.indexOf(_handler);
+
+			if (~index) RESIZE_HANDLERS.splice(index, 1);
+		};
+
 	});;
 
 	this.willInit = function () {

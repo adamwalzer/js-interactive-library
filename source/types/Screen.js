@@ -27,7 +27,7 @@ var Screen = Entity.extend(function () {
 	this.__init = function () {
 		this.proto();
 
-		if (this.hasClass('screen')) {
+		if (this.is(pl.game.config('screenSelector'))) {
 			attachBehaviorEvent.call(this);
 		}
 	};
