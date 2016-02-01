@@ -473,7 +473,7 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.completed = function () {
-		return this.game.demoMode || (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
+		return this.game.demoMode || (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || (this.hasOwnProperty('requiredQueue') && this.requiredQueue.length === 0);
 	};
 
 	/**
