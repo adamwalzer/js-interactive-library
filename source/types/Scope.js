@@ -326,7 +326,7 @@ var Scope = jQProxy.extend(function () {
 
 				handler = this.propertyHandlers[property];
 
-				this.find('[pl-'+property+']').each(function () {
+				this.findOwn('[pl-'+property+']').each(function () {
 					var attr;
 
 					if (scope === $(this).scope()) {
