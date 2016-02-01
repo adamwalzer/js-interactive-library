@@ -333,8 +333,6 @@ var Game = GlobalScope.extend(function () {
 	this.captureScreens = function () {
 		var screenSelector, prototype, collection;
 
-		if (!this.hasOwnProperty('screens')) return this;
-
 		screenSelector = pl.game.config('screenSelector');
 		prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
 		collection = [];
@@ -345,7 +343,7 @@ var Game = GlobalScope.extend(function () {
 			$node = $(_node);
 			id = $node.id();
 			key = (id) ? 'name' : (id = _index, 'index');
-			record = this.screens.get(id, key);
+			record = this.screens && this.screens.get(id, key);
 			component = $node.attr('pl-component');
 			screen = createEntity.call(prototype, $node, record && record.implementation);
 			screen.screen = screen;
