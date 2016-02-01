@@ -273,35 +273,35 @@ var Scope = jQProxy.extend(function () {
 		if (!this.hasOwnProperty('entities')) return this;
 
 		this.entities.forEach(this.bind(function (_record, _index) {
-			var $node, instance, id, query, index;
+			var $nodes, query, index;
 
-			$node = this.findOwn(_record.selector);
+			$nodes = this.findOwn(_record.selector);
 			query = ['#'+_record.selector, '[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
 			index = 0;
 
-			while (!$node.length) {
+			while (!$nodes.length) {
 				if (index === query.length) {
 					throw new Error("Unable to locate entity with selector", _record.selector);
 				}
-				$node = this.findOwn(query[index]);
+				$nodes = this.findOwn(query[index]);
 				index+=1;
 			}
 
-			if (!Scope.isPrototypeOf(_record)) {
-				instance = createEntity.call(this, $node, _record.implementation);
+			$nodes.each(this.bind(function (_index, _node) {
+				var $node, instance, id;
 
-				if (!instance.isReady) {
-					this.assetQueue.add(instance);
+				$node = $(_node);
+
+				if (!Scope.isPrototypeOf(_record)) {
+					instance = createEntity.call(this, $node, _record.implementation);
+					if (!instance.isReady) this.assetQueue.add(instance);
+				} else {
+					instance = _record;
 				}
 				
-			}
-
-			else {
-				instance = _record;
-			}
-			
-			id = util.transformId(instance.id(), true);
-			if (id) util.assignRef(this, id, instance);
+				id = util.transformId(instance.id(), true);
+				if (id) util.assignRef(this, id, instance);
+			}));
 		}));
 
 		return this;
