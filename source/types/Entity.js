@@ -310,9 +310,7 @@ var Entity = GlobalScope.extend(function () {
 		screen = this;
 		time = util.toMillisec(_time);
 
-		this.timeoutID = setTimeout(function() {
-			_cb.call(screen);
-		}, time);
+		util.assignRef(this, 'timeoutID', setTimeout(_cb.bind(screen), time));
 
 		return this;
 	};
@@ -323,9 +321,28 @@ var Entity = GlobalScope.extend(function () {
 		screen = this;
 		time = util.toMillisec(_time);
 
-		this.intervalID = setInterval(function() {
-			_cb.call(screen);
-		}, time);
+		util.assignRef(this, 'intervalID', setTimeout(_cb.bind(screen), time));
+
+		return this;
+	};
+
+	this.kill = function (_timer) {
+		var id;
+
+		id = _timer === 'repeat' ? this.intervalID : this.timeoutID;
+
+		if (typeof id === 'number') {
+			(_timer === 'repeat' ? clearInterval : clearTimeout)(id);
+			this[_timer === 'repeat' ? 'intervalID' : 'timeoutID'] = null;
+		}
+
+		else if (id) {
+			id.forEach((function (_id) {
+				this.kill(_id);
+			}).bind(this));
+
+			_timer === 'repeat' ? this.intervalID = null : this.timeoutID = null;
+		}
 
 		return this;
 	};
@@ -375,18 +392,6 @@ var Entity = GlobalScope.extend(function () {
 
 		else {
 			this.frameHandlers.remove(_handler);
-		}
-
-		return this;
-	};
-
-	this.kill = function (_timer) {
-		if (_timer === 'repeat') {
-			clearInterval(this.intervalID);
-		}
-
-		else {
-			clearTimeout(this.timeoutID);
 		}
 
 		return this;
