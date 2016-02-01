@@ -67,9 +67,8 @@ var Game = GlobalScope.extend(function () {
 		var vp, $html, RESIZE_HANDLERS;
 
 		vp = this;
-		RESIZE_HANDLERS = [];
 		$html = $('html');
-		$html.addClass(this.orientation);
+		RESIZE_HANDLERS = [];
 
 		$(window).on('resize', function (_event) {
 			if (!$html.hasClass(vp.orientation)) {
@@ -130,6 +129,8 @@ var Game = GlobalScope.extend(function () {
 
 			if (~index) RESIZE_HANDLERS.splice(index, 1);
 		};
+
+		$html.addClass(this.orientation);
 
 	});;
 
