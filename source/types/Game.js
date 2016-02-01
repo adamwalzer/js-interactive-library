@@ -428,7 +428,7 @@ var Game = GlobalScope.extend(function () {
 	};
 
 	this.currentScreen = function () {
-		return this.findOwn('.screen.OPEN').not('#quit').scope();
+		return this.findOwn(pl.game.config('screenSelector')+'.OPEN').not('#quit').scope();
 	};
 
 	this.flip = function () {
