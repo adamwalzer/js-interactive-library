@@ -223,6 +223,8 @@ var util = new (function () {
 
 		name = util.transformId(_name, true);
 
+		if (_obj[name] === _ref) return _ref;
+
 		if (_obj[name]) {
 			if (!_obj[name].__refCollction__) {
 				_obj[name] = [_obj[name]];
@@ -241,6 +243,8 @@ var util = new (function () {
 		else {
 			_obj[name] = _ref;
 		}
+
+		return _obj[name];
 	};
 
 });

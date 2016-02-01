@@ -119,9 +119,10 @@ var Entity = GlobalScope.extend(function () {
 	this.frameRate = 60; // 60fps
 	this.draggables = null;
 	this.requiredQueue = null;
+	this.bgImageCollection = null;
 
-	this.handleProperty(function () {
-		this.size = function (_node, _name, _value, _property) {
+	this.handleProperty({
+		size: function (_node, _name, _value) {
 			var size;
 
 			if (this.is(_node)) {
@@ -131,9 +132,9 @@ var Entity = GlobalScope.extend(function () {
 					height: size[1] || size[0]
 				});
 			}
-		};
+		},
 
-		this.position = function (_node, _name, _value, _property) {
+		position: function (_node, _name, _value) {
 			var size;
 
 			if (this.is(_node)) {
@@ -143,21 +144,36 @@ var Entity = GlobalScope.extend(function () {
 					left: size[0]
 				});
 			}
-		};
+		},
 
-		this.draggable = function (_node, _name, _value, _property) {
+		draggable: function (_node, _name, _value) {
 			if (!this.hasOwnProperty('draggables')) {
 				this.draggables = $();
 			}
 
 			this.draggables.push(_node);
-		};
+		},
+
+		bg: function (_node, _name, _value) {
+			var img = new Image();
+			
+			if (!this.hasOwnProperty('bgImageCollection')) this.bgImageCollection = [];
+
+			if (this.isMemberSafe('bgImageCollection')) {
+				img.src = _value;
+				this.bgImageCollection.push(img);
+				$(_node).css('background-image', 'url('+_value+')');
+			}
+		}
 	});
 
-	this.__init = function () {
-		this.proto()
+	this.__init = function (_event) {
+		if (this.bgImageCollection && this.isMemberSafe('bgImageCollection')) {
+			this.watchAssets(this.bgImageCollection);
+		}
 		attachDragEvents.call(this);
-		return this;
+
+		return this.proto();
 	};
 
 	this.size = function () {
@@ -473,7 +489,7 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.completed = function () {
-		return this.game.demoMode || (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || this.requiredQueue.length === 0;
+		return this.game.demoMode || (this.hasOwnProperty('isComplete') && this.isComplete) || !this.requiredQueue || (this.hasOwnProperty('requiredQueue') && this.requiredQueue.length === 0);
 	};
 
 	/**

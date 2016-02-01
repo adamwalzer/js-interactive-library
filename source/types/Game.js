@@ -67,9 +67,8 @@ var Game = GlobalScope.extend(function () {
 		var vp, $html, RESIZE_HANDLERS;
 
 		vp = this;
-		RESIZE_HANDLERS = [];
 		$html = $('html');
-		$html.addClass(this.orientation);
+		RESIZE_HANDLERS = [];
 
 		$(window).on('resize', function (_event) {
 			if (!$html.hasClass(vp.orientation)) {
@@ -130,6 +129,8 @@ var Game = GlobalScope.extend(function () {
 
 			if (~index) RESIZE_HANDLERS.splice(index, 1);
 		};
+
+		$html.addClass(this.orientation);
 
 	});;
 
@@ -333,8 +334,6 @@ var Game = GlobalScope.extend(function () {
 	this.captureScreens = function () {
 		var screenSelector, prototype, collection;
 
-		if (!this.hasOwnProperty('screens')) return this;
-
 		screenSelector = pl.game.config('screenSelector');
 		prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
 		collection = [];
@@ -345,7 +344,7 @@ var Game = GlobalScope.extend(function () {
 			$node = $(_node);
 			id = $node.id();
 			key = (id) ? 'name' : (id = _index, 'index');
-			record = this.screens.get(id, key);
+			record = this.screens && this.screens.get(id, key);
 			component = $node.attr('pl-component');
 			screen = createEntity.call(prototype, $node, record && record.implementation);
 			screen.screen = screen;
@@ -428,7 +427,7 @@ var Game = GlobalScope.extend(function () {
 	};
 
 	this.currentScreen = function () {
-		return this.findOwn('.screen.OPEN').not('#quit').scope();
+		return this.findOwn(pl.game.config('screenSelector')+'.OPEN').not('#quit').scope();
 	};
 
 	this.flip = function () {
