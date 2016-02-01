@@ -352,11 +352,13 @@ var Scope = jQProxy.extend(function () {
 	}
 
 	function init () {
-		var initEvent;
+		var willInitEvent, initEvent;
 
 		initEvent = $.Event('initialize', { targetScope: this });
+		willInitEvent = $.Event('will-initialize', { targetScope: this });
 
 		invokeLocal.call(this, 'willInit');
+		this.trigger(willInitEvent);
 
 		this.attachEvents();
 
