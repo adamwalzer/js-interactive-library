@@ -76,25 +76,37 @@ var Scope = jQProxy.extend(function () {
 	var Actionables;
 
 	function attachActionHandler () {
-		var entity;
-
-		entity = this;
-
 		this.on(pl.EVENT.CLICK, function (_event) {
 			var target, record;
 
 			target = $(_event.target).closest('[pl-action]')[0];
-			// TODO: Resolve for touches
-			_event.cursor = Point.create().set(_event.clientX, _event.clientY);
+
+			if (_event.originalEvent && _event.originalEvent.changedTouches) {
+				/**
+				 * For now, interactions should use the last touch if multiple fingers are captured.
+				 * @todo Maybe invoke action for each touch.
+				 */
+				_event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
+			}
+			
+			_event.cursor = Point.create().set(new function () {
+				if (_event.touch) {
+					this.x = _event.touch.clientX;
+					this.y = _event.touch.clientY;
+				} else {
+					this.x = _event.clientX;
+					this.y = _event.clientY;
+				}
+			});
 
 			if (target) {
-				record = entity.actionables.item(target);
+				record = this.actionables.item(target);
 
 				if (record) {
-					_event.targetScope = entity;
-					entity.event = _event;
-					evalAction(record.action, entity);
-					entity.event = null;
+					_event.targetScope = this;
+					this.event = _event;
+					evalAction(record.action, this);
+					this.event = null;
 				}
 			}
 		});
