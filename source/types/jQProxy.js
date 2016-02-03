@@ -148,17 +148,11 @@ var jQProxy = Basic.extend(function () {
 	// Wraps you function 'this' to the scope.
 	// 
 	this.bind = function (_handler) {
-		var scope, dataArgs;
+		var args;
 
-		scope = this;
-		dataArgs = [].slice.call(arguments, 1);
+		args = [].map.call(arguments, function (m) { return m }).slice(1);
 
-		return function () {
-			var args;
-
-			args = [].slice.call(arguments, 0);
-			return _handler.apply(scope, args.concat(dataArgs));
-		};
+		return _handler.bind.apply(_handler, [this].concat(args));
 	};
 
 	this.findOwn = function (_selector) {
