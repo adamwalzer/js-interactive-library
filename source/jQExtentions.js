@@ -235,4 +235,20 @@ import Matrix from 'lib/matrix';
 		return point;
 	};
 
+	/**
+	 * Accessor method for `pl` attributes.
+	 */
+	this.pl = function (_name, _value) {
+		var args;
+		args = ['pl-'+_name];
+		if (typeof _value !== 'undefined') args.push(_value);
+
+		if (_value === null) {
+			this.removeAttr('pl-'+_name);
+			return this;
+		}
+
+		return this.attr.apply(this, args);
+	};
+
 }).call($.fn);
