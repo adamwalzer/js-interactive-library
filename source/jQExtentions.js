@@ -17,6 +17,12 @@ import Matrix from 'lib/matrix';
  */
 
 (function () {
+	var original;
+
+	original = {
+		position: this.position
+	};
+
 	/**
 	 * Resolves the scope for each of the set of matched nodes.
 	 * @function external:jQuery#scope
@@ -104,6 +110,38 @@ import Matrix from 'lib/matrix';
 		classes = (this.attr('class') || '').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
 
 		return classes && (classes.length === 1 ? classes[0] : classes);
+	};
+
+	this.size = function () {
+		var size;
+
+		if (!arguments.length) {
+			size = Size.create().set(this.width(), this.height());	
+		} else {
+			size = Size.create(arguments);
+			this.css(size);
+		}
+
+		return size;
+	};
+
+	this.position = function () {
+		var pos;
+
+		if (!arguments.length) {
+			pos = original.position.call(this);
+			pos = Point.create().set(pos.left, pos.top);
+		} else {
+			pos = Point.create(arguments);
+
+			this.css({
+				position: 'relative',
+				left: pos.x,
+				top: pos.y
+			});
+		}
+
+		return pos;
 	};
 
 	/**
@@ -210,29 +248,74 @@ import Matrix from 'lib/matrix';
 		var matrix, point;
 		
 		matrix = this.transform();
-		point = Point.create();
+		point = Point.create().set(0,0);
 
-		if (matrix !== 'none') {
-			if (!arguments.length) {
-				point.set(matrix.e, matrix.f);
-			}
-			
-			else{
-				matrix = new Matrix();
+		if (!arguments.length) {
+			if (matrix !== 'none') point.set(matrix.e, matrix.f);
+		} else {
+			if (matrix === 'none') matrix = new Matrix();
 
-				point.set.apply(point, arguments);
-				matrix.translate(point.x, point.y);
-				this.css('transform', matrix.toCSS());
-			}
-		}
-
-		else {
 			point.set.apply(point, arguments);
 			matrix.translate(point.x, point.y);
 			this.css('transform', matrix.toCSS());
 		}
 
 		return point;
+	};
+
+	/**
+	 * Getter for the CSS transform scale. (overloaded)
+	 * @function external:jQuery#transformPosition
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Setter for the CSS transform scale. (overloaded)
+	 * @function external:jQuery#transformPosition
+	 * @arg {Point} _point - A point object {x,y}
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Setter for the CSS transform scale.
+	 * @function external:jQuery#transformPosition
+	 * @arg {number} _x - x coordinate
+	 * @arg {number} _y - y coordinate
+	 * @returns {Point}
+	 */
+	this.transformScale = function () {
+		var matrix, scale;
+		
+		matrix = this.transform();
+		scale = Point.create().set(1,1);
+
+		if (!arguments.length) {
+			if (matrix !== 'none') scale.set(matrix.a, matrix.d);
+		} else {
+			if (matrix === 'none') matrix = new Matrix();
+
+			scale.set.apply(scale, arguments);
+			matrix.scale(scale.x, scale.y);
+			this.css('transform', matrix.toCSS());
+		}
+
+		return scale;
+	};
+
+	/**
+	 * Accessor method for `pl` attributes.
+	 */
+	this.pl = function (_name, _value) {
+		var args;
+		args = ['pl-'+_name];
+		if (typeof _value !== 'undefined') args.push(_value);
+
+		if (_value === null) {
+			this.removeAttr('pl-'+_name);
+			return this;
+		}
+
+		return this.attr.apply(this, args);
 	};
 
 }).call($.fn);

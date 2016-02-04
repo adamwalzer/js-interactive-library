@@ -16,32 +16,18 @@ function attachEvents () {
 
 	$(document)
 		.on('mousedown', function (_event) {
-			var draggable, scope, cursor, $transform, point, mode, style, dragStartEvent, helperUUID;
+			var $draggable, scope, cursor, mode, gameScale, point, transform, helperID, dragStartEvent;
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
 
 			if ($draggable.length) {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
-				mode = $draggable.attr('pl-draggable');
-				point = $draggable.absolutePosition();
+				mode = $draggable.pl('draggable');
+				gameScale = scope.game.transformScale().x;
+				point = $draggable.position();
 				transform = $draggable.transform();
-				// TODO: Set these styles in a style node.
-				// That way I dont have to override them important :/
-				style = util.mixin({}, window.getComputedStyle($draggable[0]));
-				helperUUID = createUUID();
-
-				delete style.zIndex;
-				delete style.opacity;
-				delete style.cursor;
-				delete style.transition;
-				delete style.transitionDelay;
-				delete style.transitionDuration;
-				delete style.transitionProperty;
-				delete style.transitionTimingFunction;
-
-				draggableStyleSheet.html(provideSource(helperUUID, style));
-
+				helperID = createID();
 				state = {
 					mode: mode,
 					$draggable: $draggable,
@@ -61,12 +47,19 @@ function attachEvents () {
 					}
 				};
 
+				// FireFox has a different scaling implementation than other browsers (transform:scale(); vs. zoom:;)
+				// so we need to account for the game transform scale.
+				// 
+				if (gameScale !== 1) point = point.scale(1/gameScale);
+
+				draggableStyleSheet.html( provideSource( helperID, createDraggableRule($draggable)));
+
 				switch (mode) {
 					case 'clone':
 						state.$helper = $draggable.clone();
 						state.$helper
-							.id(helperUUID)
-							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
+							.id(helperID)
+							.pl('draggable', null) // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
@@ -77,8 +70,8 @@ function attachEvents () {
 
 						state.$helper = $draggable.clone();
 						state.$helper
-							.id(helperUUID)
-							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
+							.id(helperID)
+							.pl('draggable', null) // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
@@ -196,14 +189,40 @@ function createHelperStyleSheet () {
 	draggableStyleSheet = $('<style id="draggable-helper-css" type="text/css"></style>').appendTo(document.body);
 }
 
-function provideSource (_uuid, _definition) {
+function createDraggableRule (_$draggable) {
+	var i, style, blacklist, rule, prop;
+
+	style = window.getComputedStyle(_$draggable[0]);
+	rule = {};
+	blacklist = [
+		"zIndex",
+		"opacity",
+		"cursor",
+		"transition",
+		"transitionDelay",
+		"transitionDuration",
+		"transitionProperty",
+		"transitionTimingFunction"
+	];
+
+	for (i=0; i < style.length; i+=1) {
+		prop = util.transformId(style[i], true);
+		if (~blacklist.indexOf(prop)) continue;
+		if (prop.indexOf('Webkit') === 0) prop = prop.slice(0,1).toLowerCase()+prop.slice(1);
+		if (style[prop]) rule[prop] = style[prop];
+	}
+
+	return rule;
+}
+
+function provideSource (_id, _rule) {
 	var source, prop, value;
 
-	source = '#'+_uuid+'.draggable-helper {';
+	source = '#'+_id+'.draggable-helper {';
 
-	for (prop in _definition) {
-		if (!_definition.hasOwnProperty(prop)) continue;
-		value = _definition[prop];
+	for (prop in _rule) {
+		if (!_rule.hasOwnProperty(prop)) continue;
+		value = _rule[prop];
 		source += prop.replace(/([A-Z]+)/g, '-$1').toLowerCase()+': '+value+';'
 	}
 
@@ -212,7 +231,7 @@ function provideSource (_uuid, _definition) {
 	return source;
 };
 
-function createUUID () {
+function createID () {
 	return 'xy-xyxy-y'.replace(/x|y/g, function (_token) {
 		if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
 		return Math.floor(Math.random() * Date.now()).toString(16).slice(2);
