@@ -23,8 +23,8 @@ function attachEvents () {
 			if ($draggable.length) {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
-				mode = $draggable.attr('pl-draggable');
 				point = $draggable.absolutePosition();
+				mode = $draggable.pl('draggable');
 				transform = $draggable.transform();
 				// TODO: Set these styles in a style node.
 				// That way I dont have to override them important :/
@@ -65,8 +65,8 @@ function attachEvents () {
 					case 'clone':
 						state.$helper = $draggable.clone();
 						state.$helper
-							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
 							.id(helperID)
+							.pl('draggable', null) // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
@@ -77,8 +77,8 @@ function attachEvents () {
 
 						state.$helper = $draggable.clone();
 						state.$helper
-							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
 							.id(helperID)
+							.pl('draggable', null) // helpers are not to be captured as draggable
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
