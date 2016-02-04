@@ -236,6 +236,45 @@ import Matrix from 'lib/matrix';
 	};
 
 	/**
+	 * Getter for the CSS transform scale. (overloaded)
+	 * @function external:jQuery#transformPosition
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Setter for the CSS transform scale. (overloaded)
+	 * @function external:jQuery#transformPosition
+	 * @arg {Point} _point - A point object {x,y}
+	 * @returns {Point}
+	 */
+
+	/**
+	 * Setter for the CSS transform scale.
+	 * @function external:jQuery#transformPosition
+	 * @arg {number} _x - x coordinate
+	 * @arg {number} _y - y coordinate
+	 * @returns {Point}
+	 */
+	this.transformScale = function () {
+		var matrix, scale;
+		
+		matrix = this.transform();
+		scale = Point.create().set(1,1);
+
+		if (!arguments.length) {
+			if (matrix !== 'none') scale.set(matrix.a, matrix.d);
+		} else {
+			if (matrix === 'none') matrix = new Matrix();
+
+			scale.set.apply(scale, arguments);
+			matrix.scale(scale.x, scale.y);
+			this.css('transform', matrix.toCSS());
+		}
+
+		return scale;
+	};
+
+	/**
 	 * Accessor method for `pl` attributes.
 	 */
 	this.pl = function (_name, _value) {
