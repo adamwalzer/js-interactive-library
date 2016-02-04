@@ -29,7 +29,6 @@ function attachEvents () {
 				// TODO: Set these styles in a style node.
 				// That way I dont have to override them important :/
 				style = util.mixin({}, window.getComputedStyle($draggable[0]));
-				helperUUID = createUUID();
 
 				delete style.zIndex;
 				delete style.opacity;
@@ -42,6 +41,7 @@ function attachEvents () {
 
 				draggableStyleSheet.html(provideSource(helperUUID, style));
 
+				helperID = createID();
 				state = {
 					mode: mode,
 					$draggable: $draggable,
@@ -65,8 +65,8 @@ function attachEvents () {
 					case 'clone':
 						state.$helper = $draggable.clone();
 						state.$helper
-							.id(helperUUID)
 							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
+							.id(helperID)
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
@@ -77,8 +77,8 @@ function attachEvents () {
 
 						state.$helper = $draggable.clone();
 						state.$helper
-							.id(helperUUID)
 							.removeAttr('pl-draggable') // helpers are not to be captured as draggable
+							.id(helperID)
 							.addClass('draggable-helper')
 							.appendTo(document.body)
 							.absolutePosition(point);
@@ -196,14 +196,14 @@ function createHelperStyleSheet () {
 	draggableStyleSheet = $('<style id="draggable-helper-css" type="text/css"></style>').appendTo(document.body);
 }
 
-function provideSource (_uuid, _definition) {
+function provideSource (_id, _rule) {
 	var source, prop, value;
 
-	source = '#'+_uuid+'.draggable-helper {';
+	source = '#'+_id+'.draggable-helper {';
 
-	for (prop in _definition) {
-		if (!_definition.hasOwnProperty(prop)) continue;
-		value = _definition[prop];
+	for (prop in _rule) {
+		if (!_rule.hasOwnProperty(prop)) continue;
+		value = _rule[prop];
 		source += prop.replace(/([A-Z]+)/g, '-$1').toLowerCase()+': '+value+';'
 	}
 
@@ -212,7 +212,7 @@ function provideSource (_uuid, _definition) {
 	return source;
 };
 
-function createUUID () {
+function createID () {
 	return 'xy-xyxy-y'.replace(/x|y/g, function (_token) {
 		if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
 		return Math.floor(Math.random() * Date.now()).toString(16).slice(2);
