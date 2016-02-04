@@ -17,6 +17,12 @@ import Matrix from 'lib/matrix';
  */
 
 (function () {
+	var original;
+
+	original = {
+		position: this.position
+	};
+
 	/**
 	 * Resolves the scope for each of the set of matched nodes.
 	 * @function external:jQuery#scope
@@ -104,6 +110,38 @@ import Matrix from 'lib/matrix';
 		classes = (this.attr('class') || '').match(/[0-9A-Z]+(?:-[0-9A-Z]+)?/g);
 
 		return classes && (classes.length === 1 ? classes[0] : classes);
+	};
+
+	this.size = function () {
+		var size;
+
+		if (!arguments.length) {
+			size = Size.create().set(this.width(), this.height());	
+		} else {
+			size = Size.create(arguments);
+			this.css(size);
+		}
+
+		return size;
+	};
+
+	this.position = function () {
+		var pos;
+
+		if (!arguments.length) {
+			pos = original.position.call(this);
+			pos = Point.create().set(pos.left, pos.top);
+		} else {
+			pos = Point.create(arguments);
+
+			this.css({
+				position: 'relative',
+				left: pos.x,
+				top: pos.y
+			});
+		}
+
+		return pos;
 	};
 
 	/**
