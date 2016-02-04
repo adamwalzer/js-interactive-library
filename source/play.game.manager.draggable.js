@@ -16,7 +16,7 @@ function attachEvents () {
 
 	$(document)
 		.on('mousedown', function (_event) {
-			var draggable, scope, cursor, $transform, point, mode, style, dragStartEvent, helperUUID;
+			var $draggable, scope, cursor, mode, gameScale, point, transform, helperID, dragStartEvent;
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
 
@@ -24,23 +24,9 @@ function attachEvents () {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
 				mode = $draggable.pl('draggable');
+				gameScale = scope.game.transformScale().x;
 				point = $draggable.position();
 				transform = $draggable.transform();
-				// TODO: Set these styles in a style node.
-				// That way I dont have to override them important :/
-				style = util.mixin({}, window.getComputedStyle($draggable[0]));
-
-				delete style.zIndex;
-				delete style.opacity;
-				delete style.cursor;
-				delete style.transition;
-				delete style.transitionDelay;
-				delete style.transitionDuration;
-				delete style.transitionProperty;
-				delete style.transitionTimingFunction;
-
-				draggableStyleSheet.html(provideSource(helperUUID, style));
-
 				helperID = createID();
 				state = {
 					mode: mode,
@@ -60,6 +46,13 @@ function attachEvents () {
 						transform: null
 					}
 				};
+
+				// FireFox has a different scaling implementation than other browsers (transform:scale(); vs. zoom:;)
+				// so we need to account for the game transform scale.
+				// 
+				if (gameScale !== 1) point = point.scale(1/gameScale);
+
+				draggableStyleSheet.html( provideSource( helperID, createDraggableRule($draggable)));
 
 				switch (mode) {
 					case 'clone':
@@ -194,6 +187,32 @@ function resolveEventPoint (_event, _scale) {
 
 function createHelperStyleSheet () {
 	draggableStyleSheet = $('<style id="draggable-helper-css" type="text/css"></style>').appendTo(document.body);
+}
+
+function createDraggableRule (_$draggable) {
+	var i, style, blacklist, rule, prop;
+
+	style = window.getComputedStyle(_$draggable[0]);
+	rule = {};
+	blacklist = [
+		"zIndex",
+		"opacity",
+		"cursor",
+		"transition",
+		"transitionDelay",
+		"transitionDuration",
+		"transitionProperty",
+		"transitionTimingFunction"
+	];
+
+	for (i=0; i < style.length; i+=1) {
+		prop = util.transformId(style[i], true);
+		if (~blacklist.indexOf(prop)) continue;
+		if (prop.indexOf('Webkit') === 0) prop = prop.slice(0,1).toLowerCase()+prop.slice(1);
+		if (style[prop]) rule[prop] = style[prop];
+	}
+
+	return rule;
 }
 
 function provideSource (_id, _rule) {
