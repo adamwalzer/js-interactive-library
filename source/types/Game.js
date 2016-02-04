@@ -151,9 +151,6 @@ var Game = GlobalScope.extend(function () {
 
 		this.viewport.onResize(this.bind(scaleGame));
 
-		/**
-		 * 
-		 */
 		pl.game.on('platform-event', this.bind(function (_event) {
 			platformEventHandler.invoke(_event, this);
 		}));

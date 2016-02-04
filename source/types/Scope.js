@@ -76,25 +76,37 @@ var Scope = jQProxy.extend(function () {
 	var Actionables;
 
 	function attachActionHandler () {
-		var entity;
-
-		entity = this;
-
 		this.on(pl.EVENT.CLICK, function (_event) {
 			var target, record;
 
 			target = $(_event.target).closest('[pl-action]')[0];
-			// TODO: Resolve for touches
-			_event.cursor = Point.create().set(_event.clientX, _event.clientY);
+
+			if (_event.originalEvent && _event.originalEvent.changedTouches) {
+				/**
+				 * For now, interactions should use the last touch if multiple fingers are captured.
+				 * @todo Maybe invoke action for each touch.
+				 */
+				_event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
+			}
+			
+			_event.cursor = Point.create().set(new function () {
+				if (_event.touch) {
+					this.x = _event.touch.clientX;
+					this.y = _event.touch.clientY;
+				} else {
+					this.x = _event.clientX;
+					this.y = _event.clientY;
+				}
+			});
 
 			if (target) {
-				record = entity.actionables.item(target);
+				record = this.actionables.item(target);
 
 				if (record) {
-					_event.targetScope = entity;
-					entity.event = _event;
-					evalAction(record.action, entity);
-					entity.event = null;
+					_event.targetScope = this;
+					this.event = _event;
+					evalAction(record.action, this);
+					this.event = null;
 				}
 			}
 		});
@@ -504,20 +516,19 @@ var Scope = jQProxy.extend(function () {
 	this.ready = function () { return this; };
 
 	this.watchAssets = function (_nodes) {
-		var scope, assetTypes;
+		var assetTypes, watch, createHandler;
 
-		function watch (_node) {
+		createHandler = this.bind(function (_node) {
+			return (function () {
+				var loadedEvent = $.Event('loaded', { targetScope: this });
+
+				this.assetQueue.ready(_node.src);
+				this.trigger(loadedEvent, [_node]);
+			}).bind(this);
+		});
+
+		watch = this.bind(function (_node) {
 			var eventMap, isNodeComplete;
-
-			function createHandler (_node) {
-				return function () {
-					var loadedEvent;
-
-					loadedEvent = $.Event('loaded', { targetScope: scope });
-					scope.assetQueue.ready(_node.src);
-					scope.trigger(loadedEvent, [_node]);
-				};
-			}
 
 			eventMap = {
 				AUDIO: 'onloadeddata',
@@ -525,25 +536,28 @@ var Scope = jQProxy.extend(function () {
 				IMG: 'onload'
 			};
 
-			isNodeComplete = {
-				AUDIO: _node.readyState === _node.HAVE_ENOUGH_DATA,
-				VIDEO: _node.readyState === _node.HAVE_ENOUGH_DATA,
-				IMG: _node.complete
-			};
+			isNodeComplete = (function () {
+				switch (_node.nodeName) {
+					case 'IMG':
+						return !!_node.complete;
+					case 'AUDIO':
+					case 'VIDEO':
+						if (_node.readyState === _node.HAVE_ENOUGH_DATA) return true;
+						_node.load();
+				}
 
-			// console.log('found asset', this.nodeName);
+				return false;
+			}).call(this);
 
-			if (isNodeComplete[_node.nodeName]) return;
-			if (scope.assetQueue.add(_node.src)) {
-				// console.log('watch', this.nodeName, this.src, scope.id());
+			if (isNodeComplete) return;
+			if (this.assetQueue.add(_node.src)) {
 				_node[eventMap[_node.nodeName]] = createHandler(_node);
 				_node.onerror = function () {
 					console.error('Image failed to load', _node.src);
 				};
 			}
-		}
+		});
 
-		scope = this;
 		assetTypes = ['IMG', 'AUDIO', 'VIDEO'];
 
 		if (_nodes) {
@@ -565,24 +579,16 @@ var Scope = jQProxy.extend(function () {
 	};
 
 	this.attachEvents = function () {
-		var scope;
 
 		this.proto();
 
-		scope = this;
-
-		// if (this.is('#bears')) debugger;
-
-		this.assetQueue.on('complete', function () {
-			scope.assetQueue.off();
-			ready.call(scope);
-		});
+		this.assetQueue.on('complete', this.bind(function () {
+			this.assetQueue.off();
+			ready.call(this);
+		}));
 
 		this.on('ready', function (_event) {
-			// console.log('* ready:', this.address(), ', target:', _event.targetScope.address());
-
 			if (this.has(_event.targetScope) && this.assetQueue.has(_event.targetScope)) {
-				// console.log('** update queue', _event.targetScope.address(), this.assetQueue.length);
 				this.assetQueue.ready(_event.targetScope);
 			}
 
