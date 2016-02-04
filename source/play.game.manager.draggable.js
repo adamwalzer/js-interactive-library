@@ -23,8 +23,8 @@ function attachEvents () {
 			if ($draggable.length) {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
-				point = $draggable.absolutePosition();
 				mode = $draggable.pl('draggable');
+				point = $draggable.position();
 				transform = $draggable.transform();
 				// TODO: Set these styles in a style node.
 				// That way I dont have to override them important :/
