@@ -210,23 +210,13 @@ import Matrix from 'lib/matrix';
 		var matrix, point;
 		
 		matrix = this.transform();
-		point = Point.create();
+		point = Point.create().set(0,0);
 
-		if (matrix !== 'none') {
-			if (!arguments.length) {
-				point.set(matrix.e, matrix.f);
-			}
-			
-			else{
-				matrix = new Matrix();
+		if (!arguments.length) {
+			if (matrix !== 'none') point.set(matrix.e, matrix.f);
+		} else {
+			if (matrix === 'none') matrix = new Matrix();
 
-				point.set.apply(point, arguments);
-				matrix.translate(point.x, point.y);
-				this.css('transform', matrix.toCSS());
-			}
-		}
-
-		else {
 			point.set.apply(point, arguments);
 			matrix.translate(point.x, point.y);
 			this.css('transform', matrix.toCSS());
