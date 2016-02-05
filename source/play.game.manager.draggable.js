@@ -12,10 +12,13 @@ function boot () {
 }
 
 function attachEvents () {
-	var state;
+	var state, E;
+
+	E = pl.EVENT;
+
 
 	$(document)
-		.on('mousedown', function (_event) {
+		.on(E.ACTION_DOWN, function (_event) {
 			var $draggable, scope, cursor, mode, game, point, transform, helperID, dragStartEvent;
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
@@ -97,7 +100,7 @@ function attachEvents () {
 			}
 		})
 
-		.on('mousemove', function (_event) {
+		.on(E.ACTION_MOVE, function (_event) {
 			var cursor, $draggable, distance, point, transform, dragMoveEvent;
 
 			if (state) {
@@ -136,7 +139,7 @@ function attachEvents () {
 			}
 		})
 
-		.on('mouseup mouseout', function (_event) {
+		.on([E.ACTION_UP, E.ACTION_OUT].join(' '), function (_event) {
 			var $draggable, dragEndEvent;
 
 			if (state) {
