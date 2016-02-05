@@ -16,6 +16,9 @@ function attachEvents () {
 
 	E = pl.EVENT;
 
+	if (E.ACTION_MOVE === 'touchmove') document.addEventListener(E.ACTION_MOVE, function (_event) {
+		_event.preventDefault();
+	}, false);
 
 	$(document)
 		.on(E.ACTION_DOWN, function (_event) {
