@@ -25,10 +25,10 @@ function attachEvents () {
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
 				mode = $draggable.pl('draggable');
 				game = {
-					position: scope.game.position(),
+					position: scope.game.absolutePosition(),
 					scale: scope.game.transformScale().x
 				};
-				point = $draggable.absolutePosition().dec(scope.game.absolutePosition());
+				point = $draggable.absolutePosition().dec(game.position);
 				transform = $draggable.transform();
 				helperID = createID();
 				state = {
