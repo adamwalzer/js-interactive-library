@@ -16,7 +16,7 @@ function attachEvents () {
 
 	$(document)
 		.on('mousedown', function (_event) {
-			var $draggable, scope, cursor, mode, gameScale, point, transform, helperID, dragStartEvent;
+			var $draggable, scope, cursor, mode, game, point, transform, helperID, dragStartEvent;
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
 
@@ -24,8 +24,11 @@ function attachEvents () {
 				scope = $draggable.scope();
 				cursor = resolveEventPoint(_event, 1/scope.game.zoom);
 				mode = $draggable.pl('draggable');
-				gameScale = scope.game.transformScale().x;
-				point = $draggable.position();
+				game = {
+					position: scope.game.absolutePosition(),
+					scale: scope.game.transformScale().x
+				};
+				point = $draggable.absolutePosition().dec(game.position);
 				transform = $draggable.transform();
 				helperID = createID();
 				state = {
@@ -50,7 +53,7 @@ function attachEvents () {
 				// FireFox has a different scaling implementation than other browsers (transform:scale(); vs. zoom:;)
 				// so we need to account for the game transform scale.
 				// 
-				if (gameScale !== 1) point = point.scale(1/gameScale);
+				if (game.scale !== 1) point = point.scale(1/game.scale);
 
 				draggableStyleSheet.html( provideSource( helperID, createDraggableRule($draggable)));
 
