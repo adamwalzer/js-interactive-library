@@ -76,7 +76,7 @@ var Scope = jQProxy.extend(function () {
 	var Actionables;
 
 	function attachActionHandler () {
-		this.on(pl.EVENT.CLICK, function (_event) {
+		this.on(pl.EVENT.ACTION, function (_event) {
 			var target, record;
 
 			target = $(_event.target).closest('[pl-action]')[0];

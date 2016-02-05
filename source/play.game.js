@@ -241,6 +241,22 @@ READY_QUEUE = [];
 		return this;
 	};
 
+	/**
+	 * Accessor for the detected features supported by the browser.
+	 */
+	this.feature = (function () {
+		var detect = {
+			touch: function () {
+				return window.hasOwnProperty('ontouchend');
+			}
+		};
+
+		return function (_name) {
+			var tester = detect[_name];
+			return tester && tester();
+		};
+	}());
+
 }).call(game);
 
 export default game;

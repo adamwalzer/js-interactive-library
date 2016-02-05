@@ -12,10 +12,16 @@ function boot () {
 }
 
 function attachEvents () {
-	var state;
+	var state, E;
+
+	E = pl.EVENT;
+
+	if (E.ACTION_MOVE === 'touchmove') document.addEventListener(E.ACTION_MOVE, function (_event) {
+		_event.preventDefault();
+	}, false);
 
 	$(document)
-		.on('mousedown', function (_event) {
+		.on(E.ACTION_DOWN, function (_event) {
 			var $draggable, scope, cursor, mode, game, point, transform, helperID, dragStartEvent;
 
 			$draggable = $(_event.target).closest('[pl-draggable]');
@@ -97,7 +103,7 @@ function attachEvents () {
 			}
 		})
 
-		.on('mousemove', function (_event) {
+		.on(E.ACTION_MOVE, function (_event) {
 			var cursor, $draggable, distance, point, transform, dragMoveEvent;
 
 			if (state) {
@@ -136,7 +142,7 @@ function attachEvents () {
 			}
 		})
 
-		.on('mouseup mouseout', function (_event) {
+		.on([E.ACTION_UP, E.ACTION_OUT].join(' '), function (_event) {
 			var $draggable, dragEndEvent;
 
 			if (state) {
@@ -171,21 +177,25 @@ function attachEvents () {
 }
 
 function resolveEventPoint (_event, _scale) {
-	var x, y, scale;
+	var scale = _scale || 1;
 
-	scale = _scale || 1;
-
-	if (_event.touches) {
-		x = _event.touches[0].clientX;
-		y = _event.touches[0].clientY;
+	if (_event.originalEvent && _event.originalEvent.changedTouches) {
+		/**
+		 * For now, interactions should use the last touch if multiple fingers are captured.
+		 * @todo Maybe invoke action for each touch.
+		 */
+		_event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
 	}
-
-	else {
-		x = _event.clientX;
-		y = _event.clientY;
-	}
-
-	return Point.create().set(x * scale, y * scale);
+	
+	return Point.create().set(new function () {
+		if (_event.touch) {
+			this.x = _event.touch.clientX * scale;
+			this.y = _event.touch.clientY * scale;
+		} else {
+			this.x = _event.clientX * scale;
+			this.y = _event.clientY * scale;
+		}
+	});
 }
 
 function createHelperStyleSheet () {
