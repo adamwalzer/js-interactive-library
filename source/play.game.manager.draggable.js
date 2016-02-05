@@ -177,21 +177,25 @@ function attachEvents () {
 }
 
 function resolveEventPoint (_event, _scale) {
-	var x, y, scale;
+	var scale = _scale || 1;
 
-	scale = _scale || 1;
-
-	if (_event.touches) {
-		x = _event.touches[0].clientX;
-		y = _event.touches[0].clientY;
+	if (_event.originalEvent && _event.originalEvent.changedTouches) {
+		/**
+		 * For now, interactions should use the last touch if multiple fingers are captured.
+		 * @todo Maybe invoke action for each touch.
+		 */
+		_event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
 	}
-
-	else {
-		x = _event.clientX;
-		y = _event.clientY;
-	}
-
-	return Point.create().set(x * scale, y * scale);
+	
+	return Point.create().set(new function () {
+		if (_event.touch) {
+			this.x = _event.touch.clientX * scale;
+			this.y = _event.touch.clientY * scale;
+		} else {
+			this.x = _event.clientX * scale;
+			this.y = _event.clientY * scale;
+		}
+	});
 }
 
 function createHelperStyleSheet () {
