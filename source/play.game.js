@@ -253,6 +253,7 @@ READY_QUEUE = [];
 
 		return function (_name) {
 			var tester = detect[_name];
+			if (!tester && console) console.warn('No feature detection for "'+_name+'".');
 			return tester && tester();
 		};
 	}());
