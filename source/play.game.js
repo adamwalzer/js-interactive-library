@@ -243,6 +243,13 @@ READY_QUEUE = [];
 
 	/**
 	 * Accessor for the detected features supported by the browser.
+	 *
+	 * *Supported Feature Detectors*
+	 * - touch
+	 *
+	 * @function feature;
+	 * @arg {string} _name - The feature which to test for (i.e. `"touch"`)
+	 * @returns {boolean} The support status for the specified feature.
 	 */
 	this.feature = (function () {
 		var detect = {
