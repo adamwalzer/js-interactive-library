@@ -16,9 +16,8 @@ function attachEvents () {
 
 	E = pl.EVENT;
 
-	if (E.ACTION_MOVE === 'touchmove') document.addEventListener(E.ACTION_MOVE, function (_event) {
-		_event.preventDefault();
-	}, false);
+	// Disable scrolling on touchDevices (particularly for iOS elastic scroll).
+	if (E.ACTION_MOVE === 'touchmove') attachEvents.disableTouchScroll();
 
 	$(document)
 		.on(E.ACTION_DOWN, function (_event) {
@@ -175,6 +174,12 @@ function attachEvents () {
 			}
 		});
 }
+
+attachEvents.disableTouchScroll = function () {
+	document.addEventListener("touchmove", function (_event) {
+		_event.preventDefault();
+	}, false);
+};
 
 function resolveEventPoint (_event, _scale) {
 	var scale = _scale || 1;
