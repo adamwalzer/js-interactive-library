@@ -321,7 +321,7 @@ var Entity = GlobalScope.extend(function () {
 		screen = this;
 		time = util.toMillisec(_time);
 
-		util.assignRef(this, 'intervalID', setTimeout(_cb.bind(screen), time));
+		util.assignRef(this, 'intervalID', setInterval(_cb.bind(screen), time));
 
 		return this;
 	};
