@@ -2,3 +2,4 @@ node_modules
 build
 **/*.swp
 .DS_Store
+NOTES.txt
