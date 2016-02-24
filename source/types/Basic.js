@@ -155,8 +155,12 @@ var Basic = {
 	toString: function () {
 		var type;
 		
-		type = this.baseType.replace('TYPE_', '');
-		type = type.slice(0,1)+type.slice(1).toLowerCase();
+		if (this.baseType) {
+			type = this.baseType.replace('TYPE_', '');
+			type = type.slice(0,1)+type.slice(1).toLowerCase();	
+		} else {
+			type = this.constructor.name || 'Object';
+		}
 
 		return '[object '+type+']';
 	}
