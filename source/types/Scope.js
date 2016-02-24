@@ -408,6 +408,33 @@ var Scope = jQProxy.extend(function () {
 			}
 		}
 
+		/**
+		 * Sort audio into DOM order.
+		 * @todo Consider including this into `AudioManager`. Micah: 2/23/2016.
+		 */
+		if (this.hasOwnProperty('audio')) {
+			this.audio.collections().forEach(function (_collection) {
+				if (!_collection.length) return;
+
+				this.findOwn('audio.'+_collection.type).each(function (_index, _node) {
+					var id, audio, collection, index;
+
+					id = $(_node).id();
+					audio = _collection.find('#'+id);
+					index = _collection.indexOf(audio);
+
+					if (index !== _index) {
+						this.log('sort', audio.id, 'from', index, 'to', _index);
+
+						_collection[index] = _collection[_index];
+						_collection[_index] = audio;
+
+						if (!_collection[index]) debugger;
+					}
+				}.bind(this));
+			}.bind(this));
+		}
+
 		this.isReady = true;
 		this.addClass('READY');
 
