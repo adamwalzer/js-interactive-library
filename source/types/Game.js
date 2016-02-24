@@ -381,45 +381,44 @@ var Game = GlobalScope.extend(function () {
 		playing = Collection.create();
 
 		this.on('audio-play', function (_event) {
-			var current, bgMusic;
+			var audio, current, bgMusic;
 
-			if (_event.audioType !== 'sfx') {
-				current = playing.filter(_event.audioType, 'type');
+			audio = _event.target;
+
+			if (audio.type !== 'sfx') {
+				current = playing.filter(audio.type, 'type');
 				bgMusic = playing.filter('background', 'type');
 
 				if (current) {
-					current.forEach(function (_record) {
-						_record.audio.pause();
-						_record.audio.currentTime = 0;
+					current.forEach(function (_audio) {
+						_audio.stop();
 					});
 				}
 
-				if (_event.audioType === 'voice-over') {
-					if (bgMusic) bgMusic.forEach(function (_record) {
-						_record.audio.volume = 0.2;
-					});
+				if (audio.type === 'voiceOver') {
+					// if (bgMusic) bgMusic.forEach(function (_record) {
+					// 	_record.audio.volume = 0.2;
+					// });
 				}
 			}
 
-			playing.push({
-				audio: _event.target,
-				type: _event.audioType
-			});
+			playing.push(audio);
 		});
 
 		this.on('audio-ended audio-pause', function (_event) {
 			var current, scope, bgMusic;
 
-			current = playing.get(_event.target, 'audio')
-			scope = $(_event.target).scope();
+			scope = _event.targetScope;
 			bgMusic = playing.filter('background', 'type');
 
-			playing.remove(current);
+			playing.remove(_event.target);
 			deQueue(scope, _event.target);
 
-			if (_event.audioType === 'voice-over' && !playing.get('voice-over', 'type')) {
+			this.log('audio-ended', _event.target.fileName, _event.target.id, playing.length, playing.join(', '));
+
+			if (_event.target.type === 'voiceOver' && !playing.get('voiceOver', 'type')) {
 				if (bgMusic) bgMusic.forEach(function (_record) {
-					_record.audio.volume = 1;
+					// _record.audio.volume = 1;
 				});
 			}
 		});
