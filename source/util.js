@@ -247,6 +247,19 @@ var util = new (function () {
 		return _obj[name];
 	};
 
+	this.noop = function() {};
+
+	this.resolveFileName = function (_path) {
+		return _path.slice(_path.lastIndexOf('/')+1);
+	};
+
+	this.createId = function (_pattern) {
+		return (_pattern || 'xy-xyxy-y').replace(/x|y/g, function (_token) {
+			if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
+			return Math.floor(Math.random() * Date.now()).toString(16).slice(2);
+		});
+	};
+
 });
 
 export default util;
