@@ -63,7 +63,7 @@ import Matrix from 'lib/matrix';
 			}
 
 			// If document already has the id defined then set as a unique library id.
-			if ($(_set).length) {
+			if ($('#'+_set).length) {
 				this.attr('pl-id', _set);
 			}
 
