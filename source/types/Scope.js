@@ -19,6 +19,7 @@ import { Point } from 'types/Dimensions';
 import game from 'play.game';
 import util from 'util';
 import evalAction from 'evalAction';
+import { AudioManager } from 'types/AudioManager';
 
 /**
  * Creates a new Enitiy instance with a context node and implementation.
@@ -531,7 +532,6 @@ var Scope = jQProxy.extend(function () {
 			var eventMap, isNodeComplete;
 
 			eventMap = {
-				AUDIO: 'onloadeddata',
 				VIDEO: 'onloadeddata',
 				IMG: 'onload'
 			};
@@ -540,10 +540,10 @@ var Scope = jQProxy.extend(function () {
 				switch (_node.nodeName) {
 					case 'IMG':
 						return !!_node.complete;
-					case 'AUDIO':
 					case 'VIDEO':
 						if (_node.readyState === _node.HAVE_ENOUGH_DATA) return true;
 						_node.load();
+						break;
 				}
 
 				return false;
@@ -558,7 +558,7 @@ var Scope = jQProxy.extend(function () {
 			}
 		});
 
-		assetTypes = ['IMG', 'AUDIO', 'VIDEO'];
+		assetTypes = ['IMG', 'VIDEO'];
 
 		if (_nodes) {
 			_nodes.forEach(watch);
@@ -614,63 +614,58 @@ var Scope = jQProxy.extend(function () {
 	};
 
 	this.captureAudioAssets = function () {
-		var scope, screen;
+		var $audio = this.findOwn('audio');
 
-		scope = this;
-		screen = (scope.screen != null && typeof scope.screen === 'object') ? scope.screen : scope;
+		if (!$audio.length) return false;
+		
+		this.audio = AudioManager.create();
 
-		scope.findOwn('audio').each(function () {
-			var $node, id, audioTypes;
+		$audio.each(function (_index, _node) {
+			this.assetQueue.add(_node.src);
+			this.audio.watch(_node).then(function (_audio) {
+				var loadedEvent = $.Event('loaded', { target: _node, targetScope: this });
 
-			if (!scope.hasOwnProperty('audio')) {
-				scope.audio = {
-					background: null,
-					voiceOver: null,
-					sfx: null
-				};
+				if ($(_node).is('[pl-required]')) this.screen.require(_audio);
+
+				if (this.assetQueue.has(_node.src)) this.assetQueue.ready(_node.src);
+
+				this.trigger(loadedEvent);
+			}.bind(this));
+		}.bind(this));
+
+		// proxy events
+		this.audio.on('play pause ended', this.bind(function (_event) {
+			var map = {
+				background: 'BACKGROUND',
+				voiceOver: 'VOICE-OVER',
+				sfx: 'SFX'
+			};
+
+			switch (_event.type) {
+				case 'play':
+					[this, this.screen].forEach(function (_scope) {
+						if (_scope.$els) _scope.addClass('PLAYING '+map[_event.target.type]);
+					});
+					break;
+
+				case 'pause':
+				case 'ended':
+					[this, this.screen].forEach(function (_scope) {
+						if (_scope.$els) _scope.removeClass('PLAYING '+map[_event.target.type]);
+					});
+					break;
 			}
 
-			$node = $(this);
-			id = util.transformId($node.id(), true);
-			audioTypes = ['background', 'voice-over', 'sfx'];
-
-			audioTypes.forEach(function (_type) {
-				if ($node.hasClass(_type)) {
-					$node.on('play pause ended', function (_event) {
-						switch (_event.type) {
-							case 'play':
-								screen.addClass('PLAYING '+_type.toUpperCase());
-								break;
-
-							case 'pause':
-							case 'ended':
-								screen.removeClass('PLAYING '+_type.toUpperCase());
-								break;
-						}
-						scope.trigger($.Event('audio-'+_event.type, {
-							target: $node[0],
-							targetScope: scope,
-							audioType: _type
-						}));
-					});
-
-					if ($node.attr('pl-required') != null) {
-						screen.require($node[0]);
-					}
-
-					// This property can be either an array of nodes or the node.
-					util.assignRef(scope.audio, _type, $node[0]);
-
-					// Makes sure the property is set on the final value of scope.audio[_type].
-					// This should be safe to run out of the callstack.
-					setTimeout(function () {
-						if (id) util.assignRef(scope.audio[util.transformId(_type, true)], id, $node[0]);
-					});
-				}
+			var audioEvent = $.Event('audio-'+_event.type, {
+				target: _event.target,
+				targetNode: _event.targetNode,
+				targetScope: this
 			});
-		});
 
-		return scope;
+			this.trigger(audioEvent);
+		}));
+
+		return this;
 	};
 
 	this.handleProperty = function (_implementation) {
