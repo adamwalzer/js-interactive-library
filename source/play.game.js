@@ -108,6 +108,8 @@ READY_QUEUE = [];
  */
 (function () {
 
+	var audioContext;
+
 	this.component = component;
 	this.manager = manager;
 	
@@ -264,6 +266,13 @@ READY_QUEUE = [];
 			return tester && tester();
 		};
 	}());
+
+	this.getAudioContext = function () {
+		if (!audioContext) {
+			audioContext = new (window.AudioContext || window.webkitAudioContext);
+		}
+		return audioContext;
+	};
 
 }).call(game);
 
