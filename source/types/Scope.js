@@ -414,9 +414,15 @@ var Scope = jQProxy.extend(function () {
 		 */
 		if (this.hasOwnProperty('audio')) {
 			this.audio.collections().forEach(function (_collection) {
+				var map = {
+					voiceOver: 'voice-over',
+					background: 'background',
+					sfx: 'sfx'
+				};
+
 				if (!_collection.length) return;
 
-				this.findOwn('audio.'+_collection.type).each(function (_index, _node) {
+				this.findOwn('audio.'+map[_collection.type]).each(function (_index, _node) {
 					var id, audio, collection, index;
 
 					id = $(_node).id();
