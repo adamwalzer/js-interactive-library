@@ -153,7 +153,7 @@ $(
 
 		['background','voiceOver','sfx'].forEach(function (_type) {
 			var collection = this[_type] = AudioCollection.create(_type);
-			this.$el.append(collection.$el);
+			this.addShadow(collection);
 		}.bind(this));
 	},
 
@@ -296,7 +296,9 @@ $(
 		return '[object '+(this.constructor.name || 'Object')+']';
 	}
 )}
-
+/**
+ * Extend AudioCollection with Collection.
+ */
 AudioCollection.prototype = Object.create(Collection, {
 	constructor: {
 		value: AudioCollection,
@@ -311,7 +313,6 @@ AudioCollection.prototype = Object.create(Collection, {
  * An interface for controlling a MediaElement or AudioBuffer.
  * @arg {function} $ - Passed by `type()`, gives you a pritier interface for defining the instance members.
  * @classdesc An itterable with a collection of Audio objects. This interface also exposes methods for working with it members.
- * @extends Collection
  */
 function Audio ($) {
 
@@ -356,7 +357,7 @@ $(
 			this.fileName = util.resolveFileName(_audio.node.src);
 		}
 
-		if (!this.id) $audio.id(this.id = util.createId('yy'));
+		if (!this.id) $audio.id(this.id = util.createId());
 		$audio.data('context', this);
 
 		Object.defineProperty(this, 'config', {
@@ -414,7 +415,7 @@ $(
 	 * Proveds a string representation of the object type.
 	 */
 	function toString () {
-		return '[object '+(this.constructor.name || 'Object')+']';
+		return '[audio#'+this.id+' '+this.fileName+']';
 	}
 )}
 
