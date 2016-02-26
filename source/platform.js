@@ -33,13 +33,11 @@ var platform = new (function () {
 	this.EVENT_FLIPPED = 'flipped';
 
 	this.emit = function (_name) {
-		window.frameElement.dispatchEvent(createEvent(_name));
+		if (window.frameElement) window.frameElement.dispatchEvent(createEvent(_name));
 	};
 
 	this.saveGameState = function (_data) {
-		window.frameElement.dispatchEvent(createEvent(this.EVENT_SAVE, {
-			gameData: _data
-		}));
+		if (window.frameElement) window.frameElement.dispatchEvent(createEvent(this.EVENT_SAVE, { gameData: _data }));
 	};
 
 	window.addEventListener('platform-event', function (_event) {
