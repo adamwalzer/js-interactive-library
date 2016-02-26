@@ -44,7 +44,7 @@ var EventTargetInterface, InspectorInterface, PlayableInterface, $$ = window.jQu
  * @extends InspectorInterface
  */
 function AudioManager ($) {
-	var AUDIO_TYPES;
+	var AUDIO_TYPES, BUFFER_CACHE;
 
 	/**
 	 * A record object for passing the MediaElement which got loaded as an `AudioBuffer`.
@@ -75,14 +75,17 @@ function AudioManager ($) {
 	 * @returns {Promise}
 	 */
 	function loadArrayBuffer (_audio) {
-		var xhr, manager;
+		var xhr, manager, fileName;
 
 		xhr = new (XMLHttpRequest || util.noop);
 		manager = this;
+		fileName = util.resolveFileName(_audio.src);
 
 		if (!xhr.open) Promise.reject('This platfom does not support the XMLHttpRequest API.');
 
 		return new Promise(function (resolve, reject) {
+			var cache = BUFFER_CACHE[fileName];
+
 			// Decodes ArrayBuffer into an AudioBuffer.
 			function onLoad () {
 				if (xhr.status >= 200 && xhr.status < 300) {
@@ -91,8 +94,12 @@ function AudioManager ($) {
 					if (ctx = pl.game.getAudioContext()) {
 						return new Promise(function (resolveDecoding, rejectDecoding) {
 							ctx.decodeAudioData(xhr.response, function (_buffer) {
-								resolve( manager.collect( new AudioBufferRecord(_audio, _buffer)));
+								var audio = manager.collect( new AudioBufferRecord(_audio, _buffer));
+								resolve(audio);
 								resolveDecoding(_buffer);
+
+								// Cache the AudioBuffer to resolve duplicates.
+								BUFFER_CACHE[fileName] = _buffer;
 							});
 						});
 					}
@@ -111,6 +118,10 @@ function AudioManager ($) {
 				xhr = null;
 			}
 
+			if (cache && cache !== 'loading') return resolve( manager.collect( new AudioBufferRecord(_audio, cache)));
+
+			BUFFER_CACHE[fileName] = 'loading';
+
 			xhr.responseType = 'arraybuffer';
 
 			xhr.addEventListener('load', onLoad, false);
@@ -123,6 +134,7 @@ function AudioManager ($) {
 	 * The CSS class names reconized as audio types.
 	 */
 	AUDIO_TYPES = /background|voice-over|sfx/i;
+	BUFFER_CACHE = {};
 	/**
 	 * Duck typed multiple inheritance.
 	 */
