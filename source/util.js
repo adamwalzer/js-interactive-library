@@ -247,12 +247,28 @@ var util = new (function () {
 		return _obj[name];
 	};
 
+	/**
+	 * N0 OPeration.
+	 */
 	this.noop = function() {};
 
+	/**
+	 * Get the file name out of a simple file path.
+	 * @arg {string} _path - The file path. 
+	 * @returns {string} The extracted name.
+	 */
 	this.resolveFileName = function (_path) {
 		return _path.slice(_path.lastIndexOf('/')+1);
 	};
 
+	/**
+	 * Produces a string following the specied pattern. Which is a mix of x, y, z and - characters.
+	 * - x; produces a letter a-f.
+	 * - y; produces a digit 0-9.
+	 * - z; produces a 4 character hex value derived from the now time stamp.
+	 * @arg {string} _pattern - The xyz pattern.
+	 * @returns {string} The generated ID.
+	 */
 	this.createId = function (_pattern) {
 		return (_pattern || 'xy-z').replace(/[xyz]/g, function (_token) {
 			if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
