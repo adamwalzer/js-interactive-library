@@ -256,7 +256,7 @@ var util = new (function () {
 	this.createId = function (_pattern) {
 		return (_pattern || 'xy-z').replace(/[xyz]/g, function (_token) {
 			if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
-			if (_token === 'y') return (Math.ceil(Math.random() * 9)).toString(16);
+			if (_token === 'y') return (Math.floor(Math.random() * 10)).toString(16);
 			return Math.floor(Math.random() * Date.now()).toString(16).slice(0, 4);
 		});
 	};
