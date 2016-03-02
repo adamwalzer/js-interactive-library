@@ -401,9 +401,7 @@ var Scope = jQProxy.extend(function () {
 		if (entities) {
 			if (entities.length > 0) {
 				this.entities = entities;
-			}
-
-			else {
+			} else {
 				this.entities = [entities];
 			}
 		}
@@ -413,6 +411,7 @@ var Scope = jQProxy.extend(function () {
 		 * @todo Consider including this into `AudioManager`. Micah: 2/23/2016.
 		 */
 		if (this.hasOwnProperty('audio')) {
+			(this.game || this).media.addShadow(this.audio);
 			this.audio.collections().forEach(function (_collection) {
 				var map = {
 					voiceOver: 'voice-over',
@@ -426,18 +425,14 @@ var Scope = jQProxy.extend(function () {
 					var id, audio, collection, index;
 
 					id = $(_node).id();
-					audio = _collection.find('#'+id);
+					audio = (_collection.find('#'+id) || [])[0];
 					index = _collection.indexOf(audio);
 
 					if (index !== _index) {
-						this.log('sort', audio.id, 'from', index, 'to', _index);
-
 						_collection[index] = _collection[_index];
 						_collection[_index] = audio;
-
-						if (!_collection[index]) debugger;
 					}
-				}.bind(this));
+				});
 			}.bind(this));
 		}
 
@@ -647,11 +642,19 @@ var Scope = jQProxy.extend(function () {
 	};
 
 	this.captureAudioAssets = function () {
-		var $audio = this.findOwn('audio');
+		var deQ, $audio;
 
-		if (!$audio.length) return false;
+		if (!($audio = this.findOwn('audio')).length) return false;
+
+		deQ = function (_item) {
+			[this, this.screen].forEach(function (_scope) {
+				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
+					_scope.requiredQueue.ready(_item);
+				}
+			});
+		}.bind(this);
 		
-		this.audio = AudioManager.create();
+		this.audio = AudioManager.create(this.id());
 
 		$audio.each(function (_index, _node) {
 			this.assetQueue.add(_node.src);
@@ -679,18 +682,28 @@ var Scope = jQProxy.extend(function () {
 					[this, this.screen].forEach(function (_scope) {
 						if (_scope.$els) _scope.addClass('PLAYING '+map[_event.target.type]);
 					});
+					$(_event.targetNode).addClass('PLAYING');
 					break;
 
 				case 'pause':
 				case 'ended':
 					[this, this.screen].forEach(function (_scope) {
-						if (_scope.$els) _scope.removeClass('PLAYING '+map[_event.target.type]);
+						if (_scope.$els) {
+							_scope.removeClass(map[_event.target.type]);
+							if (!(/BACKGROUND|VOICE-OVER|SFX/).test(_scope.state().join(' '))) _scope.removeClass('PLAYING');
+						}
+
 					});
+					$(_event.targetNode).removeClass('PLAYING');
+					deQ(_event.target);
 					break;
 			}
 
+			// this.log(_event.type+' : '+_event.target.fileName+'#'+_event.target.id, this.audio);
+
 			var audioEvent = $.Event('audio-'+_event.type, {
 				target: _event.target,
+				targetSource: _event.targetSource,
 				targetNode: _event.targetNode,
 				targetScope: this
 			});
