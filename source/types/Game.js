@@ -8,6 +8,7 @@ import Screen from 'types/Screen';
 import Collection from 'types/Collection';
 import { createEntity } from 'types/Scope';
 import { Size } from 'types/Dimensions';
+import { MediaManager } from 'types/AudioManager';
 
 var Game = GlobalScope.extend(function () {
 
@@ -71,6 +72,7 @@ var Game = GlobalScope.extend(function () {
 	this.zoom = 1;
 	this.keyCommands = null;
 	this.demoMode = false;
+	this.media = null;
 	this.viewport = new (function () {
 		var vp, $html, RESIZE_HANDLERS;
 
@@ -146,8 +148,8 @@ var Game = GlobalScope.extend(function () {
 		this.addClass('pl-game');
 
 		scaleGame.call(this);
-		this.captureScreens();
 		this.watchAudio();
+		this.captureScreens();
 
 		this.viewport.onResize(this.bind(scaleGame));
 
@@ -368,58 +370,24 @@ var Game = GlobalScope.extend(function () {
 	};
 
 	this.watchAudio = function () {
-		var playing;
-
-		function deQueue (_scope, _item) {
-			[_scope, _scope.screen].forEach(function (_scope) {
-				if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
-					_scope.requiredQueue.ready(_item);
-				}				
-			});
-		}
-
-		playing = Collection.create();
-
-		this.on('audio-play', function (_event) {
-			var audio, current, bgMusic;
+		this.media = MediaManager.create(this.id());
+		this.media.rule('.voiceOver', function (_event) {
+			var audio, playing;
 
 			audio = _event.target;
+			console.log('Game Media Rule', _event.type, audio);
 
-			if (audio.type !== 'sfx') {
-				current = playing.filter(audio.type, 'type');
-				bgMusic = playing.filter('background', 'type');
+			playing = audio && this.playing('.audio:not('+audio.id()+')');
 
-				if (current) {
-					current.forEach(function (_audio) {
-						_audio.stop();
-					});
-				}
+			switch (_event.type) {
+				case 'play':
+					console.log(' -- playing:', playing);
+					if (playing) playing.stop('@ALL');
+					break;
 
-				if (audio.type === 'voiceOver') {
-					// if (bgMusic) bgMusic.forEach(function (_record) {
-					// 	_record.audio.volume = 0.2;
-					// });
-				}
-			}
-
-			playing.push(audio);
-		});
-
-		this.on('audio-ended audio-pause', function (_event) {
-			var current, scope, bgMusic;
-
-			scope = _event.targetScope;
-			bgMusic = playing.filter('background', 'type');
-
-			playing.remove(_event.target);
-			deQueue(scope, _event.target);
-
-			this.log('audio-ended', _event.target.fileName, _event.target.id, playing.length, playing.join(', '));
-
-			if (_event.target.type === 'voiceOver' && !playing.get('voiceOver', 'type')) {
-				if (bgMusic) bgMusic.forEach(function (_record) {
-					// _record.audio.volume = 1;
-				});
+				case 'pause':
+				case 'ended':
+					break;
 			}
 		});
 	};
