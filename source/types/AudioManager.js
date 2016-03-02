@@ -10,7 +10,12 @@ import util from 'util';
 import Collection from 'types/Collection';
 
 // Object type definitions are using  `$` as the augmentation method for Types.
-var EventTargetInterface, InspectorInterface, PlayableInterface, $$ = window.jQuery;
+var EventTargetInterface,
+	InspectorInterface,
+	PlayableInterface,
+	LegislatorInterface,
+	StateInterface,
+	$$ = window.jQuery;
 
 /**
  * The Scopes entry for its audio management interface. This gives access to collections of Audio objects grouped into three types.
@@ -148,8 +153,8 @@ $(
 	/**
 	 * Define instance properties.
 	 */
-	function alloc () {
-		this.initialize('man');
+	function alloc (_id) {
+		this.initialize(_id, 'audio manager');
 
 		['background','voiceOver','sfx'].forEach(function (_type) {
 			var collection = this[_type] = AudioCollection.create(_type);
@@ -255,7 +260,7 @@ function AudioCollection ($, sup) {
 	/**
 	 * Duck typed multiple inheritance.
 	 */
-	util.mixin(this, EventTargetInterface, PlayableInterface);
+	util.mixin(this, EventTargetInterface, PlayableInterface, InspectorInterface, StateInterface);
 
 $(
 	'type',
@@ -267,6 +272,7 @@ $(
 	/**
 	 * Adds an Audio object to the collection.
 	 * @arg {HTMLAudioElement|Audio} _audio - Object to add.
+	 * @override
 	 * @returns {Audio}
 	 */
 	function add (_audio) {
@@ -278,7 +284,7 @@ $(
 
 		sup(this, 'add')(audio);
 		this.addShadow(audio);
-		if (audio.id) util.assignRef(this, audio.id, audio);
+		if (audio.id()) util.assignRef(this, audio.id(), audio);
 
 		return audio;
 	},
@@ -327,10 +333,10 @@ function Audio ($) {
 	/**
 	 * Duck typed multiple inheritance.
 	 */
-	util.mixin(this, EventTargetInterface, PlayableInterface);
+	util.mixin(this, EventTargetInterface, PlayableInterface, StateInterface);
 
 $(
-	'type, media, activeSource, buffer, id, config, fileName',
+	'type, media, activeSource, buffer, config, fileName',
 
 	/**
 	 * Allocates instance props.
@@ -338,27 +344,20 @@ $(
 	 * @arg {string} _type - The collection type.
 	 */
 	function alloc (_audio, _type) {
-		var config, $audio;
+		var config, $audio, id;
 
 		config = {};
 		$audio = $$(_audio.node || _audio);
 
+		if (!(id = $audio.id())) $audio.id(id = util.createId());
+
 		this.type = _type || null;
+		this.fileName = util.resolveFileName($audio.attr('src'));
+		this.media = $audio[0];
 
-		if (_audio.nodeName === 'AUDIO') {
-			this.media = _audio;
-			this.id = $audio.id();
-			this.fileName = _audio.src.slice(_audio.src.lastIndexOf('/')+1);
-		}
-
-		else if (_audio.buffer) {
-			this.buffer = _audio.buffer;
-			this.id = $$(_audio.node).id();
-			this.fileName = util.resolveFileName(_audio.node.src);
-		}
-
-		if (!this.id) $audio.id(this.id = util.createId());
 		$audio.data('context', this);
+
+		if (_audio.buffer) this.buffer = _audio.buffer;
 
 		Object.defineProperty(this, 'config', {
 			get: function () {
@@ -366,7 +365,7 @@ $(
 			}
 		});
 
-		this.initialize(this.id, 'audio');
+		this.initialize(id, 'audio '+this.type);
 	},
 	/**
 	 * Provides an `AudioNode` for a particular audio source.
@@ -380,18 +379,17 @@ $(
 		ctx = pl.game.getAudioContext();
 
 		if (ctx) {
-			if (this.media) {
-				try {
-					return this.activeSource || ctx.createMediaElementSource(this.media);
-				} catch(e) {
-					console.warn(e.message, this);
-				}
-			}
 			if (this.buffer) {
 				src = ctx.createBufferSource();
 				src.buffer = this.buffer;
 
 				return src;
+			} else {
+				try {
+					return this.activeSource || ctx.createMediaElementSource(this.media);
+				} catch(e) {
+					console.warn(e.message, this);
+				}
 			}
 		}
 
@@ -415,7 +413,60 @@ $(
 	 * Proveds a string representation of the object type.
 	 */
 	function toString () {
-		return '[audio#'+this.id+' '+this.fileName+']';
+		return '[audio#'+this.id()+' '+this.fileName+']';
+	}
+)}
+/**
+ * <span class="note important">NOTE: This constructor is used to construct its protoype which we instatiate with `MediaManager.create()`.</span>
+ * Manages any playing media (Audio, Video).
+ * @arg {function} $ - Passed by `type()`, gives you a pritier interface for defining the instance members.
+ * @classdesc Manages any playing media (Audio, Video).
+ * @class
+ */
+function MediaManager ($, sup) {
+	/**
+	 * Duck typed multiple inheritance.
+	 */
+	util.mixin(this, EventTargetInterface, InspectorInterface, LegislatorInterface, StateInterface);
+$(
+	function alloc (_id) {
+		sup(this, 'alloc', arguments);
+		this.initialize(_id, 'media manager');
+	}
+)}
+/**
+ * <span class="note important">NOTE: This constructor is used to construct its protoype which we instatiate with `MediaCollection.create()`.</span>
+ * Returned as the result of some collection process.
+ * @arg {function} $ - Passed by `type()`, gives you a pritier interface for defining the instance members.
+ * @classdesc Returned as the result of some collection process.
+ *
+ * @class
+ * @extends AudioCollection
+ * @extends EventTargetInterface
+ * @extends InspectorInterface
+ * @extends LegislatorInterface
+ * @extends StateInterface
+ */
+function MediaCollection ($, sup) {
+	/**
+	 * Duck typed multiple inheritance.
+	 */
+	util.mixin(this, InspectorInterface, StateInterface);
+$(
+	/**
+	 * @override
+	 */
+	function add (_media) {
+		this.addShadow(_media);
+		if (_media.id()) util.assignRef(this, _media.id(), _media);
+		return Collection.add.call(this, _media);
+	},
+	/**
+	 * @override
+	 */
+	function addShadow (_media) {
+		this.$el.append(_media.$el.clone());
+		return this;
 	}
 )}
 
@@ -445,6 +496,13 @@ EventTargetInterface = {
 		this.$el.data('context', this);
 	},
 	/**
+	 * Get/set the id of the interface.
+	 * @arg {string} _id - A valid CSS ID.
+	 */
+	id: function (_id) {
+		return this.$el.id(_id);
+	},
+	/**
 	 * Add an interface to the shadow DOM.
 	 * @arg {Audio|AudioCollection} _obj - The object to add.
 	 * @returns this
@@ -465,7 +523,27 @@ EventTargetInterface = {
 	 * @arg {string} _selector - A CSS selector to match a node in the shadow DOM API tree.
 	 */
 	find: function (_selector) {
-		return this.$el.find(_selector).data('context');
+		var collection = MediaCollection.create();
+
+		// console.log(this.$el[0], 'find', _selector, this.$el.find(_selector));
+
+		this.$el.find(_selector).each(function () {
+			collection.add($$(this).data('context'));
+			// console.log(this.id, '- found', this);
+		});
+
+		return collection;
+	},
+	filter: function (_selector) {
+		var collection = MediaCollection.create();
+
+		if (!_selector) return this;
+
+		this.$el.filter(_selector).each(function () {
+			collection.add($$(this).data('context'));
+		});
+
+		return collection;
 	},
 	/**
 	 * Attach events to a shadow node.
@@ -493,14 +571,43 @@ EventTargetInterface = {
  * Interface for inspecting an API level (i.e. manager or collection).
  */
 InspectorInterface = {
-	isPlaying: function () {
-		// body...
-	},
-
-	current: function () {
-		// body...
+	playing: function (_filterSelector) {
+		var playing = this.find('.PLAYING').filter(_filterSelector);
+		return !!playing.length && playing;
 	}
 };
+
+LegislatorInterface = {
+	rule: function (_selector, _event, _handler) {
+		var handler, args;
+
+		handler = [typeof _event, typeof _handler].indexOf('function');
+		args = util.toArray(arguments).slice(1);
+
+		if (typeof _event === 'function') _event = 'play pause ended';
+
+		this.on(_event, function (_e) {
+			if (_e.target.$el.is(_selector)) args[handler].apply(this, arguments);
+		}.bind(this));
+	}
+};
+
+StateInterface = {
+	state: function () {
+		return this.$el.state.apply(this.$el, arguments);
+	},
+
+	addState: function (_state) {
+		console.log('add', this.id(), _state);
+		return this.$el.addClass(_state.toUpperCase());
+	},
+
+	removeState: function (_state) {
+		console.log('remove', this.id(), _state);
+		return this.$el.removeClass(_state.toUpperCase());
+	}
+};
+
 /**
  * Interface for methods involving audio control for any API level.
  */
@@ -526,10 +633,16 @@ PlayableInterface = {
 
 		ctx = pl.game.getAudioContext();
 		proxyEvent = (function (_event) {
-			var endedEvent = $$.Event(_event.type, { target: this, targetNode: _event.target });
-			console.log('AUDIO', _event.type, this.fileName, this.id);
+			var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
 
-			this.trigger(endedEvent);
+			// console.log('AUDIO', _event.type, this.fileName, this.id());
+
+			this.trigger(theEvent);
+
+			if (_event.type === 'ended') {
+				this.removeState('PLAYING');
+				this.activeSource = null;
+			}
 
 			_event.target.removeEventListener(_event.type, handler, false);
 		}.bind(this));
@@ -543,9 +656,11 @@ PlayableInterface = {
 			src.start();
 		}
 
-		handler({target: src.mediaElement || src, type: 'play'});
-
+		this.addState('PLAYING');
+		console.log('playing', this.$el[0]);
 		this.activeSource = src;
+
+		handler({target: src.mediaElement || src, type: 'play'});
 
 		return this;
 	},
@@ -558,13 +673,17 @@ PlayableInterface = {
 	/**
 	 * Stop an audio object.
 	 */
-	stop: function () {
-		var endedEvent;
-
+	stop: function (_filterSelector) {
 		if (this.background) return this.background.stop();
-		if (this.length != null) return this[0] && this[0].stop();
-
-		endedEvent = $$.Event('ended', { target: this, targetNode: this.activeSource.mediaElement || this.activeSource });
+		if (this.length != null) {
+			if (_filterSelector === '@ALL') {
+				this.forEach(function (_audio) {
+					console.log('STOP', _audio);
+				});
+			} else {
+				return this[0] && this[0].stop();
+			}
+		}
 
 		if (!this.activeSource) return false;
 
@@ -574,11 +693,6 @@ PlayableInterface = {
 		} else {
 			this.activeSource.stop();
 		}
-
-		console.log('AUDIO stop', this.fileName, this.id);
-		console.log('AUDIO ended', this.fileName, this.id);
-
-		this.trigger(endedEvent);
 		
 		this.activeSource = null;
 
@@ -586,4 +700,6 @@ PlayableInterface = {
 	}
 };
 
-export default type(AudioManager, AudioCollection, Audio);
+export default type(MediaManager, AudioManager, AudioCollection, Audio);
+
+AudioCollection.extend(MediaCollection);
