@@ -545,7 +545,7 @@ var Scope = jQProxy.extend(function () {
 	this.ready = function () { return this; };
 
 	this.watchAssets = function (_nodes) {
-		var assetTypes, watch, createHandler;
+		var createHandler, watch;
 
 		createHandler = this.bind(function (_node) {
 			return (function () {
@@ -553,55 +553,30 @@ var Scope = jQProxy.extend(function () {
 
 				this.assetQueue.ready(_node.src);
 				this.trigger(loadedEvent, [_node]);
+
+				_node.onload = null;
 			}).bind(this);
 		});
 
-		watch = this.bind(function (_node) {
-			var eventMap, isNodeComplete;
+		watch = this.bind(function (_index, _node) {
+			var node = typeof _index === 'number' ? _node : _index;
 
-			eventMap = {
-				VIDEO: 'onloadeddata',
-				IMG: 'onload'
-			};
-
-			isNodeComplete = (function () {
-				switch (_node.nodeName) {
-					case 'IMG':
-						return !!_node.complete;
-					case 'VIDEO':
-						if (_node.readyState === _node.HAVE_ENOUGH_DATA) return true;
-						_node.load();
-						break;
-				}
-
-				return false;
-			}).call(this);
-
-			if (isNodeComplete) return;
-			if (this.assetQueue.add(_node.src)) {
-				_node[eventMap[_node.nodeName]] = createHandler(_node);
-				_node.onerror = function () {
-					console.error('Image failed to load', _node.src);
+			if (node.nodeName !== 'IMG' || node.complete) return;
+			if (this.assetQueue.add(node.src)) {
+				node.onload = createHandler(node);
+				node.onerror = function () {
+					console.error('Image failed to load', node.src);
 				};
 			}
 		});
-
-		assetTypes = ['IMG', 'VIDEO'];
 
 		if (_nodes) {
 			_nodes.forEach(watch);
 			return this;
 		}
 
-		this.each(function () {
-			if (~assetTypes.indexOf(this.nodeName)) {
-				watch(this);
-			}
-		});
-
-		this.findOwn(assetTypes.join(',')).each(function () {
-			watch(this);
-		});
+		this.each(watch);
+		this.findOwn('img').each(watch);
 
 		return this;
 	};
