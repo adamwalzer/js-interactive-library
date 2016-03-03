@@ -53,6 +53,18 @@ var Game = GlobalScope.extend(function () {
 		console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
 	}
 
+	function collectVideos () {
+		this.find('video').each(function (_index, _node) {
+			this.media.video.add(_node);
+			
+			_node.onplay = function () {
+				var playing = this.media.playing('.background, .voiceOver');
+				playing.stop('@ALL');
+				this.log('video play', playing);
+			}.bind(this);
+		}.bind(this));
+	}
+
 	screenPrototype = Screen;
 	platformEventHandler = new (function () {
 		
@@ -375,21 +387,26 @@ var Game = GlobalScope.extend(function () {
 			var audio, playing;
 
 			audio = _event.target;
-			console.log('Game Media Rule', _event.type, audio);
+			console.log('Game Media Rule', _event.type, audio.fileName);
 
-			playing = audio && this.playing('.audio:not('+audio.id()+')');
+			playing = audio && this.playing('.audio:not(#'+audio.id()+')');
 
 			switch (_event.type) {
 				case 'play':
-					console.log(' -- playing:', playing);
-					if (playing) playing.stop('@ALL');
+					if (playing) {
+						playing.filter('.voiceOver').stop('@ALL');
+						playing.filter('.background').volume(0.2);
+					}
 					break;
 
 				case 'pause':
 				case 'ended':
+					playing.filter('.background').volume(1);
 					break;
 			}
 		});
+
+		collectVideos.call(this);
 	};
 
 	this.progress = function () {
