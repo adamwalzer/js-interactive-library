@@ -354,7 +354,7 @@ var Entity = GlobalScope.extend(function () {
 		frames = 0;
 		lastTime = 0;
 
-		if (!this.hasOwnProperty('frameHandlers')) {
+		if (!this.hasOwnProperty('frameHandlers') || this.frameHandlers.length === 0) {
 			frame = function (_time) {
 				var i, handler;
 
