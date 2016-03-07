@@ -406,6 +406,22 @@ var Game = GlobalScope.extend(function () {
 			}
 		});
 
+		if (~pl.EVENT.ACTION.indexOf('touch')) {
+			this.on(pl.EVENT.ACTION, function beginAudio (_event) {
+				var ctx, screen;
+
+				ctx = game.getAudioContext();
+				screen = this.currentScreen();
+
+				if (screen && ctx && ctx.state === 'suspended') {
+					game.enableAudioContext();
+					this.log('awesome!');
+					screen.startAudio();
+					this.off(pl.EVENT.ACTION, beginAudio);
+				}
+			});
+		}
+
 		collectVideos.call(this);
 	};
 
