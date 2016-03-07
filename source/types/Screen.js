@@ -33,11 +33,24 @@ var Screen = Entity.extend(function () {
 	};
 
 	this.start = function () {
+		this.startAudio();
 		return this;
 	};
 
 	this.stop = function () {
+		this.stopAudio();
 		return this;
+	};
+
+	this.startAudio = function () {
+		this.log('proto startAudio');
+		this.audio.background.play();
+		this.audio.voiceOver.play();
+	};
+
+	this.stopAudio = function () {
+		this.audio.background.stop('@ALL');
+		this.audio.voiceOver.stop('@ALL');
 	};
 
 	this.index = function () {
