@@ -274,6 +274,20 @@ READY_QUEUE = [];
 		return audioContext;
 	};
 
+	this.enableAudioContext = function () {
+		var ctx, silence;
+
+		ctx = this.getAudioContext();
+		silence = ctx.createBufferSource();
+
+		silence.buffer = ctx.createBuffer(2, 1, 44100);
+		silence.connect(ctx.destination);
+		silence.start();
+		silence.disconnect();
+
+		return silence;
+	};
+
 }).call(game);
 
 export default game;
