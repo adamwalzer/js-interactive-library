@@ -164,7 +164,6 @@ function AudioManager ($) {
 			xhr.addEventListener('error', onError, false);
 			xhr.open('GET', _audio.src, true);
 			xhr.send();
-			console.log('request', fileName);
 		});
 	}
 	/**
@@ -654,14 +653,16 @@ PlayableInterface = {
 			proxyEvent(_event);
 		}
 
-		console.log('play', this.type, this.fileName);
+		ctx = pl.game.getAudioContext();
+
+		if (ctx.state === 'suspended') return false;
 
 		if (this.background) return this.background.play();
 		if (this.length != null) return this[0] && this[0].play();
 
-		if (!(src = this.getSource())) return false;
+		console.log('play', this.type, this.fileName);
 
-		ctx = pl.game.getAudioContext();
+		if (!(src = this.getSource())) return false;
 		proxyEvent = (function (_event) {
 			var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
 
