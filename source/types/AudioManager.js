@@ -175,7 +175,7 @@ function AudioManager ($) {
 	/**
 	 * Duck typed multiple inheritance.
 	 */
-	util.mixin(this, EventTargetInterface, PlayableInterface);
+	util.mixin(this, EventTargetInterface, PlayableInterface, InspectorInterface, LegislatorInterface, StateInterface);
 
 // A little ugg but define instance members.
 $(
