@@ -115,24 +115,29 @@ function AudioManager ($) {
 
 			// Decodes ArrayBuffer into an AudioBuffer.
 			function onLoad () {
+				var ctx, promise;
+
 				if (xhr.status >= 200 && xhr.status < 300) {
-					var ctx;
-
 					if (ctx = pl.game.getAudioContext()) {
-						return new Promise(function (resolveDecoding, rejectDecoding) {
-							var r = ctx.decodeAudioData(xhr.response, function (_buffer) {
-								var audio = manager.collect( new AudioBufferRecord(_audio, _buffer));
-								resolve(audio);
-								resolveDecoding(_buffer);
+						promise = new Promise(function (resolveDecoding, rejectDecoding) {
+							try {
+								ctx.decodeAudioData(xhr.response, function (_buffer) {
+									var audio = manager.collect( new AudioBufferRecord(_audio, _buffer));
 
-								console.log('decoded', fileName);
-
-								// Cache the AudioBuffer to resolve duplicates.
-								BUFFER_CACHE[fileName] = _buffer;
-							});
-
-							console.log('DECODE?', fileName, r);
+									resolveDecoding(audio);
+									// Cache the AudioBuffer to resolve duplicates.
+									BUFFER_CACHE[fileName] = _buffer;
+								}, function () {
+									rejectDecoding("Failed to decode ArrayBuffer for "+fileName+".");
+								});	
+							} catch (e) {
+								rejectDecoding(e);
+							}
 						});
+
+						promise.then(resolve).catch(reject);
+
+						return promise;
 					}
 					
 				} else {
