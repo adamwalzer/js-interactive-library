@@ -395,13 +395,13 @@ var Game = GlobalScope.extend(function () {
 				case 'play':
 					if (playing) {
 						playing.filter('.voiceOver').stop('@ALL');
-						playing.filter('.background').volume(0.2);
+						playing.filter('.background').volume(game.config('bgVolume.drop') || 0.2);
 					}
 					break;
 
 				case 'pause':
 				case 'ended':
-					playing.filter('.background').volume(1);
+					playing.filter('.background').volume(game.config('bgVolume.max') || 1);
 					break;
 			}
 		});
