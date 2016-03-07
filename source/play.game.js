@@ -175,7 +175,7 @@ READY_QUEUE = [];
 	 */
 	this.config = function (_key_mixin) {
 		switch (typeof _key_mixin) {
-			case 'string': return CONFIG[_key_mixin];
+			case 'string': return util.resolvePath(CONFIG, _key_mixin);
 			case 'object':
 				if (_key_mixin) util.mixin(CONFIG, _key_mixin);
 		}
