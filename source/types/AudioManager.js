@@ -604,7 +604,6 @@ EventTargetInterface = {
 InspectorInterface = {
 	playing: function (_filterSelector) {
 		var playing = this.find('.PLAYING').filter(_filterSelector);
-		console.log('whats playing?', this.$el.id(), playing);
 		return !!playing.length && playing;
 	}
 };
@@ -671,13 +670,11 @@ PlayableInterface = {
 		if (this.background) return this.background.play();
 		if (this.length != null) return this[0] && this[0].play();
 
-		console.log('play', this.type, this.fileName);
+		// console.log('play', this.type, this.fileName);
 
 		if (!(src = this.getSource())) return false;
 		proxyEvent = (function (_event) {
 			var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
-
-			// console.log('AUDIO', _event.type, this.fileName, this.id());
 
 			this.trigger(theEvent);
 
@@ -720,7 +717,6 @@ PlayableInterface = {
 		if (this.length != null) {
 			if (_filterSelector === '@ALL') {
 				this.forEach(function (_audio) {
-					console.log('STOP', _audio.fileName);
 					_audio.stop();
 				});
 			} else {
@@ -736,6 +732,8 @@ PlayableInterface = {
 			this.media.pause();
 			this.media.currentTime = 0;
 		}
+
+		console.log('STOP', this.fileName);
 		
 		this.activeSource = null;
 

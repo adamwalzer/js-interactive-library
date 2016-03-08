@@ -657,24 +657,26 @@ var Scope = jQProxy.extend(function () {
 					[this, this.screen].forEach(function (_scope) {
 						if (_scope.$els) _scope.addClass('PLAYING '+map[_event.target.type]);
 					});
+
 					$(_event.targetNode).addClass('PLAYING');
 					break;
 
 				case 'pause':
 				case 'ended':
 					[this, this.screen].forEach(function (_scope) {
-						if (_scope.$els) {
-							_scope.removeClass(map[_event.target.type]);
-							if (!(/BACKGROUND|VOICE-OVER|SFX/).test(_scope.state().join(' '))) _scope.removeClass('PLAYING');
-						}
+						var state;
 
+						if (_scope.$els) {
+							state = _scope.state() || '';
+							_scope.removeClass(map[_event.target.type]);
+							if (!(/BACKGROUND|VOICE-OVER|SFX/).test(state.join ? state.join(' ') : state)) _scope.removeClass('PLAYING');
+						}
 					});
+
 					$(_event.targetNode).removeClass('PLAYING');
 					deQ(_event.target);
 					break;
 			}
-
-			// this.log(_event.type+' : '+_event.target.fileName+'#'+_event.target.id, this.audio);
 
 			var audioEvent = $.Event('audio-'+_event.type, {
 				target: _event.target,
