@@ -306,7 +306,21 @@ import Matrix from 'lib/matrix';
 	 * Accessor method for `pl` attributes.
 	 */
 	this.pl = function (_name, _value) {
-		var args;
+		var args, result;
+
+		if (!_name) {
+			result = {};
+			this.each(function () {
+				Array.forEach(this.attributes, function (_attr) {
+					if (_attr.name.indexOf('pl-') === 0) {
+						result[_attr.name.slice(3)] = _attr.value;
+					}
+				});
+			});
+			return result;
+		}
+
+
 		args = ['pl-'+_name];
 		if (typeof _value !== 'undefined') args.push(_value);
 
