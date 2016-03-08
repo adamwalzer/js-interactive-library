@@ -43,13 +43,13 @@ var Screen = Entity.extend(function () {
 	};
 
 	this.startAudio = function () {
-		this.log('proto startAudio');
+		if (!this.audio) return;
 		this.audio.background.play();
 		this.audio.voiceOver.play();
 	};
 
 	this.stopAudio = function () {
-		this.audio.background.stop('@ALL');
+		if (!this.audio) return;
 		this.audio.voiceOver.stop('@ALL');
 	};
 
