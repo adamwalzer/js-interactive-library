@@ -407,7 +407,7 @@ function Audio ($) {
 	util.mixin(this, EventTargetInterface, PlayableInterface, StateInterface);
 
 $(
-	'type, media, activeSource, buffer, config, fileName, gain',
+	'type, media, activeSource, buffer, config, fileName, gain, delay',
 
 	/**
 	 * Allocates instance props.
@@ -643,7 +643,7 @@ PlayableInterface = {
 	 * Play an audio object.
 	 */
 	play: function () {
-		var src, ctx, proxyEvent;
+		var ctx, src, proxyEvent, dest, delay;
 
 		function handler (_event) {
 			if (_event.type === 'ended') {
@@ -651,6 +651,14 @@ PlayableInterface = {
 				src = null;
 			}
 			proxyEvent(_event);
+		}
+
+		function playSource () {
+			if (this.buffer) {
+				src.start(0);
+			} else {
+				this.media.play();
+			}
 		}
 
 		ctx = pl.game.getAudioContext();
@@ -682,14 +690,14 @@ PlayableInterface = {
 
 		(src.mediaElement || src).addEventListener('ended', handler, false);
 
-		if (this.buffer) {
-			src.start(0);
-		} else {
-			this.media.play();
-		}
-
 		this.addState('PLAYING');
 		this.activeSource = src;
+
+		if (delay = this.config('delay')) {
+			setTimeout(playSource.bind(this), util.toMillisec(delay));
+		} else {
+			playSource.call(this);
+		}
 
 		handler({target: src.mediaElement || src, type: 'play'});
 
