@@ -395,10 +395,14 @@ function Audio ($) {
 
 	function accessConfig (_augment, _val) {
 		if (_val) {
-			this[_augment] = _val;
+			return this[_augment] = _val;
+		} else if (typeof _augment === 'string') {
+			return this[_augment];
 		} else {
 			util.mixin(this, _augment);
 		}
+
+		return _augment;
 	}
 
 	/**
@@ -415,10 +419,10 @@ $(
 	 * @arg {string} _type - The collection type.
 	 */
 	function alloc (_audio, _type) {
-		var config, $audio, id, ctx;
+		var $audio, ctx, config, id;
 
-		config = {};
 		$audio = $$(_audio.node || _audio);
+		config = $audio.pl();
 		ctx = pl.game.getAudioContext();
 
 		if (!(id = $audio.id())) $audio.id(id = util.createId());
@@ -435,9 +439,8 @@ $(
 		if (_audio.buffer) this.buffer = _audio.buffer;
 
 		Object.defineProperty(this, 'config', {
-			get: function () {
-				return accessConfig.bind(config);
-			}
+			value: accessConfig.bind(config),
+			writeable: false
 		});
 
 		this.initialize(id, 'audio '+this.type);
