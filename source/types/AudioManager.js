@@ -420,11 +420,12 @@ $(
 	 * @arg {string} _type - The collection type.
 	 */
 	function alloc (_audio, _type) {
-		var $audio, ctx, config, id;
+		var $audio, config, ctx, readyEvent, id;
 
 		$audio = $$(_audio.node || _audio);
 		config = $audio.pl();
 		ctx = pl.game.getAudioContext();
+		readyEvent = $$.Event('ready', {targetScope: this});
 
 		if (!(id = $audio.id())) $audio.id(id = util.createId());
 
@@ -445,6 +446,8 @@ $(
 		});
 
 		this.initialize(id, 'audio '+this.type);
+
+		$$(this.media).trigger(readyEvent);
 	},
 	/**
 	 * Provides an `AudioNode` for a particular audio source.

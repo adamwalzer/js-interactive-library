@@ -817,19 +817,11 @@ var Scope = jQProxy.extend(function () {
 				query = '#_value, [pl-id=_value], [pl-component=_value]'.replace(/_value/g, _value);
 				$node = this.find(query);
 
-				if ($node.is('audio, video')) {
-					$node.each(this.bind(function (_index, _node) {
-						this.require(_node);
-					}));
-				}
-				
-				else {
-					$node.on('ready', this.bind(function (_event) {
-						if ($node.is(_event.target)) {
-							this.require(_event.targetScope);
-						}
-					}));
-				}
+				$node.on('ready', this.bind(function (_event) {
+					if ($node.is(_event.target)) {
+						this.require(_event.targetScope);
+					}
+				}));
 			}
 		};
 
