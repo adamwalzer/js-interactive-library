@@ -647,7 +647,7 @@ PlayableInterface = {
 	 * Play an audio object.
 	 */
 	play: function () {
-		var ctx, src, proxyEvent, dest, delay;
+		var ctx, src, proxyEvent, dest, delay, shouldPlay;
 
 		function handler (_event) {
 			if (_event.type === 'ended') {
@@ -665,24 +665,30 @@ PlayableInterface = {
 			}
 		}
 
+		function response (_val) {
+			shouldPlay = _val;
+		}
+
 		ctx = pl.game.getAudioContext();
+		shouldPlay = true;
 
 		if (ctx.state === 'suspended') return false;
 
 		if (this.background) return this.background.play();
 		if (this.length != null) return this[0] && this[0].play();
 
-		// console.log('play', this.type, this.fileName);
-
 		if (!(src = this.getSource())) return false;
 		proxyEvent = (function (_event) {
 			var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
-
-			this.trigger(theEvent);
-
-			if (_event.type === 'ended') {
-				this.removeState('PLAYING');
-				this.activeSource = null;
+			
+			// proxy event to shadow DOM only when it has an active source.
+			if (this.activeSource) {
+				this.trigger(theEvent);
+				
+				if (_event.type === 'ended') {
+					this.removeState('PLAYING');
+					this.activeSource = null;
+				}
 			}
 
 			_event.target.removeEventListener(_event.type, handler, false);
@@ -692,16 +698,20 @@ PlayableInterface = {
 
 		(src.mediaElement || src).addEventListener('ended', handler, false);
 
-		this.addState('PLAYING');
-		this.activeSource = src;
+		this.trigger($$.Event('shouldPlay', { target: this, targetSource: src, targetNode: this.media, response: response }));
 
-		if (delay = this.config('delay')) {
-			setTimeout(playSource.bind(this), util.toMillisec(delay));
-		} else {
-			playSource.call(this);
+		if (shouldPlay) {
+			this.addState('PLAYING');
+			this.activeSource = src;
+
+			if (delay = this.config('delay')) {
+				setTimeout(playSource.bind(this), util.toMillisec(delay));
+			} else {
+				playSource.call(this);
+			}
+
+			handler({target: src.mediaElement || src, type: 'play'});
 		}
-
-		handler({target: src.mediaElement || src, type: 'play'});
 
 		return this;
 	},

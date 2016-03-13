@@ -400,10 +400,16 @@ var Game = GlobalScope.extend(function () {
 					break;
 
 				case 'pause':
+				case 'stopped':
 				case 'ended':
-					playing.filter('.background').volume(game.config('bgVolume.max') || 1);
+					if (playing) playing.filter('.background').volume(game.config('bgVolume.max') || 1);
 					break;
 			}
+		});
+
+		this.media.rule('.background', 'play', function (_event) {
+			var playing = this.playing('.background:not(#'+_event.target.id()+')');
+			if (playing) playing.stop('@ALL');
 		});
 
 		if (~pl.EVENT.ACTION.indexOf('touch')) {

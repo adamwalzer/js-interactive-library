@@ -645,7 +645,7 @@ var Scope = jQProxy.extend(function () {
 		}.bind(this));
 
 		// proxy events
-		this.audio.on('play pause ended', this.bind(function (_event) {
+		this.audio.on('play pause ended stopped', this.bind(function (_event) {
 			var map = {
 				background: 'BACKGROUND',
 				voiceOver: 'VOICE-OVER',
@@ -662,6 +662,7 @@ var Scope = jQProxy.extend(function () {
 					break;
 
 				case 'pause':
+				case 'stopped':
 				case 'ended':
 					[this, this.screen].forEach(function (_scope) {
 						var state;
