@@ -206,13 +206,14 @@ $(
 		type = getAudioType(_audio);
 
 		if (!type) return Promise.reject("Audio is missing a type. Please classify as 'background', 'voiceOver' or 'sfx'.");
-		if (~['sfx', 'voiceOver'].indexOf(type)) return loadArrayBuffer.call(this, _audio);
+		// if (~['sfx', 'voiceOver'].indexOf(type)) 
+		return loadArrayBuffer.call(this, _audio);
 
-		return new Promise(function (resolve, reject) {
-			_audio.onloadeddata = function () { resolve(manager.collect(this)); };
-			_audio.onerror = reject;
-			_audio.load();
-		});
+		// return new Promise(function (resolve, reject) {
+		// 	_audio.onloadeddata = function () { resolve(manager.collect(this)); };
+		// 	_audio.onerror = reject;
+		// 	_audio.load();
+		// });
 	},
 
 	/**
