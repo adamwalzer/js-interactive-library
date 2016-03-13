@@ -270,6 +270,8 @@ READY_QUEUE = [];
 	this.getAudioContext = function () {
 		if (!audioContext) {
 			audioContext = new (window.AudioContext || window.webkitAudioContext);
+			window.onfocus = function() { audioContext.resume(); };
+			window.onblur = function() { audioContext.suspend(); };
 		}
 		return audioContext;
 	};
