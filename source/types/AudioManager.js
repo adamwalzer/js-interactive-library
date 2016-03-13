@@ -464,6 +464,7 @@ $(
 			if (this.buffer) {
 				src = ctx.createBufferSource();
 				src.buffer = this.buffer;
+				src.loop = this.media.loop;
 
 				return src;
 			} else {
