@@ -59,7 +59,7 @@ var Game = GlobalScope.extend(function () {
 			
 			_node.onplay = function () {
 				var playing = this.media.playing('.background, .voiceOver');
-				playing.stop('@ALL');
+				if (playing) playing.stop('@ALL');
 				this.log('video play', playing);
 			}.bind(this);
 		}.bind(this));
@@ -383,12 +383,24 @@ var Game = GlobalScope.extend(function () {
 
 	this.watchAudio = function () {
 		this.media = MediaManager.create(this.id());
+
+		/**
+		 * Prevent duplicate playback of voiceOvers and backgrounds.
+		 */
+		this.media.rule('.background, .voiceOver', 'shouldPlay', function (_event) {
+			var playing = this.playing() || [];
+			console.log('!!-- shouldPlay', _event.target.fileName, !~playing.indexOf(_event.target));
+			// shouldPlay = false if _event.target is already playing.
+			_event.response(!~playing.indexOf(_event.target));
+		});
+
+		/**
+		 * 
+		 */
 		this.media.rule('.voiceOver', function (_event) {
 			var audio, playing;
 
 			audio = _event.target;
-			console.log('Game Media Rule', _event.type, audio.fileName);
-
 			playing = audio && this.playing('.audio:not(#'+audio.id()+')');
 
 			switch (_event.type) {
