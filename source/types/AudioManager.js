@@ -555,11 +555,8 @@ EventTargetInterface = {
 	find: function (_selector) {
 		var collection = MediaCollection.create();
 
-		// console.log(this.$el[0], 'find', _selector, this.$el.find(_selector));
-
 		this.$el.find(_selector).each(function () {
 			collection.add($$(this).data('context'));
-			// console.log(this.id, '- found', this);
 		});
 
 		return collection;
@@ -620,7 +617,7 @@ LegislatorInterface = {
 		handler = [typeof _event, typeof _handler].indexOf('function');
 		args = util.toArray(arguments).slice(1);
 
-		if (typeof _event === 'function') _event = 'play pause ended';
+		if (typeof _event === 'function') _event = 'play pause stopped ended';
 
 		this.on(_event, function (_e) {
 			if (_e.target.$el.is(_selector)) args[handler].apply(this, arguments);
@@ -718,6 +715,8 @@ PlayableInterface = {
 	 * Stop an audio object.
 	 */
 	stop: function (_filterSelector) {
+		var stopEvent = $$.Event('stopped', { target: this, targetSource: this.activeSource, targetNode: this.media });
+
 		if (this.background) return this.background.stop(_filterSelector);
 		if (this.length != null) {
 			if (_filterSelector === '@ALL') {
@@ -738,13 +737,18 @@ PlayableInterface = {
 			this.media.currentTime = 0;
 		}
 
-		console.log('STOP', this.fileName);
+		console.log('* STOP -', this.fileName);
 		
 		this.activeSource = null;
 
+		this.removeState('PLAYING');
+		this.trigger(stopEvent);
+
 		return this;
 	},
-
+	/**
+	 * @todo MGR, 2/9/2016: Pipe audio sources into gain nodes for each level of the API.
+	 */
 	volume: function (_level, _filterSelector) {
 		if (this.background) return this.background.volume(_level);
 		if (this.length != null) {
