@@ -654,7 +654,8 @@ var Scope = jQProxy.extend(function () {
 
 			switch (_event.type) {
 				case 'play':
-					[this, this.screen].forEach(function (_scope) {
+					[this, this.screen].forEach(function (_scope, _index, _set) {
+						if (_index === 1 && _scope === _set[0]) return;
 						if (_scope.$els) _scope.addClass('PLAYING '+map[_event.target.type]);
 					});
 
@@ -664,18 +665,20 @@ var Scope = jQProxy.extend(function () {
 				case 'pause':
 				case 'stopped':
 				case 'ended':
-					[this, this.screen].forEach(function (_scope) {
+					[this, this.screen].forEach(function (_scope, _index, _set) {
 						var state;
 
+						if (_index === 1 && _scope === _set[0]) return;
+
 						if (_scope.$els) {
-							state = _scope.state() || '';
 							_scope.removeClass(map[_event.target.type]);
-							if (!(/BACKGROUND|VOICE-OVER|SFX/).test(state.join ? state.join(' ') : state)) _scope.removeClass('PLAYING');
+							state = _scope.attr('class');
+							if (!(/BACKGROUND|VOICE-OVER|SFX/).test(state)) _scope.removeClass('PLAYING');
 						}
 					});
 
 					$(_event.targetNode).removeClass('PLAYING');
-					deQ(_event.target);
+					if (_event.type === 'ended') deQ(_event.target);
 					break;
 			}
 
