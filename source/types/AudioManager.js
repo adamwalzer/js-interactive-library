@@ -746,8 +746,6 @@ PlayableInterface = {
 			this.media.pause();
 			this.media.currentTime = 0;
 		}
-
-		console.log('* STOP -', this.fileName);
 		
 		this.activeSource = null;
 

@@ -389,7 +389,6 @@ var Game = GlobalScope.extend(function () {
 		 */
 		this.media.rule('.background, .voiceOver', 'shouldPlay', function (_event) {
 			var playing = this.playing() || [];
-			console.log('!!-- shouldPlay', _event.target.fileName, !~playing.indexOf(_event.target));
 			// shouldPlay = false if _event.target is already playing.
 			_event.response(!~playing.indexOf(_event.target));
 		});
