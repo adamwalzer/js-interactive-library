@@ -358,12 +358,7 @@ AudioCollection.prototype = Object.create(Collection, {
  * @extends LegislatorInterface
  * @extends StateInterface
  */
-function MediaCollection ($, sup) {
-	/**
-	 * Duck typed multiple inheritance.
-	 */
-	util.mixin(this, InspectorInterface, StateInterface);
-$(
+function MediaCollection ($, sup) {$(
 	/**
 	 * @override
 	 */
