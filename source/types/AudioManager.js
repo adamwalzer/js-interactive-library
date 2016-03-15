@@ -321,6 +321,16 @@ $(
 		return audio;
 	},
 	/**
+	 * Query a collection for ownership of an audio object.
+	 * @arg {string|Audio|HTMLAudioElement} The validating reference.
+	 * @returns {boolean}
+	 */
+	function has (_query) {
+		return this.some(function (_audio) {
+			return _audio === _query || _audio.media === _query || _audio.fileName === _query || _audio.id() === _query;
+		});
+	},
+	/**
 	 * Get the owning manager interface for an Audio object.
 	 * @returns {AudioManager}
 	 */
