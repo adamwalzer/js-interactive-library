@@ -390,7 +390,7 @@ var Game = GlobalScope.extend(function () {
 		this.media.rule('.background, .voiceOver', 'shouldPlay', function (_event) {
 			var playing = this.playing() || [];
 			// shouldPlay = false if _event.target is already playing.
-			_event.response(!~playing.indexOf(_event.target));
+			_event.response(!playing || !playing.length || (!~playing.indexOf(_event.target) && !playing.has(_event.target.fileName)));
 		});
 
 		/**
