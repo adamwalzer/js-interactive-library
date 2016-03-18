@@ -651,7 +651,7 @@ PlayableInterface = {
 	/**
 	 * Play an audio object.
 	 */
-	play: function () {
+	play: function (_selector) {
 		var ctx, src, proxyEvent, dest, delay, shouldPlay;
 
 		function handler (_event) {
@@ -680,7 +680,14 @@ PlayableInterface = {
 		if (ctx.state === 'suspended') return false;
 
 		if (this.background) return this.background.play();
-		if (this.length != null) return this[0] && this[0].play();
+		if (this.length != null) {
+			if (_selector) {
+				if (this[_selector]) return this[_selector].play();
+				
+				return this.find(_selector).play();
+			}
+			return this[0] && this[0].play();
+		}
 
 		if (!(src = this.getSource())) return false;
 		proxyEvent = (function (_event) {
