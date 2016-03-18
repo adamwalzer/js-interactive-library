@@ -305,23 +305,17 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.delay = function (_time, _cb) {
-		var screen, time;
+		var time = util.toMillisec(_time);
 
-		screen = this;
-		time = util.toMillisec(_time);
-
-		util.assignRef(this, 'timeoutID', setTimeout(_cb.bind(screen), time));
+		util.assignRef(this, 'timeoutID', setTimeout(_cb.bind(this), time));
 
 		return this;
 	};
 
 	this.repeat = function (_time, _cb) {
-		var screen, time;
+		var time = util.toMillisec(_time);
 
-		screen = this;
-		time = util.toMillisec(_time);
-
-		util.assignRef(this, 'intervalID', setInterval(_cb.bind(screen), time));
+		util.assignRef(this, 'intervalID', setInterval(_cb.bind(this), time));
 
 		return this;
 	};

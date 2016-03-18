@@ -136,8 +136,8 @@ var util = new (function () {
 	this.toMillisec = function (_source) {
 		var tokens, time, units;
 
-		if (!_source) return;
 		if (typeof _source === 'number') return _source;
+		if (!_source) return;
 
 		tokens = _source.split(/\s+/);
 		time = 0;
