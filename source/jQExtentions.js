@@ -332,4 +332,13 @@ import Matrix from 'lib/matrix';
 		return this.attr.apply(this, args);
 	};
 
+	/**
+	 * Invoke a method of each item in the set of matched elements.
+	 */
+	this.exec = function (_method, _args) {
+		return this.map(function () {
+			if (typeof this[_method] === 'function') return this[_method].apply(this, _args);
+		}).toArray();
+	};
+
 }).call($.fn);
