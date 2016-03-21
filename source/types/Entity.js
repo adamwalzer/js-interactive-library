@@ -321,9 +321,7 @@ var Entity = GlobalScope.extend(function () {
 	};
 
 	this.kill = function (_timer) {
-		var id;
-
-		id = _timer === 'repeat' ? this.intervalID : this.timeoutID;
+		var id = _timer === 'repeat' ? this.intervalID : this.timeoutID;
 
 		if (typeof id === 'number') {
 			(_timer === 'repeat' ? clearInterval : clearTimeout)(id);
@@ -331,9 +329,9 @@ var Entity = GlobalScope.extend(function () {
 		}
 
 		else if (id) {
-			id.forEach((function (_id) {
-				this.kill(_id);
-			}).bind(this));
+			id.forEach(function (_id) {
+				(_timer === 'repeat' ? clearInterval : clearTimeout)(_id);
+			});
 
 			_timer === 'repeat' ? this.intervalID = null : this.timeoutID = null;
 		}
