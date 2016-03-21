@@ -321,16 +321,6 @@ $(
 		return audio;
 	},
 	/**
-	 * Query a collection for ownership of an audio object.
-	 * @arg {string|Audio|HTMLAudioElement} The validating reference.
-	 * @returns {boolean}
-	 */
-	function has (_query) {
-		return this.some(function (_audio) {
-			return _audio === _query || _audio.media === _query || _audio.fileName === _query || _audio.id() === _query;
-		});
-	},
-	/**
 	 * Get the owning manager interface for an Audio object.
 	 * @returns {AudioManager}
 	 */
@@ -612,7 +602,25 @@ InspectorInterface = {
 	playing: function (_filterSelector) {
 		var playing = this.find('.PLAYING').filter(_filterSelector);
 		return !!playing.length && playing;
-	}
+	},
+	/**
+	 * Query a collection for ownership of an audio object.
+	 * @arg {string|Audio|HTMLAudioElement} The validating reference.
+	 * @returns {boolean}
+	 */
+	has: function (_query) {
+		if (this.background) {
+			return ['background', 'voiceOver', 'sfx'].some(function (_name) {
+				return this[_name].has(_query);
+			}.bind(this));
+		}
+
+		if (this[_query]) return true;
+
+		return this.some(function (_audio) {
+			return _audio === _query || _audio.media === _query || _audio.fileName === _query || _audio.id() === _query;
+		});
+	},
 };
 
 LegislatorInterface = {
@@ -683,7 +691,7 @@ PlayableInterface = {
 		if (this.length != null) {
 			if (_selector) {
 				if (this[_selector]) return this[_selector].play();
-				
+
 				return this.find(_selector).play();
 			}
 			return this[0] && this[0].play();
