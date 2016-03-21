@@ -2,7 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    devtool: 'eval-source-map',
+    devtool: 'cheap-source-map',
     resolve: {
         root: path.resolve('./source'),
         extensions: ['', '.js']

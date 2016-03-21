@@ -1,50 +1,30 @@
-var gulp = require('gulp');
-var watch = require('gulp-watch');
-var gutil = require("gulp-util");
-var webpack = require("webpack");
-var webpackDevConfig = require("./webpack.config.dev.js");
-var spawn = require('child_process').spawn;
+var gulp = require('gulp'),
+    watch = require('gulp-watch'),
+    gutil = require("gulp-util"),
+    webpack = require("webpack"),
+    webpackDevConfig = require("./webpack.config.dev.js"),
+    webpackPrdConfig = require("./webpack.config.prod.js"),
+    spawn = require('child_process').spawn;
 
-gulp.task("default", ["build-dev"]); 
-
-gulp.task("build-dev", ["webpack:build-dev"]);
-
-// Production build
-gulp.task("build", ["webpack:build"]);
-
-gulp.task("webpack:build", function(callback) {
-    // modify some webpack config options
-    var myConfig = Object.create(webpackProdConfig);
-    myConfig.plugins = myConfig.plugins.concat(
-        new webpack.DefinePlugin({
-            "process.env": {
-                // This has effect on the react lib size
-                "NODE_ENV": JSON.stringify("production")
-            }
-        }),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.UglifyJsPlugin()
-    );
-
-    // run webpack
-    webpack(myConfig, function(err, stats) {
-        if(err) throw new gutil.PluginError("webpack:build", err);
-        gutil.log("[webpack:build]", stats.toString({
-            colors: true
-        }));
-        callback();
-    });
-});
-
-gulp.task("webpack:build-dev", function(callback) {
-    webpack(Object.create(webpackDevConfig)).run(function(err, stats) {
+function build (_config, _cb) {
+    webpack(_config).run(function(err, stats) {
         if(err) throw new gutil.PluginError("webpack:build-dev", err);
         gutil.log("[webpack:build-dev]", stats.toString({
             colors: true
         }));
-        callback();
+        if (_cb) _cb();
     });
-});
+}
+
+// Production build
+gulp.task("webpack:build", function(callback) { build(webpackPrdConfig, callback) });
+gulp.task("build", ["webpack:build"]);
+
+// Development build
+gulp.task("webpack:build-dev", function(callback) { build(webpackDevConfig, callback) });
+gulp.task("build-dev", ["webpack:build-dev"]);
+
+gulp.task("default", ["build-dev"]); 
 
 gulp.task("jsdoc", function () {
     var files, stream
