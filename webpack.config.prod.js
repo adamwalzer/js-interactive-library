@@ -11,20 +11,17 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env': {
-                'BABEL_ENV': JSON.stringify('production'),
-                'NODE_ENV': JSON.stringify('production')
+                'BABEL_ENV': JSON.stringify('production')
             }
         }),
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin({
-            mangle: {},
-            sourceMap: false,
-            compressor: {
+            mangle: false,
+            sourceMap: true,
+            compress: {
+                unused: false,
                 warnings: false
             }
-        }),
-        new webpack.optimize.AggressiveMergingPlugin()
+        })
     ],
     output: {
         path: path.join(__dirname, 'build'),
