@@ -671,8 +671,19 @@ PlayableInterface = {
 		}
 
 		function playSource () {
+			var time;
 			if (this.buffer) {
 				src.start(0);
+
+				if (!src.loop) {
+					time = Math.ceil(this.buffer.duration * 1000) + 500;
+					setTimeout(function () {
+						if (this.activeSource) {
+							console.warn('Native `ended` failed to fire, simulating...');
+							handler({target: src.mediaElement || src, type: 'ended'});
+						}
+					}.bind(this), time);
+				}
 			} else {
 				this.media.play();
 			}
