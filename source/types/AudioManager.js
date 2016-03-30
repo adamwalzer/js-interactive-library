@@ -714,12 +714,12 @@ PlayableInterface = {
 			
 			// proxy event to shadow DOM only when it has an active source.
 			if (this.activeSource) {
-				this.trigger(theEvent);
-				
 				if (_event.type === 'ended') {
 					this.removeState('PLAYING');
 					this.activeSource = null;
 				}
+
+				this.trigger(theEvent);
 			}
 
 			_event.target.removeEventListener(_event.type, handler, false);
