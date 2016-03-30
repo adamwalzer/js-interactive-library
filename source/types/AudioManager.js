@@ -761,11 +761,7 @@ PlayableInterface = {
 		if (!this.activeSource) return false;
 
 		if (this.buffer) {
-			try {
-				this.activeSource.stop();
-			} catch (err) {
-				// console.log(err);
-			}
+			this.activeSource.stop();
 		} else {
 			this.media.pause();
 			this.media.currentTime = 0;
