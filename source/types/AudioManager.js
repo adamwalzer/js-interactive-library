@@ -407,7 +407,7 @@ function Audio ($) {
 	util.mixin(this, EventTargetInterface, PlayableInterface, StateInterface);
 
 $(
-	'type, media, activeSource, buffer, config, fileName, gain, delay',
+	'type, media, activeSource, buffer, config, fileName, gain, delay, delayID',
 
 	/**
 	 * Allocates instance props.
@@ -663,9 +663,8 @@ PlayableInterface = {
 		var ctx, src, proxyEvent, dest, delay, shouldPlay;
 
 		function handler (_event) {
-			if (_event.type === 'ended') {
-				src.disconnect();
-				src = null;
+			if (_event.type === 'ended' && _event.activeSource) {
+				_event.activeSource.disconnect();
 			}
 			proxyEvent(_event);
 		}
@@ -673,20 +672,22 @@ PlayableInterface = {
 		function playSource () {
 			var time;
 			if (this.buffer) {
-				src.start(0);
+				this.activeSource.start(0);
 
-				if (!src.loop) {
+				if (!this.activeSource.loop) {
 					time = Math.ceil(this.buffer.duration * 1000) + 500;
 					setTimeout(function () {
 						if (this.activeSource) {
 							console.warn('Native `ended` failed to fire, simulating...');
-							handler({target: src.mediaElement || src, type: 'ended'});
+							handler({target: this.activeSource, type: 'ended'});
 						}
 					}.bind(this), time);
 				}
 			} else {
 				this.media.play();
 			}
+
+			this.delayID = null;
 		}
 
 		function response (_val) {
@@ -726,8 +727,7 @@ PlayableInterface = {
 		}.bind(this));
 
 		src.connect(this.gain);
-
-		(src.mediaElement || src).addEventListener('ended', handler, false);
+		src.addEventListener('ended', handler, false);
 
 		this.trigger($$.Event('shouldPlay', { target: this, targetSource: src, targetNode: this.media, response: response }));
 
@@ -736,12 +736,12 @@ PlayableInterface = {
 			this.activeSource = src;
 
 			if (delay = this.config('delay')) {
-				setTimeout(playSource.bind(this), util.toMillisec(delay));
+				this.delayID = setTimeout(playSource.bind(this), util.toMillisec(delay));
 			} else {
 				playSource.call(this);
 			}
 
-			handler({target: src.mediaElement || src, type: 'play'});
+			handler({target: src, type: 'play'});
 		}
 
 		return this;
@@ -772,10 +772,15 @@ PlayableInterface = {
 		if (!this.activeSource) return false;
 
 		if (this.buffer) {
-			this.activeSource.stop();
+			if (!this.delayID) this.activeSource.stop();
 		} else {
 			this.media.pause();
 			this.media.currentTime = 0;
+		}
+
+		if (this.delayID) {
+			clearTimeout(this.delayID);
+			this.delayID = null;
 		}
 		
 		this.activeSource = null;
