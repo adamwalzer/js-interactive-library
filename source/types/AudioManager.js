@@ -697,7 +697,14 @@ PlayableInterface = {
 		ctx = pl.game.getAudioContext();
 		shouldPlay = true;
 
-		if (ctx.state === 'suspended') return false;
+		/*
+		 * I'm commenting out this line because having it there
+		 * prevents new audio from starting while the game is out of focus
+		 * which makes certain screens impossible to complete.
+		 * Giving the game the ability to pause will remove the need for
+		 * this line of code, anyway.
+		 */
+		// if (ctx.state === 'suspended') return false;
 
 		if (this.background) return this.background.play();
 		if (this.length != null) {
