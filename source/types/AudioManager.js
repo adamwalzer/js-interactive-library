@@ -656,39 +656,54 @@ StateInterface = {
  * Interface for methods involving audio control for any API level.
  */
 PlayableInterface = {
+	proxyEvent: function(_event) {
+		var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
+		
+		// proxy event to shadow DOM only when it has an active source.
+		if (this.activeSource) {
+			if (_event.type === 'ended') {
+				this.removeState('PLAYING');
+				this.activeSource = null;
+			}
+
+			this.trigger(theEvent);
+		}
+
+		_event.target.removeEventListener(_event.type, this.handler.bind(this), false);
+	},
+	handler: function(_event) {
+		if (_event.type === 'ended' && _event.activeSource) {
+			_event.activeSource.disconnect();
+		}
+		this.proxyEvent.call(this,_event);
+	},
+	playSource: function() {
+		var time;
+		if (this.buffer) {
+			this.activeSource.start(0);
+			this.startTime = new Date();
+
+			if (!this.activeSource.loop) {
+				time = Math.ceil(this.buffer.duration * 1000) + 250;
+				this.timeout = setTimeout(function() {
+					if (this.activeSource) {
+						console.warn('Native `ended` failed to fire, simulating...');
+						this.handler({target: this.activeSource, type: 'ended'});
+					}
+				}.bind(this), time);
+			}
+		} else {
+			this.media.play();
+		}
+
+		this.delayID = null;
+	},
 	/**
 	 * Play an audio object.
 	 */
 	play: function (_selector) {
-		var ctx, src, proxyEvent, dest, delay, shouldPlay;
+		var ctx, src, dest, delay, shouldPlay;
 
-		function handler (_event) {
-			if (_event.type === 'ended' && _event.activeSource) {
-				_event.activeSource.disconnect();
-			}
-			proxyEvent(_event);
-		}
-
-		function playSource () {
-			var time;
-			if (this.buffer) {
-				this.activeSource.start(0);
-
-				if (!this.activeSource.loop) {
-					time = Math.ceil(this.buffer.duration * 1000) + 500;
-					setTimeout(function () {
-						if (this.activeSource) {
-							console.warn('Native `ended` failed to fire, simulating...');
-							handler({target: this.activeSource, type: 'ended'});
-						}
-					}.bind(this), time);
-				}
-			} else {
-				this.media.play();
-			}
-
-			this.delayID = null;
-		}
 
 		function response (_val) {
 			shouldPlay = _val;
@@ -717,24 +732,9 @@ PlayableInterface = {
 		}
 
 		if (!(src = this.getSource())) return false;
-		proxyEvent = (function (_event) {
-			var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
-			
-			// proxy event to shadow DOM only when it has an active source.
-			if (this.activeSource) {
-				if (_event.type === 'ended') {
-					this.removeState('PLAYING');
-					this.activeSource = null;
-				}
-
-				this.trigger(theEvent);
-			}
-
-			_event.target.removeEventListener(_event.type, handler, false);
-		}.bind(this));
 
 		src.connect(this.gain);
-		src.addEventListener('ended', handler, false);
+		src.addEventListener('ended', this.handler.bind(this), false);
 
 		this.trigger($$.Event('shouldPlay', { target: this, targetSource: src, targetNode: this.media, response: response }));
 
@@ -743,12 +743,12 @@ PlayableInterface = {
 			this.activeSource = src;
 
 			if (delay = this.config('delay')) {
-				this.delayID = setTimeout(playSource.bind(this), util.toMillisec(delay));
+				this.delayID = setTimeout(this.playSource.bind(this), util.toMillisec(delay));
 			} else {
-				playSource.call(this);
+				this.playSource.call(this);
 			}
 
-			handler({target: src, type: 'play'});
+			this.handler({target: src, type: 'play'});
 		}
 
 		return this;
@@ -757,6 +757,26 @@ PlayableInterface = {
 	 * Pause an audio object.
 	 */
 	pause: function () {
+		if (this.buffer) {
+			this.pauseTime = new Date();
+			clearTimeout(this.timeout);
+			this.timeout = null;
+		}
+
+		return this;
+	},
+	/**
+	 * Resume an audio object.
+	 */
+	resume: function () {
+		var time;
+		if (this.buffer) {
+			if (!this.activeSource.loop) {
+				time = Math.ceil(this.buffer.duration * 1000 - (this.startTime - this.pauseTime)) + 250;
+				// this.timeout = setTimeout(simEnd.bind(this), time);
+			}
+		}
+
 		return this;
 	},
 	/**
@@ -813,7 +833,9 @@ PlayableInterface = {
 		}
 
 		this.gain.gain.value = _level;
-	}
+	},
+	startTime: 0,
+	pauseTime: 0,
 };
 
 export default type(MediaManager, AudioManager, AudioCollection, Audio);

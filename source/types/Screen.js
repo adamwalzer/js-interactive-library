@@ -42,6 +42,26 @@ var Screen = Entity.extend(function () {
 		return this;
 	};
 
+	this.pause = function() {
+		this.pauseMedia();
+		if(this.hasOwnProperty('entities') && this.entities) {
+			this.entities.forEach(function(entity) {
+				entity.pause();
+			});
+		}
+		return this;
+	};
+
+	this.resume = function() {
+		this.resumeMedia();
+		if(this.hasOwnProperty('entities') && this.entities) {
+			this.entities.forEach(function(entity) {
+				entity.resume();
+			});
+		}
+		return this;
+	};
+
 	this.startAudio = function () {
 		if (!this.audio) return;
 		this.audio.background.play();
@@ -51,6 +71,24 @@ var Screen = Entity.extend(function () {
 	this.stopAudio = function () {
 		if (!this.audio) return;
 		this.audio.voiceOver.stop('@ALL');
+	};
+
+	this.pauseMedia = function() {
+		if(!this.currentMedia) return;
+		for(var media in this.currentMedia) { 
+			if(this.currentMedia.hasOwnProperty(media)) {
+				if(this.currentMedia[media]) this.currentMedia[media].pause();
+			}
+		}
+	};
+
+	this.resumeMedia = function() {
+		if(!this.currentMedia) return;
+		for(var media in this.currentMedia) { 
+			if(this.currentMedia.hasOwnProperty(media)) {
+				if(this.currentMedia[media]) this.currentMedia[media].resume();
+			}
+		}
 	};
 
 	this.index = function () {

@@ -207,6 +207,13 @@ var Game = GlobalScope.extend(function () {
 			platformEventHandler.invoke(_event, this);
 		}));
 
+		window.onfocus = function() {
+			this.resume();
+		}.bind(this);
+		window.onblur = function() {
+			this.pause();
+		}.bind(this);
+
 		return this;
 	};
 
@@ -494,6 +501,24 @@ var Game = GlobalScope.extend(function () {
 		console.log('THATS A FLIP!');
 		game.report.flip(this);
 	};
+
+	this.pause = function() {
+		this.addClass('PAUSED');
+		this.screens.forEach(function(screen) {
+			if(screen.state(screen.STATE.OPEN)) {
+				screen.pause();
+			}
+		});
+		game.getAudioContext().suspend();
+	}
+
+	this.resume = function() {
+		this.removeClass('PAUSED');
+		this.screens.forEach(function(screen) {
+			if(screen.state(screen.STATE.OPEN)) screen.resume();
+		});
+		game.getAudioContext().resume();
+	}
 
 	this.exit = function () {
 		console.log('GOODBYE!');
