@@ -517,7 +517,7 @@ var Game = GlobalScope.extend(function () {
 		this.screens.forEach(function(screen) {
 			if(screen.state(screen.STATE.OPEN)) screen.resume();
 		});
-		game.getAudioContext().resume();
+		if(!this.hasClass('QUIT-SCREEN')) game.getAudioContext().resume();
 	}
 
 	this.exit = function () {
