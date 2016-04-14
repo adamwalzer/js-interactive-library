@@ -453,7 +453,7 @@ $(
 	function getSource () {
 		var ctx, src;
 
-		ctx = pl.game.getAudioContext();
+		ctx = this.audioContext || pl.game.getAudioContext();
 
 		if (ctx) {
 			if (this.buffer) {
@@ -492,6 +492,12 @@ $(
 	 */
 	function toString () {
 		return '[audio#'+this.id()+' '+this.fileName+']';
+	},
+	function setContext (ctx) {
+		this.gain = ctx.createGain();
+		this.gain.disconnect();
+		this.gain.connect(ctx.destination);
+		this.audioContext = ctx;
 	}
 )}
 
@@ -710,7 +716,7 @@ PlayableInterface = {
 			shouldPlay = _val;
 		}
 
-		ctx = pl.game.getAudioContext();
+		ctx = this.audioContext || pl.game.getAudioContext();
 		shouldPlay = true;
 
 		/*
