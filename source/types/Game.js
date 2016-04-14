@@ -502,8 +502,8 @@ var Game = GlobalScope.extend(function () {
 		game.report.flip(this);
 	};
 
-	this.pause = function() {
-		this.addClass('PAUSED');
+	this.pause = function(quitScreen) {
+		if(!quitScreen) this.addClass('PAUSED');
 		this.screens.forEach(function(screen) {
 			if(screen.state(screen.STATE.OPEN)) {
 				screen.pause();
