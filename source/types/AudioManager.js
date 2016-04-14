@@ -677,6 +677,12 @@ PlayableInterface = {
 		}
 		this.proxyEvent.call(this,_event);
 	},
+	simEnd: function() {
+		if (this.activeSource) {
+			console.warn('Native `ended` failed to fire, simulating...');
+			this.handler({target: this.activeSource, type: 'ended'});
+		}
+	},
 	playSource: function() {
 		var time;
 		if (this.buffer) {
@@ -685,12 +691,7 @@ PlayableInterface = {
 
 			if (!this.activeSource.loop) {
 				time = Math.ceil(this.buffer.duration * 1000) + 250;
-				this.timeout = setTimeout(function() {
-					if (this.activeSource) {
-						console.warn('Native `ended` failed to fire, simulating...');
-						this.handler({target: this.activeSource, type: 'ended'});
-					}
-				}.bind(this), time);
+				this.timeout = setTimeout(this.simEnd.bind(this), time);
 			}
 		} else {
 			this.media.play();
@@ -772,8 +773,8 @@ PlayableInterface = {
 		var time;
 		if (this.buffer) {
 			if (!this.activeSource.loop) {
-				time = Math.ceil(this.buffer.duration * 1000 - (this.startTime - this.pauseTime)) + 250;
-				// this.timeout = setTimeout(simEnd.bind(this), time);
+				time = Math.ceil(this.buffer.duration * 1000 - (this.pauseTime - this.startTime)) + 250;
+				this.timeout = setTimeout(this.simEnd.bind(this), time);
 			}
 		}
 
