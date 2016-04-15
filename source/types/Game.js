@@ -207,12 +207,13 @@ var Game = GlobalScope.extend(function () {
 			platformEventHandler.invoke(_event, this);
 		}));
 
-		window.onfocus = function() {
+		window.addEventListener('load', window.focus);
+		window.addEventListener('focus', function() {
 			this.resume();
-		}.bind(this);
-		window.onblur = function() {
+		}.bind(this));
+		window.addEventListener('blur', function() {
 			this.pause();
-		}.bind(this);
+		}.bind(this));
 
 		return this;
 	};
