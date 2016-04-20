@@ -6,12 +6,12 @@ const COLLECTION_DRAGABLES = Collection.create();
 
 var draggableStyleSheet;
 
-function boot () {
+function boot() {
   createHelperStyleSheet();
   attachEvents();
 }
 
-function attachEvents () {
+function attachEvents() {
   var state, E;
 
   E = pl.EVENT;
@@ -27,7 +27,7 @@ function attachEvents () {
 
       if ($draggable.length) {
         scope = $draggable.scope();
-        cursor = resolveEventPoint(_event, 1/scope.game.zoom);
+        cursor = resolveEventPoint(_event, 1 / scope.game.zoom);
         mode = $draggable.pl('draggable');
         game = {
           position: scope.game.absolutePosition(),
@@ -57,37 +57,37 @@ function attachEvents () {
 
         // FireFox has a different scaling implementation than other browsers (transform:scale(); vs. zoom:;)
         // so we need to account for the game transform scale.
-        // 
-        if (game.scale !== 1) point = point.scale(1/game.scale);
+        //
+        if (game.scale !== 1) point = point.scale(1 / game.scale);
 
         draggableStyleSheet.html( provideSource( helperID, createDraggableRule($draggable)));
 
         switch (mode) {
-          case 'clone':
-            state.$helper = $draggable.clone();
-            state.$helper
+        case 'clone':
+          state.$helper = $draggable.clone();
+          state.$helper
               .id(helperID)
               .pl('draggable', null) // helpers are not to be captured as draggable
               .addClass('draggable-helper')
               .appendTo(document.body)
               .absolutePosition(point);
-            break;
+          break;
 
-          case 'pluck':
-            $draggable.addClass('PLUCKED');
+        case 'pluck':
+          $draggable.addClass('PLUCKED');
 
-            state.$helper = $draggable.clone();
-            state.$helper
+          state.$helper = $draggable.clone();
+          state.$helper
               .id(helperID)
               .pl('draggable', null) // helpers are not to be captured as draggable
               .addClass('draggable-helper')
               .appendTo(document.body)
               .absolutePosition(point);
-            break;
+          break;
 
-          default:
-            state.$helper = $draggable;
-            break;
+        default:
+          state.$helper = $draggable;
+          break;
         }
 
         state.$helper.removeClass('DRAG-ENDED')
@@ -106,7 +106,7 @@ function attachEvents () {
       var cursor, $draggable, distance, point, transform, dragMoveEvent;
 
       if (state) {
-        cursor = resolveEventPoint(_event, 1/state.scope.game.zoom);
+        cursor = resolveEventPoint(_event, 1 / state.scope.game.zoom);
         distance = state.start.cursor.distance(cursor);
         point = Point.create();
         transform = null;
@@ -176,12 +176,12 @@ function attachEvents () {
 }
 
 attachEvents.disableTouchScroll = function () {
-  document.addEventListener("touchmove", function (_event) {
+  document.addEventListener('touchmove', function (_event) {
     _event.preventDefault();
   }, false);
 };
 
-function resolveEventPoint (_event, _scale) {
+function resolveEventPoint(_event, _scale) {
   var scale = _scale || 1;
 
   if (_event.originalEvent && _event.originalEvent.changedTouches) {
@@ -189,9 +189,9 @@ function resolveEventPoint (_event, _scale) {
      * For now, interactions should use the last touch if multiple fingers are captured.
      * @todo Maybe invoke action for each touch.
      */
-    _event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
+    _event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length - 1];
   }
-  
+
   return Point.create().set(new function () {
     if (_event.touch) {
       this.x = _event.touch.clientX * scale;
@@ -203,53 +203,53 @@ function resolveEventPoint (_event, _scale) {
   });
 }
 
-function createHelperStyleSheet () {
+function createHelperStyleSheet() {
   draggableStyleSheet = $('<style id="draggable-helper-css" type="text/css"></style>').appendTo(document.body);
 }
 
-function createDraggableRule (_$draggable) {
+function createDraggableRule(_$draggable) {
   var i, style, blacklist, rule, prop;
 
   style = window.getComputedStyle(_$draggable[0]);
   rule = {};
   blacklist = [
-    "zIndex",
-    "opacity",
-    "cursor",
-    "transition",
-    "transitionDelay",
-    "transitionDuration",
-    "transitionProperty",
-    "transitionTimingFunction"
+    'zIndex',
+    'opacity',
+    'cursor',
+    'transition',
+    'transitionDelay',
+    'transitionDuration',
+    'transitionProperty',
+    'transitionTimingFunction'
   ];
 
-  for (i=0; i < style.length; i+=1) {
+  for (i = 0; i < style.length; i += 1) {
     prop = util.transformId(style[i], true);
     if (~blacklist.indexOf(prop)) continue;
-    if (prop.indexOf('Webkit') === 0) prop = prop.slice(0,1).toLowerCase()+prop.slice(1);
+    if (prop.indexOf('Webkit') === 0) prop = prop.slice(0, 1).toLowerCase() + prop.slice(1);
     if (style[prop]) rule[prop] = style[prop];
   }
 
   return rule;
 }
 
-function provideSource (_id, _rule) {
+function provideSource(_id, _rule) {
   var source, prop, value;
 
-  source = '#'+_id+'.draggable-helper {';
+  source = '#' + _id + '.draggable-helper {';
 
   for (prop in _rule) {
     if (!_rule.hasOwnProperty(prop)) continue;
     value = _rule[prop];
-    source += prop.replace(/([A-Z]+)/g, '-$1').toLowerCase()+': '+value+';'
+    source += prop.replace(/([A-Z]+)/g, '-$1').toLowerCase() + ': ' + value + ';';
   }
 
   source += '}';
 
   return source;
-};
+}
 
-function createID () {
+function createID() {
   return 'xy-xyxy-y'.replace(/x|y/g, function (_token) {
     if (_token === 'x') return (Math.floor(Math.random() * 5) + 10).toString(16);
     return Math.floor(Math.random() * Date.now()).toString(16).slice(2);

@@ -1,6 +1,6 @@
 /**
  * Extentions to jQuery used by the library.
- * 
+ *
  * @module
  * @author Micah Rolon <micah@ginasink.com>
  *
@@ -36,9 +36,9 @@ import Matrix from 'lib/matrix';
     this.each(function () {
       var $node, scope;
 
-      $node = $(this)
+      $node = $(this);
       scope = $node.data('pl-scope');
-      
+
       if (!scope) {
         scope = $node.closest('.pl-scope').data('pl-scope');
       }
@@ -63,14 +63,14 @@ import Matrix from 'lib/matrix';
       }
 
       // If document already has the id defined then set as a unique library id.
-      if ($('#'+_set).length) {
+      if ($('#' + _set).length) {
         this.attr('pl-id', _set);
       }
 
       else {
         this.attr('id', _set);
       }
-      
+
       return this;
     }
 
@@ -91,9 +91,9 @@ import Matrix from 'lib/matrix';
 
     tag = this[0].nodeName.toLowerCase();
     id = this.attr('id');
-    classes = this.attr('class') ? '.'+this.attr('class').split(' ').join('.') : '';
-    
-    return tag+(id ? '#'+id : '')+classes;
+    classes = this.attr('class') ? '.' + this.attr('class').split(' ').join('.') : '';
+
+    return tag + (id ? '#' + id : '') + classes;
   };
 
   /**
@@ -116,7 +116,7 @@ import Matrix from 'lib/matrix';
     var size;
 
     if (!arguments.length) {
-      size = Size.create().set(this.width(), this.height());  
+      size = Size.create().set(this.width(), this.height());
     } else {
       size = Size.create(arguments);
       this.css(size);
@@ -171,7 +171,7 @@ import Matrix from 'lib/matrix';
       return offset;
     }
   };
-  
+
   /**
    * Sets a CSS matrix transform on all nodes in the collection. (overloaded)
    * @function external:jQuery#transform
@@ -191,9 +191,9 @@ import Matrix from 'lib/matrix';
    */
   this.transform = function () {
     var t, matrix, is3d;
-    
+
     matrix = new Matrix();
-    
+
     if (!arguments.length) {
       t = this.css('transform');
       is3d = !!~t.indexOf('matrix3d');
@@ -206,8 +206,8 @@ import Matrix from 'lib/matrix';
 
             result = [];
 
-            for (i=0; i < _matrix.length; i+=4) {
-              result = result.concat(_matrix.slice(i, i+2))
+            for (i = 0; i < _matrix.length; i += 4) {
+              result = result.concat(_matrix.slice(i, i + 2));
             }
             return result;
           }(t));
@@ -246,9 +246,9 @@ import Matrix from 'lib/matrix';
    */
   this.transformPosition = function () {
     var matrix, point;
-    
+
     matrix = this.transform();
-    point = Point.create().set(0,0);
+    point = Point.create().set(0, 0);
 
     if (!arguments.length) {
       if (matrix !== 'none') point.set(matrix.e, matrix.f);
@@ -285,9 +285,9 @@ import Matrix from 'lib/matrix';
    */
   this.transformScale = function () {
     var matrix, scale;
-    
+
     matrix = this.transform();
-    scale = Point.create().set(1,1);
+    scale = Point.create().set(1, 1);
 
     if (!arguments.length) {
       if (matrix !== 'none') scale.set(matrix.a, matrix.d);
@@ -321,11 +321,11 @@ import Matrix from 'lib/matrix';
     }
 
 
-    args = ['pl-'+_name];
+    args = ['pl-' + _name];
     if (typeof _value !== 'undefined') args.push(_value);
 
     if (_value === null) {
-      this.removeAttr('pl-'+_name);
+      this.removeAttr('pl-' + _name);
       return this;
     }
 

@@ -22,7 +22,7 @@ var COMPONENTS;
  * @arg {function|object} _implementation - Constructor function or object with the behavior's implementation.
  * @returns {@link module:play~pl.game}
  */
-function component (_name, _implementation) {
+function component(_name, _implementation) {
   if (!component.get(_name)) {
     COMPONENTS.push({
       name: _name,
@@ -43,7 +43,7 @@ COMPONENTS = [];
  * @mixes Events
  */
 (function () {
-  
+
   util.mixin(this, Events);
 
   /**
@@ -55,7 +55,7 @@ COMPONENTS = [];
   this.get = function (_name) {
     var i, record;
 
-    for (i=0; record = COMPONENTS[i]; i+=1) {
+    for (i = 0; record = COMPONENTS[i]; i += 1) {
       if (record.name === _name) return record;
     }
 
@@ -72,14 +72,14 @@ COMPONENTS = [];
    * @returns `this`
    */
   this.load = function (_name, _callback) {
-    var path
+    var path;
 
     if (component.get(_name)) {
       if (_callback) _callback.call(component, _name);
       return null;
     }
 
-    path = pl.game.config('componentDirectory')+_name+'/behavior.js';
+    path = pl.game.config('componentDirectory') + _name + '/behavior.js';
 
     $.getScript(path, function () {
       if (_callback) _callback.call(component, _name);
@@ -119,7 +119,7 @@ COMPONENTS = [];
         index = queue.indexOf(_name);
         queue.splice(index, 1);
 
-        if (!queue.length && _callback) _callback.apply(component, arguments)
+        if (!queue.length && _callback) _callback.apply(component, arguments);
       });
     });
 

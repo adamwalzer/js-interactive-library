@@ -32,7 +32,7 @@ var GAMES, CONFIG, READY_QUEUE;
  * @arg {string} _name - The name of the game matched with a DOM nodes 'id' attribute.
  * @arg {function|object} _implementation - The constructor or object which implements the scope behavior.
  */
-function game (_name, _implementation) {
+function game(_name, _implementation) {
   if (game.isDOMReady) {
     initialize(_name, _implementation);
   }
@@ -42,7 +42,7 @@ function game (_name, _implementation) {
   }
 }
 
-function ready (_eventName) {
+function ready(_eventName) {
   if (READY_QUEUE.length) return false;
   game.trigger(_eventName || 'ready');
 }
@@ -53,7 +53,7 @@ function ready (_eventName) {
  * @arg {string} _name - The name of the game matched with a DOM nodes 'id' attribute.
  * @arg {function|object} _implementation - The constructor or object which implements the scope behavior.
  */
-function register (_name, _implementation) {
+function register(_name, _implementation) {
   if (!~GAMES.indexOf(_name)) {
     GAMES.push({
       id: _name,
@@ -76,19 +76,19 @@ function register (_name, _implementation) {
  * @arg {array} _collection - The collection of game scope records for initialization.
  * @arg {function|object} _implementation - The constructor or object which implements the scope behavior.
  */
-function initialize (_name_collection, _implementation) {
+function initialize(_name_collection, _implementation) {
   switch (typeof _name_collection) {
-    case 'string':
-      SCOPE[_name_collection] = Game
+  case 'string':
+    SCOPE[_name_collection] = Game
         .extend(_implementation)
-        .initialize('#'+_name_collection);
-      break;
+        .initialize('#' + _name_collection);
+    break;
 
-    case 'object':
-      _name_collection.forEach(function (_item, _index) {
-        initialize(_item.id, _item.implementation);
-      });
-      break;
+  case 'object':
+    _name_collection.forEach(function (_item, _index) {
+      initialize(_item.id, _item.implementation);
+    });
+    break;
   }
 }
 
@@ -112,7 +112,7 @@ READY_QUEUE = [];
 
   this.component = component;
   this.manager = manager;
-  
+
   util.mixin(game, Events);
 
   this.on('platform-event', function (_event) {
@@ -158,7 +158,7 @@ READY_QUEUE = [];
     return this;
   };
 
-  
+
   /**
    * Getter/Setter for game level configuration.
    * @function module:play~pl.game.config
@@ -175,9 +175,9 @@ READY_QUEUE = [];
    */
   this.config = function (_key_mixin) {
     switch (typeof _key_mixin) {
-      case 'string': return util.resolvePath(CONFIG, _key_mixin);
-      case 'object':
-        if (_key_mixin) util.mixin(CONFIG, _key_mixin);
+    case 'string': return util.resolvePath(CONFIG, _key_mixin);
+    case 'object':
+      if (_key_mixin) util.mixin(CONFIG, _key_mixin);
     }
 
     return this;
@@ -262,7 +262,7 @@ READY_QUEUE = [];
 
     return function (_name) {
       var tester = detect[_name];
-      if (!tester && console) console.warn('No feature detection for "'+_name+'".');
+      if (!tester && console) console.warn('No feature detection for "' + _name + '".');
       return tester && tester();
     };
   }());
@@ -270,8 +270,8 @@ READY_QUEUE = [];
   this.getAudioContext = function () {
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext);
-      window.onfocus = function() { audioContext.resume(); };
-      window.onblur = function() { audioContext.suspend(); };
+      window.onfocus = function () { audioContext.resume(); };
+      window.onblur = function () { audioContext.suspend(); };
     }
     return audioContext;
   };

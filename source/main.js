@@ -14,7 +14,7 @@ import play from 'play';
 /**
  * Begin running the library
  */
-function run () {
+function run() {
   play.game.run();
 }
 

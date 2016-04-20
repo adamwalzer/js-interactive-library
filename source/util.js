@@ -18,7 +18,7 @@ var util = new (function () {
     target = arguments[0];
     objs = [].slice.call(arguments, 1);
 
-    for (i=0; i < objs.length; i+=1) {
+    for (i = 0; i < objs.length; i += 1) {
       for (member in objs[i]) {
         if (!objs[i].hasOwnProperty(member)) continue;
         target[member] = objs[i][member];
@@ -91,15 +91,15 @@ var util = new (function () {
   this.random = function (_collection_rangeA, _rangeB) {
     var index, val;
 
-    index = Math.floor(Math.random()*_collection_rangeA.length);
+    index = Math.floor(Math.random() * _collection_rangeA.length);
 
     if (arguments.length === 2) {
-      val = Math.round(Math.random()*_rangeB);
+      val = Math.round(Math.random() * _rangeB);
 
       return val < _collection_rangeA ? _collection_rangeA : val;
     }
 
-    if (index === _collection_rangeA.length) index = _collection_rangeA.length-1;
+    if (index === _collection_rangeA.length) index = _collection_rangeA.length - 1;
 
     return _collection_rangeA && _collection_rangeA[index];
   };
@@ -125,7 +125,7 @@ var util = new (function () {
    * @return {boolean}
    */
   this.isSet = function () {
-    return [].every.call(arguments, function (_arg) { return _arg != null });
+    return [].every.call(arguments, function (_arg) { return _arg != null; });
   };
 
   /**
@@ -142,9 +142,9 @@ var util = new (function () {
     tokens = _source.split(/\s+/);
     time = 0;
     units = {
-      d: 24*60*60*1000,
-      h: 60*60*1000,
-      m: 60*1000,
+      d: 24 * 60 * 60 * 1000,
+      h: 60 * 60 * 1000,
+      m: 60 * 1000,
       s: 1000
     };
 
@@ -157,7 +157,7 @@ var util = new (function () {
         value = Number(_token.slice(0, -1));
         time += value * units[unit];
       }
-      
+
       else {
         time += Number(_token);
       }
@@ -191,7 +191,7 @@ var util = new (function () {
    *
    * pl.util.resolvePath(user, 'family.sliblings[2].name');
    * // Matches the `guardians` propery if `guardians[0]` is undefined when `?` is used.
-   * pl.util.resolvePath(user, 'family.guardians[0]?.name'); 
+   * pl.util.resolvePath(user, 'family.guardians[0]?.name');
    */
   this.resolvePath = function (_obj, _path) {
     var path, obj, i, name, index, testArray;
@@ -209,8 +209,8 @@ var util = new (function () {
       if (~index && obj) {
         obj = testArray ? (obj[index] || obj) : obj[index];
       }
-      
-      i+=1;
+
+      i += 1;
 
       if (path.length === i) break;
     }
@@ -236,7 +236,7 @@ var util = new (function () {
           configureable: false
         });
       }
-      
+
       _obj[name].push(_ref);
     }
 
@@ -250,15 +250,15 @@ var util = new (function () {
   /**
    * N0 OPeration.
    */
-  this.noop = function() {};
+  this.noop = function () {};
 
   /**
    * Get the file name out of a simple file path.
-   * @arg {string} _path - The file path. 
+   * @arg {string} _path - The file path.
    * @returns {string} The extracted name.
    */
   this.resolveFileName = function (_path) {
-    return _path.slice(_path.lastIndexOf('/')+1);
+    return _path.slice(_path.lastIndexOf('/') + 1);
   };
 
   /**

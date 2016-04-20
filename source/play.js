@@ -19,7 +19,7 @@ var pl;
 /**
  * Resolves the event type for user interactions.
  */
-function resolveEventType () {
+function resolveEventType() {
   var resolution;
 
   if (game.feature('touch')) {
@@ -57,7 +57,7 @@ pl = {
   Basic, Point, Size, Queue,
   game,
   util,
-  
+
   /**
    * @namespace
    * @prop {string} ACTION - The device normalized `click` event name.

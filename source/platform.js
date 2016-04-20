@@ -7,7 +7,7 @@ import util from 'util';
 
 var platform = new (function () {
 
-  function createEvent (_name, _props) {
+  function createEvent(_name, _props) {
     var eventObject;
 
     eventObject = util.mixin(new Event('game-event', {bubbles:true, cancelable:false}), {
@@ -19,7 +19,7 @@ var platform = new (function () {
           name: _name,
           gameData: _data
         });
-        
+
         pl.game.trigger(platformEvent);
       }
     }, _props);
@@ -46,7 +46,7 @@ var platform = new (function () {
     platformEvent = $.Event('platform-event', {
       name: _event.name
     });
-    
+
     pl.game.trigger(platformEvent);
   });
 
