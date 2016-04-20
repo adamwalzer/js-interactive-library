@@ -1,4 +1,9 @@
 {
+    "globals": {
+        "pl": true,
+        "play": true,
+        "$": true
+    },
     "parser": "babel-eslint",
     "plugins": [
         "react",

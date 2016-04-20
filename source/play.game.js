@@ -35,9 +35,7 @@ var GAMES, CONFIG, READY_QUEUE;
 function game(_name, _implementation) {
   if (game.isDOMReady) {
     initialize(_name, _implementation);
-  }
-
-  else {
+  } else {
     register(_name, _implementation);
   }
 }
@@ -76,16 +74,16 @@ function register(_name, _implementation) {
  * @arg {array} _collection - The collection of game scope records for initialization.
  * @arg {function|object} _implementation - The constructor or object which implements the scope behavior.
  */
-function initialize(_name_collection, _implementation) {
-  switch (typeof _name_collection) {
+function initialize(nameCollection, implementation) {
+  switch (typeof nameCollection) {
   case 'string':
-    SCOPE[_name_collection] = Game
-        .extend(_implementation)
-        .initialize('#' + _name_collection);
+    SCOPE[nameCollection] = Game
+        .extend(implementation)
+        .initialize('#' + nameCollection);
     break;
 
   case 'object':
-    _name_collection.forEach(function (_item, _index) {
+    nameCollection.forEach(function (_item) {
       initialize(_item.id, _item.implementation);
     });
     break;
@@ -173,11 +171,11 @@ READY_QUEUE = [];
    * @arg {object} _mixin - Object to set properties on configuration.
    * @returns {this}
    */
-  this.config = function (_key_mixin) {
-    switch (typeof _key_mixin) {
-    case 'string': return util.resolvePath(CONFIG, _key_mixin);
+  this.config = function (keyMixin) {
+    switch (typeof keyMixin) {
+    case 'string': return util.resolvePath(CONFIG, keyMixin);
     case 'object':
-      if (_key_mixin) util.mixin(CONFIG, _key_mixin);
+      if (keyMixin) util.mixin(CONFIG, keyMixin);
     }
 
     return this;
@@ -212,9 +210,7 @@ READY_QUEUE = [];
   this.scope = function (_mixin) {
     if (typeof _mixin === 'function') {
       _mixin.call(SCOPE);
-    }
-
-    else if (_mixin) {
+    } else if (_mixin) {
       SCOPE.mixin(_mixin);
     }
 
@@ -270,8 +266,12 @@ READY_QUEUE = [];
   this.getAudioContext = function () {
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext);
-      window.onfocus = function () { audioContext.resume(); };
-      window.onblur = function () { audioContext.suspend(); };
+      window.onfocus = function () {
+        audioContext.resume();
+      };
+      window.onblur = function () {
+        audioContext.suspend();
+      };
     }
     return audioContext;
   };

@@ -10,7 +10,7 @@ var platform = new (function () {
   function createEvent(_name, _props) {
     var eventObject;
 
-    eventObject = util.mixin(new Event('game-event', {bubbles:true, cancelable:false}), {
+    eventObject = util.mixin(new Event('game-event', {bubbles: true, cancelable: false}), {
       name: _name,
       respond: function (_data) {
         var platformEvent;

@@ -2,7 +2,7 @@ import util from 'util';
 import Collection from 'types/Collection';
 import { Point } from 'types/Dimensions';
 
-const COLLECTION_DRAGABLES = Collection.create();
+const COLLECTION_DRAGABLES = Collection.create(); //eslint-ignore-line
 
 var draggableStyleSheet;
 
@@ -115,9 +115,7 @@ function attachEvents() {
           transform = state.start.transform.clone();
           transform.translate(distance.width, distance.height);
           point.set(transform.applyToPoint(0, 0));
-        }
-
-        else {
+        } else {
           point = distance.to('point');
         }
 

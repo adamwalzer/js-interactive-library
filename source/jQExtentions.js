@@ -65,9 +65,7 @@ import Matrix from 'lib/matrix';
       // If document already has the id defined then set as a unique library id.
       if ($('#' + _set).length) {
         this.attr('pl-id', _set);
-      }
-
-      else {
+      } else {
         this.attr('id', _set);
       }
 
@@ -157,9 +155,7 @@ import Matrix from 'lib/matrix';
       offset = this.offset();
 
       return Point.create().set(offset.left, offset.top);
-    }
-
-    else {
+    } else {
       offset = Point.create(arguments);
 
       this.css({

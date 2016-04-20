@@ -125,7 +125,9 @@ var util = new (function () {
    * @return {boolean}
    */
   this.isSet = function () {
-    return [].every.call(arguments, function (_arg) { return _arg != null; });
+    return [].every.call(arguments, function (_arg) {
+      return _arg != null;
+    });
   };
 
   /**
@@ -156,9 +158,7 @@ var util = new (function () {
       if (unit) {
         value = Number(_token.slice(0, -1));
         time += value * units[unit];
-      }
-
-      else {
+      } else {
         time += Number(_token);
       }
     });
@@ -172,7 +172,9 @@ var util = new (function () {
    * @return {array}
    */
   this.toArray = function (_collection) {
-    return Array.prototype.map.call(_collection, function (i) { return i; });
+    return Array.prototype.map.call(_collection, function (i) {
+      return i;
+    });
   };
 
   /**
@@ -236,11 +238,8 @@ var util = new (function () {
           configureable: false
         });
       }
-
       _obj[name].push(_ref);
-    }
-
-    else {
+    } else {
       _obj[name] = _ref;
     }
 
