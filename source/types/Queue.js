@@ -10,21 +10,21 @@ import Events from 'types/Events';
 
 var Queue = Collection.extend(function () {
 
-	this.baseType = 'TYPE_QUEUE';
+  this.baseType = 'TYPE_QUEUE';
 
-	this.ready = function (_record) {
-		if (_record != null) this.remove(_record);
+  this.ready = function (_record) {
+    if (_record != null) this.remove(_record);
 
-		if (!this.length) {
-			this.trigger('complete');
-		}
+    if (!this.length) {
+      this.trigger('complete');
+    }
 
-		return this;
-	};
-	
-	util.mixin(this, Events);
+    return this;
+  };
+  
+  util.mixin(this, Events);
 
-	return this;
+  return this;
 
 });
 

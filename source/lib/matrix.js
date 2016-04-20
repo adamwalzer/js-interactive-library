@@ -338,7 +338,7 @@ Matrix.prototype = {
                 f = me.f,
 
                 m = new Matrix(),
-                dt = a * d - b * c;	// determinant(), skip DRY here...
+                dt = a * d - b * c; // determinant(), skip DRY here...
 
             m.a = d / dt;
             m.b = -b / dt;
@@ -447,7 +447,7 @@ Matrix.prototype = {
             scale = {x: 1, y: 1},
             skew = {x: 0, y: 0},
 
-            determ = a * d - b * c;	// determinant(), skip DRY here...
+            determ = a * d - b * c; // determinant(), skip DRY here...
 
         if (useLU) {
             if (a) {
@@ -479,7 +479,7 @@ Matrix.prototype = {
                 skew.y = atan((a * c + b * d) / (s * s));
             }
             else { // a = b = c = d = 0
-                scale = {x: 0, y: 0};		// = invalid matrix
+                scale = {x: 0, y: 0};   // = invalid matrix
             }
         }
 
