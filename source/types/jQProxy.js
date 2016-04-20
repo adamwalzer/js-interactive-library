@@ -2,7 +2,7 @@
 *  jQProxy
 *  @desc Contains all the jQuery methods targeted towards a property which references a jQuery object.
 *  @proto Basic
-*  
+*
 *  NOTE: Custom events may trigger on scopes
 *  that also targets the same elments. Testing needed.
 */
@@ -19,7 +19,7 @@ var jQProxy = Basic.extend(function () {
   *  @return (jQuery|*) Either a jQuery object or whatever the original method returns.
   *  @private
   */
-  function createProxyFunction (_name) {
+  function createProxyFunction(_name) {
     return function () {
       var response;
 
@@ -30,7 +30,7 @@ var jQProxy = Basic.extend(function () {
         }
 
         else {
-          throw new ReferenceError('Unable to invoke '+_name+' because the scope is not initialized.');
+          throw new ReferenceError('Unable to invoke ' + _name + ' because the scope is not initialized.');
         }
         return;
       }
@@ -45,16 +45,16 @@ var jQProxy = Basic.extend(function () {
     };
   }
 
-  function resolveEventHandler (_scope, _method, _args) {
+  function resolveEventHandler(_scope, _method, _args) {
     var i, arg, args;
 
     args = [];
 
     if (~(['on', 'load']).indexOf(_method)) {
-      for (i=0; arg = _args[i]; i+=1) {
+      for (i = 0; arg = _args[i]; i += 1) {
         if (typeof arg === 'function') {
           args.push((function (_handler) {
-            return function () { return _handler.apply(_scope, arguments);};
+            return function () { return _handler.apply(_scope, arguments); };
           }(arg)));
         }
 
@@ -69,7 +69,7 @@ var jQProxy = Basic.extend(function () {
     return _args;
   }
 
-  function registerHandler (_definition) {
+  function registerHandler(_definition) {
     if (!this.hasOwnProperty('eventRegistry')) {
       if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
         this.eventRegistry = this.eventRegistry.slice(0);
@@ -120,7 +120,7 @@ var jQProxy = Basic.extend(function () {
 
     // resolve arguments
     (typeof _isCapure_handler === 'boolean') ?
-      _isCapture = _isCapure_handler:
+      _isCapture = _isCapure_handler :
       _handler = _isCapure_handler;
 
     _handler.cb = _handler.bind(this);
@@ -146,11 +146,11 @@ var jQProxy = Basic.extend(function () {
   };
 
   // Wraps you function 'this' to the scope.
-  // 
+  //
   this.bind = function (_handler) {
     var args;
 
-    args = [].map.call(arguments, function (m) { return m }).slice(1);
+    args = [].map.call(arguments, function (m) { return m; }).slice(1);
 
     return _handler.bind.apply(_handler, [this].concat(args));
   };
@@ -189,7 +189,7 @@ var jQProxy = Basic.extend(function () {
           return false;
         }
       }
-      
+
       return true;
     }
 

@@ -23,7 +23,7 @@ var BasicArray = (function () {
    * @default
    */
   this.baseType = 'TYPE_BASIC_ARRAY';
-  
+
   util.mixin(this, Basic);
 
   return this;

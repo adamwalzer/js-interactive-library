@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * Contains classes for managing different media types.
  * Providing an API for referencing and control.
@@ -30,7 +30,7 @@ var EventTargetInterface,
  *   color: #aaa;
  *   background-color: #eee;
  * }
- * 
+ *
  * .note.important {
  *   color: #b55;
  *   background-color: #fee;
@@ -39,20 +39,20 @@ var EventTargetInterface,
  *
  * @class
  */
-function MediaManager ($, sup) {
+function MediaManager($, sup) {
   /**
    * Duck typed multiple inheritance.
    */
   util.mixin(this, EventTargetInterface, InspectorInterface, LegislatorInterface, StateInterface);
-$(
+  $(
   'video',
 
-  function alloc (_id) {
+  function alloc(_id) {
     sup(this, 'alloc', arguments);
     this.video = Collection.create();
     this.initialize(_id, 'media manager');
   }
-)}
+);}
 
 /**
  * The Scopes entry for its audio management interface. This gives access to collections of Audio objects grouped into three types.
@@ -70,7 +70,7 @@ $(
  * @extends PlayableInterface
  * @extends InspectorInterface
  */
-function AudioManager ($) {
+function AudioManager($) {
   var AUDIO_TYPES, BUFFER_CACHE;
 
   /**
@@ -78,7 +78,7 @@ function AudioManager ($) {
    * @arg {HTMLAudioElement} _node - The loaded audio element.
    * @arg {ArrayBuffer} _buffer - The array buffer loaded from XHR2.
    */
-  function AudioBufferRecord (_node, _buffer) {
+  function AudioBufferRecord(_node, _buffer) {
     this.node = _node;
     this.type = getAudioType(_node);
     this.buffer = _buffer;
@@ -92,7 +92,7 @@ function AudioManager ($) {
    * @arg {HTMLAudioElement} _audio - The audio element.
    * @returns {string} - The type.
    */
-  function getAudioType (_audio) {
+  function getAudioType(_audio) {
     return util.transformId((_audio.className.match(AUDIO_TYPES) || [])[0], true);
   }
   /**
@@ -101,7 +101,7 @@ function AudioManager ($) {
    * @arg {HTMLAudioElement} _audio - The audio element.
    * @returns {Promise}
    */
-  function loadArrayBuffer (_audio) {
+  function loadArrayBuffer(_audio) {
     var xhr, manager, fileName;
 
     xhr = new (XMLHttpRequest || util.noop);
@@ -114,7 +114,7 @@ function AudioManager ($) {
       var cache = BUFFER_CACHE[fileName];
 
       // Decodes ArrayBuffer into an AudioBuffer.
-      function onLoad () {
+      function onLoad() {
         var ctx, promise;
 
         if (xhr.status >= 200 && xhr.status < 300) {
@@ -128,9 +128,9 @@ function AudioManager ($) {
                   // Cache the AudioBuffer to resolve duplicates.
                   BUFFER_CACHE[fileName] = _buffer;
                 }, function () {
-                  rejectDecoding("Failed to decode ArrayBuffer for "+fileName+".");
-                }); 
-              } catch (e) {
+                  rejectDecoding("Failed to decode ArrayBuffer for " + fileName+'.');
+                });
+              } catch(e) {
                 rejectDecoding(e);
               }
             });
@@ -139,7 +139,7 @@ function AudioManager ($) {
 
             return promise;
           }
-          
+
         } else {
           reject(xhr.statusText);
         }
@@ -148,7 +148,7 @@ function AudioManager ($) {
         xhr = null;
       }
 
-      function onError () {
+      function onError() {
         reject(xhr.statusText);
         xhr.removeEventListener('error', onError);
         xhr = null;
@@ -177,17 +177,17 @@ function AudioManager ($) {
   util.mixin(this, EventTargetInterface, PlayableInterface, InspectorInterface, LegislatorInterface, StateInterface);
 
 // A little ugg but define instance members.
-$(
+  $(
   // Declare properties.
   'background, voiceOver, sfx, scope',
 
   /**
    * Define instance properties.
    */
-  function alloc (_id) {
+  function alloc(_id) {
     this.initialize(_id, 'audio manager');
 
-    ['background','voiceOver','sfx'].forEach(function (_type) {
+    ['background', 'voiceOver', 'sfx'].forEach(function (_type) {
       var collection = this[_type] = AudioCollection.create(_type);
       this.addShadow(collection);
     }.bind(this));
@@ -199,14 +199,14 @@ $(
    * @returns {Promise}
    * @todo Support loading from node source or a string argument. - Micah:2/19/16
    */
-  function load (_audio) {
+  function load(_audio) {
     var manager, type;
 
     manager = this;
     type = getAudioType(_audio);
 
-    if (!type) return Promise.reject("Audio is missing a type. Please classify as 'background', 'voiceOver' or 'sfx'.");
-    // if (~['sfx', 'voiceOver'].indexOf(type)) 
+    if (!type) return Promise.reject('Audio is missing a type. Please classify as \'background\', \'voiceOver\' or \'sfx\'.');
+    // if (~['sfx', 'voiceOver'].indexOf(type))
     return loadArrayBuffer.call(this, _audio);
 
     // return new Promise(function (resolve, reject) {
@@ -221,12 +221,12 @@ $(
    * @arg {HTMLAudioElement} _audio - The HTML Audio element which to preload and add to the game audio context.
    * @returns {Promise}
    */
-  function watch (_audio) {
+  function watch(_audio) {
     var promise;
 
-    if (_audio.nodeName !== 'AUDIO') return Promise.reject('Invalid type for audio node. '+(typeof _audio)+' ['+_audio.protoype.constructor.name+' '+_audio.nodeName+'].');
+    if (_audio.nodeName !== 'AUDIO') return Promise.reject('Invalid type for audio node. ' + (typeof _audio) + ' [' + _audio.protoype.constructor.name + ' ' + _audio.nodeName + '].');
 
-    function reject (_error) {
+    function reject(_error) {
       var scope = $$(_audio).scope();
       console.warn(scope.id(), '-', _error);
     }
@@ -241,7 +241,7 @@ $(
    * @arg {Audio|HTMLAudioElement|AudioBufferRecord|Array} _audio - The HTML Audio element or `AudioBufferRecord` for addition to the collection.
    * @returns {Promise}
    */
-  function collect (_audio) {
+  function collect(_audio) {
     var type;
 
     if (!_audio) return false;
@@ -260,7 +260,7 @@ $(
    * Provides a collection of `AudioCollection` objects.
    * @returns {array}
    */
-  function collections () {
+  function collections() {
     var result, types;
 
     result = [];
@@ -275,10 +275,10 @@ $(
   /**
    * Proveds a string representation of the object type.
    */
-  function toString () {
-    return '[object '+(this.constructor.name || 'Object')+']';
+  function toString() {
+    return '[object ' + (this.constructor.name || 'Object') + ']';
   }
-)}
+);}
 
 /**
  * An itterable with a collection of Audio objects. This interface also exposes methods for working with it members.
@@ -288,16 +288,16 @@ $(
  * @classdesc An itterable with a collection of Audio objects. This interface also exposes methods for working with it members.
  * @extends Collection
  */
-function AudioCollection ($, sup) {
+function AudioCollection($, sup) {
   /**
    * Duck typed multiple inheritance.
    */
   util.mixin(this, EventTargetInterface, PlayableInterface, InspectorInterface, StateInterface);
 
-$(
+  $(
   'type',
 
-  function alloc (_type) {
+  function alloc(_type) {
     if (_type) this.type = _type;
     this.initialize(_type, 'collection');
   },
@@ -307,11 +307,11 @@ $(
    * @override
    * @returns {Audio}
    */
-  function add (_audio) {
+  function add(_audio) {
     var audio;
 
     if (!_audio) return false;
-    
+
     audio = (_audio instanceof Audio) ? _audio : Audio.create(_audio, this.type);
 
     sup(this, 'add')(audio);
@@ -324,16 +324,16 @@ $(
    * Get the owning manager interface for an Audio object.
    * @returns {AudioManager}
    */
-  function manager () {
+  function manager() {
     return this.$el.closest('#man').data('context');
   },
   /**
    * Proveds a string representation of the object type.
    */
-  function toString () {
-    return '[object '+(this.constructor.name || 'Object')+']';
+  function toString() {
+    return '[object ' + (this.constructor.name || 'Object') + ']';
   }
-)}
+);}
 /**
  * Extend AudioCollection with Collection.
  */
@@ -358,11 +358,11 @@ AudioCollection.prototype = Object.create(Collection, {
  * @extends LegislatorInterface
  * @extends StateInterface
  */
-function MediaCollection ($, sup) {$(
+function MediaCollection($, sup) { $(
   /**
    * @override
    */
-  function add (_media) {
+  function add(_media) {
     this.addShadow(_media);
     if (_media.id()) util.assignRef(this, _media.id(), _media);
     return Collection.add.call(this, _media);
@@ -370,16 +370,16 @@ function MediaCollection ($, sup) {$(
   /**
    * @override
    */
-  function addShadow (_media) {
+  function addShadow(_media) {
     var $clone;
-    
+
     $clone = _media.$el.clone();
     $clone.data(_media.$el.data());
 
     this.$el.append($clone);
     return this;
   }
-)}
+);}
 
 /**
  * <span class="note important">NOTE: This constructor is used to construct its protoype which we instatiate with `AudioCollection.create()`.</span>
@@ -387,9 +387,9 @@ function MediaCollection ($, sup) {$(
  * @arg {function} $ - Passed by `type()`, gives you a pritier interface for defining the instance members.
  * @classdesc An itterable with a collection of Audio objects. This interface also exposes methods for working with it members.
  */
-function Audio ($) {
+function Audio($) {
 
-  function accessConfig (_augment, _val) {
+  function accessConfig(_augment, _val) {
     if (_val) {
       return this[_augment] = _val;
     } else if (typeof _augment === 'string') {
@@ -406,7 +406,7 @@ function Audio ($) {
    */
   util.mixin(this, EventTargetInterface, PlayableInterface, StateInterface);
 
-$(
+  $(
   'type, media, activeSource, buffer, config, fileName, gain, delay, delayID',
 
   /**
@@ -414,7 +414,7 @@ $(
    * @arg {HTMLAudioElement|AudioBufferRecord} _audio - The object being wrapped.
    * @arg {string} _type - The collection type.
    */
-  function alloc (_audio, _type) {
+  function alloc(_audio, _type) {
     var $audio, config, ctx, readyEvent, id;
 
     $audio = $$(_audio.node || _audio);
@@ -440,7 +440,7 @@ $(
       writeable: false
     });
 
-    this.initialize(id, 'audio '+this.type);
+    this.initialize(id, 'audio ' + this.type);
 
     $$(this.media).trigger(readyEvent);
   },
@@ -450,7 +450,7 @@ $(
    *  - `MediaElementSouceNode` for audio elements.
    *  - `AudioBufferSourceNode` for an ArrayBuffer.
    */
-  function getSource () {
+  function getSource() {
     var ctx, src;
 
     ctx = pl.game.getAudioContext();
@@ -477,23 +477,23 @@ $(
    * Get the owning collection interface for an Audio object.
    * @returns {AudioCollection}
    */
-  function collection () {
+  function collection() {
     return this.$el.closest('.collection').data('context');
   },
   /**
    * Get the owning manager interface for an Audio object.
    * @returns {AudioManager}
    */
-  function manager () {
+  function manager() {
     return this.$el.closest('#man').data('context');
   },
   /**
    * Proveds a string representation of the object type.
    */
-  function toString () {
-    return '[audio#'+this.id()+' '+this.fileName+']';
+  function toString() {
+    return '[audio#' + this.id() + ' ' + this.fileName + ']';
   }
-)}
+);}
 
 /**
  * A virtual DOM to handle navigation and propagation of events through the API interfaces.
@@ -512,7 +512,7 @@ EventTargetInterface = {
    */
   initialize: function (_id, _class) {
     Object.defineProperty(this, '$el', {
-      value: $$('<div '+(_id ? 'id="'+_id+'"' : '')+' '+(_class ? 'class="'+_class+'"' : '')+'>'),
+      value: $$('<div ' + (_id ? 'id="' + _id + '"' : '') + ' ' + (_class ? 'class="' + _class + '"' : '') + '>'),
       writeable: false,
       configureable: false,
       enumerable: false
@@ -557,13 +557,13 @@ EventTargetInterface = {
     return collection;
   },
   /**
-   * 
+   *
    */
   filter: function (_selector) {
     var collection;
 
     if (!_selector) return this;
-    
+
     collection = MediaCollection.create();
 
     this.$el.children().each(function () {
@@ -662,14 +662,14 @@ PlayableInterface = {
   play: function (_selector) {
     var ctx, src, proxyEvent, dest, delay, shouldPlay;
 
-    function handler (_event) {
+    function handler(_event) {
       if (_event.type === 'ended' && _event.activeSource) {
         _event.activeSource.disconnect();
       }
       proxyEvent(_event);
     }
 
-    function playSource () {
+    function playSource() {
       var time;
       if (this.buffer) {
         this.activeSource.start(0);
@@ -690,7 +690,7 @@ PlayableInterface = {
       this.delayID = null;
     }
 
-    function response (_val) {
+    function response(_val) {
       shouldPlay = _val;
     }
 
@@ -719,7 +719,7 @@ PlayableInterface = {
     if (!(src = this.getSource())) return false;
     proxyEvent = (function (_event) {
       var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
-      
+
       // proxy event to shadow DOM only when it has an active source.
       if (this.activeSource) {
         if (_event.type === 'ended') {
@@ -789,7 +789,7 @@ PlayableInterface = {
       clearTimeout(this.delayID);
       this.delayID = null;
     }
-    
+
     this.activeSource = null;
 
     this.removeState('PLAYING');

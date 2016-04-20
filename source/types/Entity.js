@@ -8,8 +8,8 @@ import GlobalScope from 'types/GlobalScope';
 import Collection from 'types/Collection';
 import { Point, Size } from 'types/Dimensions';
 import Queue from 'types/Queue';
-  
-function invokeResponsibilities (_scope, _event) {
+
+function invokeResponsibilities(_scope, _event) {
   if (_scope && _scope.responsibilities && _scope.isMemberSafe('responsibilities')) {
     _scope.responsibilities.forEach(function (_record) {
       if (_record.name === _event.name) {
@@ -48,7 +48,7 @@ function invokeResponsibilities (_scope, _event) {
  *   color: #aaa;
  *   background-color: #eee;
  * }
- * 
+ *
  * .note.important {
  *   color: #b55;
  *   background-color: #fee;
@@ -62,41 +62,41 @@ function invokeResponsibilities (_scope, _event) {
  */
 var Entity = GlobalScope.extend(function () {
 
-  function resolveTarget (_target) {
-    
+  function resolveTarget(_target) {
+
     switch (typeof _target) {
-      case 'string': return this.findOwn(_target);
-      case 'object':
-        if (_target.jquery) return _target;
-        if (Entity.isPrototypeOf(_target)) return _target;
-        if (_target.nodeType === document.ELEMENT_NODE) return $(_target);
+    case 'string': return this.findOwn(_target);
+    case 'object':
+      if (_target.jquery) return _target;
+      if (Entity.isPrototypeOf(_target)) return _target;
+      if (_target.nodeType === document.ELEMENT_NODE) return $(_target);
     }
 
     return this;
   }
 
-  function ResponsibilityRecord (_name, _ability) {
+  function ResponsibilityRecord(_name, _ability) {
     this.name = _name;
     this.ability = _ability;
   }
 
-  function dragGreeter (_event) {
+  function dragGreeter(_event) {
     switch (_event.type) {
-      case 'drag-start':
-        this.grab(_event.state);
-        break;
+    case 'drag-start':
+      this.grab(_event.state);
+      break;
 
-      case 'drag-move':
-        this.dragging(_event.state);
-        break;
+    case 'drag-move':
+      this.dragging(_event.state);
+      break;
 
-      case 'drag-end':
-        this.release(_event.state);
-        break;
+    case 'drag-end':
+      this.release(_event.state);
+      break;
     }
   }
 
-  function attachDragEvents () {
+  function attachDragEvents() {
     if (this.draggables && this.isMemberSafe('draggables') && this.draggables.length) {
       this.on('drag-start drag-move drag-end', dragGreeter);
     }
@@ -156,13 +156,13 @@ var Entity = GlobalScope.extend(function () {
 
     bg: function (_node, _name, _value) {
       var img = new Image();
-      
+
       if (!this.hasOwnProperty('bgImageCollection')) this.bgImageCollection = [];
 
       if (this.isMemberSafe('bgImageCollection')) {
         img.src = _value;
         this.bgImageCollection.push(img);
-        $(_node).css('background-image', 'url('+_value+')');
+        $(_node).css('background-image', 'url(' + _value + ')');
       }
     }
   });
@@ -194,7 +194,7 @@ var Entity = GlobalScope.extend(function () {
     ids = [];
 
     this.findOwn('.pl-scope').each(function (_index, _node) {
-      var $node = $(_node); 
+      var $node = $(_node);
       ids.push($node.id() || $node.address());
     });
 
@@ -250,7 +250,7 @@ var Entity = GlobalScope.extend(function () {
       }
 
       if (result !== false) {
-        this.trigger($.Event('behavior', behaviorEvent)); 
+        this.trigger($.Event('behavior', behaviorEvent));
       }
 
       return this;
@@ -275,10 +275,10 @@ var Entity = GlobalScope.extend(function () {
 
     if (arguments.length === 1) {
       switch (typeof arguments[0]) {
-        case 'string': name = arguments[0]; break;
+      case 'string': name = arguments[0]; break;
 
-        case 'function':
-        case 'object': ability = arguments[0]; break;
+      case 'function':
+      case 'object': ability = arguments[0]; break;
       }
     }
 
@@ -288,17 +288,17 @@ var Entity = GlobalScope.extend(function () {
     }
 
     switch (typeof ability) {
-      case 'object':
-        for (name in ability) {
+    case 'object':
+      for (name in ability) {
           if (!ability.hasOwnProperty(name)) continue;
 
           this.respond(name, ability[name]);
         }
-        break;
+      break;
 
-      case 'function':
-        this.responsibilities.add(new ResponsibilityRecord(name, ability));
-        break;
+    case 'function':
+      this.responsibilities.add(new ResponsibilityRecord(name, ability));
+      break;
     }
 
     return this;
@@ -351,14 +351,14 @@ var Entity = GlobalScope.extend(function () {
         var i, handler;
 
         if (rate) {
-          if (_time - lastTime >= (1000/rate)) {
-            for (i=0; handler = this.frameHandlers[i]; i+=1) {
-              handler.call(this, _time, Math.round(1000/(_time - lastTime)), rate);
+          if (_time - lastTime >= (1000 / rate)) {
+            for (i = 0; handler = this.frameHandlers[i]; i += 1) {
+              handler.call(this, _time, Math.round(1000 / (_time - lastTime)), rate);
             }
 
             if (frames === rate) frames = 0;
 
-            frames+=1;
+            frames += 1;
             lastTime = _time;
           }
         }
@@ -424,7 +424,7 @@ var Entity = GlobalScope.extend(function () {
       var target, uiStateEvent, oppsPerformed;
 
       target = resolveTarget.call(this, _target);
-      uiStateEvent = $.Event('ui-'+setter, {
+      uiStateEvent = $.Event('ui-' + setter, {
         target: target.jquery ? target[0] : target,
         targetScope: this
       });
@@ -450,7 +450,7 @@ var Entity = GlobalScope.extend(function () {
         this.trigger(uiStateEvent);
         return target;
       }
-      
+
       return false;
     };
 
@@ -466,7 +466,7 @@ var Entity = GlobalScope.extend(function () {
       };
 
       this[getter] = function () {
-        return this.findOwn('.'+this.STATE[STATE]);
+        return this.findOwn('.' + this.STATE[STATE]);
       };
     }
 
@@ -699,7 +699,7 @@ var Entity = GlobalScope.extend(function () {
   this.state('select selected', '+SELECTED', {
     willSet: function (_target) {
       var target, $parent;
-      
+
       target = resolveTarget.call(this, _target);
       $parent = target.parent();
 
@@ -835,12 +835,12 @@ var Entity = GlobalScope.extend(function () {
   this.state('translate translated', '+TRANSLATED', {
     willSet: function (_target_point, _point) {
       var point, target;
-      
+
       target = resolveTarget.call(this, _target_point);
       point = (!~[_target_point.x, _target_point.y].indexOf(undefined)) ? _target_point : _point;
 
       if (point) {
-        target.css('transform', 'translateX('+point.x+'px) translateY('+point.y+'px)');
+        target.css('transform', 'translateX(' + point.x + 'px) translateY(' + point.y + 'px)');
       }
     }
   });

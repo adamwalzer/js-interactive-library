@@ -21,7 +21,7 @@ var Queue = Collection.extend(function () {
 
     return this;
   };
-  
+
   util.mixin(this, Events);
 
   return this;

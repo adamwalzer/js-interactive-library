@@ -17,7 +17,7 @@ var Game = GlobalScope.extend(function () {
   /**
    * Scales the game view to fill the browser window.
    */
-  function scaleGame () {
+  function scaleGame() {
     var vpSize, gameDimensions, width, height, zoom;
 
     vpSize = this.viewport.size();
@@ -31,14 +31,14 @@ var Game = GlobalScope.extend(function () {
     }
 
     util.mixin(this.node().style, {
-      width: width+'px',
+      width: width + 'px',
       zoom: zoom
     });
 
     if (!this.css('zoom')) {
       this.css({
-        transform: 'scale('+zoom+')',
-        transformOrigin: (zoom < 1 ? '0px' : '50%')+' 0px 0px',
+        transform: 'scale(' + zoom + ')',
+        transformOrigin: (zoom < 1 ? '0px' : '50%') + ' 0px 0px',
         height: this.viewport.height / zoom
       });
     }
@@ -46,17 +46,17 @@ var Game = GlobalScope.extend(function () {
     this.zoom = zoom;
   }
 
-  function demoMode (_set) {
+  function demoMode(_set) {
     this.demoMode = _set != null ? _set : !this.demoMode;
     this[this.demoMode ? 'addClass' : 'removeClass']('DEMO');
 
-    console.info(this.id(), 'is now '+(this.demoMode ? 'in' : 'out of')+' Demo Mode.');
+    console.info(this.id(), 'is now ' + (this.demoMode ? 'in' : 'out of') + ' Demo Mode.');
   }
 
-  function collectVideos () {
+  function collectVideos() {
     this.find('video').each(function (_index, _node) {
       this.media.video.add(_node);
-      
+
       _node.onplay = function () {
         var playing = this.media.playing('.background, .voiceOver');
         if (playing) playing.stop('@ALL');
@@ -67,7 +67,7 @@ var Game = GlobalScope.extend(function () {
 
   screenPrototype = Screen;
   platformEventHandler = new (function () {
-    
+
     this.invoke = function (_event, _ctx) {
       if (typeof this[_event.name] === 'function') {
         this[_event.name].call(_ctx, _event);
@@ -107,7 +107,7 @@ var Game = GlobalScope.extend(function () {
     this.LANDSCAPE = 'landscape';
     this.PROTRAIT = 'protrait';
     this.SQUAREISH = 'squareish';
-    
+
     this.size = function () {
       return Size.create().set(window.innerWidth, window.innerHeight);
     };
@@ -134,9 +134,9 @@ var Game = GlobalScope.extend(function () {
           var ratio = this.size().ratio();
 
           switch (true) {
-            case ratio > 0.9 && ratio < 1.1: return 'squareish';
-            case ratio > 1.1: return 'landscape';
-            case ratio < 0.9: return 'protrait';
+          case ratio > 0.9 && ratio < 1.1: return 'squareish';
+          case ratio > 1.1: return 'landscape';
+          case ratio < 0.9: return 'protrait';
           }
         }
       }
@@ -154,7 +154,7 @@ var Game = GlobalScope.extend(function () {
 
     $html.addClass(this.orientation);
 
-  });;
+  });
 
   this.willInit = function () {
     this.addClass('pl-game');
@@ -304,7 +304,7 @@ var Game = GlobalScope.extend(function () {
               chords.push(sequence.join('+'));
             }
           }
-          
+
           if (~index) sequence.splice(index, 1);
           if (!sequence.length) chords = [];
         }
@@ -330,7 +330,7 @@ var Game = GlobalScope.extend(function () {
       debugger;
       screenSelector = pl.game.config('screenSelector');
       prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
-      selector = (typeof _id === 'number') ? screenSelector+':nth-child('+(_id+1)+')' : '#'+_id;
+      selector = (typeof _id === 'number') ? screenSelector + ':nth-child(' + (_id + 1) + ')' : '#' + _id;
       instance = prototype.extend(_implementation).initialize(this.find(selector));
 
       instance.screen = instance;
@@ -356,7 +356,7 @@ var Game = GlobalScope.extend(function () {
     screenSelector = pl.game.config('screenSelector');
     prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
     collection = [];
-    
+
     this.findOwn(screenSelector).each(this.bind(function (_index, _node) {
       var $node, screen, record, key, id, index, component;
 
@@ -370,7 +370,7 @@ var Game = GlobalScope.extend(function () {
       screen.game = this;
 
       if ($node.attr('pl-skip') == null) collection.push(screen);
-      
+
       if (key === 'name' || component) {
         util.assignRef(this, util.transformId((key === 'name' && id) || component, true), screen);
       }
@@ -394,37 +394,37 @@ var Game = GlobalScope.extend(function () {
     });
 
     /**
-     * 
+     *
      */
     this.media.rule('.voiceOver', function (_event) {
       var audio, playing;
 
       audio = _event.target;
-      playing = audio && this.playing('.audio:not(#'+audio.id()+')');
+      playing = audio && this.playing('.audio:not(#' + audio.id() + ')');
 
       switch (_event.type) {
-        case 'play':
-          if (playing) {
+      case 'play':
+        if (playing) {
             playing.filter('.voiceOver').stop('@ALL');
             playing.filter('.background').volume(game.config('bgVolume.drop') || 0.2);
           }
-          break;
+        break;
 
-        case 'pause':
-        case 'stopped':
-        case 'ended':
-          if (playing) playing.filter('.background').volume(game.config('bgVolume.max') || 1);
-          break;
+      case 'pause':
+      case 'stopped':
+      case 'ended':
+        if (playing) playing.filter('.background').volume(game.config('bgVolume.max') || 1);
+        break;
       }
     });
 
     this.media.rule('.background', 'play', function (_event) {
-      var playing = this.playing('.background:not(#'+_event.target.id()+')');
+      var playing = this.playing('.background:not(#' + _event.target.id() + ')');
       if (playing) playing.stop('@ALL');
     });
 
     if (~pl.EVENT.ACTION.indexOf('touch')) {
-      this.on(pl.EVENT.ACTION, function beginAudio (_event) {
+      this.on(pl.EVENT.ACTION, function beginAudio(_event) {
         var ctx, screen;
 
         ctx = game.getAudioContext();
@@ -449,7 +449,7 @@ var Game = GlobalScope.extend(function () {
   };
 
   this.currentScreen = function () {
-    return this.findOwn(pl.game.config('screenSelector')+'.OPEN').not('#quit').scope();
+    return this.findOwn(pl.game.config('screenSelector') + '.OPEN').not('#quit').scope();
   };
 
   this.flip = function () {
@@ -484,7 +484,7 @@ var Game = GlobalScope.extend(function () {
     var current;
 
     current = this.currentScreen();
-    
+
     if (current) current.next();
   });
 

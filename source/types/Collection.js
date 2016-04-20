@@ -23,12 +23,12 @@ var Collection = BasicArray.extend(function () {
    * @arg {boolean} _shouldCollect - <span style="color: blue; font-weight: bold;">`true`</span>: collect all matching elements.<br>
    * <span style="color: blue; font-weight: bold;">`false`</span>: return first result.
    */
-  function getRecord (_member, _key, _shouldCollect) {
+  function getRecord(_member, _key, _shouldCollect) {
     var i, record, member, result;
 
     result = [];
 
-    for (i=0; record = this[i]; i+=1) {
+    for (i = 0; record = this[i]; i += 1) {
       if (_key !== undefined) {
         if (record[_key] === _member) {
           if (_shouldCollect) {

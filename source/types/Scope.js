@@ -31,7 +31,7 @@ import { AudioManager } from 'types/AudioManager';
  * @arg {function|object} _implementation - Constructor function or object with the entity behavior.
  * @returns {module:types/Scope~Scope}
  */
-function createEntity (_$node, _implementation) {
+function createEntity(_$node, _implementation) {
   var component, prototype, componentRecord, instance;
 
   component = _$node.attr('pl-component');
@@ -50,7 +50,7 @@ function createEntity (_$node, _implementation) {
     }
 
     else {
-      throw new Error('No implementation record for the '+component+'component.');
+      throw new Error('No implementation record for the ' + component + 'component.');
     }
   }
 
@@ -76,7 +76,7 @@ var Scope = jQProxy.extend(function () {
    */
   var Actionables;
 
-  function attachActionHandler () {
+  function attachActionHandler() {
     this.on(pl.EVENT.ACTION, function (_event) {
       var target, record;
 
@@ -87,9 +87,9 @@ var Scope = jQProxy.extend(function () {
          * For now, interactions should use the last touch if multiple fingers are captured.
          * @todo Maybe invoke action for each touch.
          */
-        _event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length-1];
+        _event.touch = _event.originalEvent.changedTouches[_event.originalEvent.changedTouches.length - 1];
       }
-      
+
       _event.cursor = Point.create().set(new function () {
         if (_event.touch) {
           this.x = _event.touch.clientX;
@@ -113,11 +113,11 @@ var Scope = jQProxy.extend(function () {
     });
   }
 
-  function getRecordBy (_key, _member, _collection) {
+  function getRecordBy(_key, _member, _collection) {
     var i, record;
 
     if (_collection) {
-      for (i=0; record = _collection[i]; i+=1) {
+      for (i = 0; record = _collection[i]; i += 1) {
         if (record[_key] === _member) return record;
       }
     }
@@ -125,14 +125,14 @@ var Scope = jQProxy.extend(function () {
     return null;
   }
 
-  function removeRecord (_record, _collection) {
+  function removeRecord(_record, _collection) {
     var index;
 
     index = _collection.indexOf(_record);
     if (~index) _collection.splice(index, 1);
   }
 
-  function captureDropables (_scope) {
+  function captureDropables(_scope) {
     var collection;
 
     collection = [];
@@ -149,7 +149,7 @@ var Scope = jQProxy.extend(function () {
     return collection;
   }
 
-  function pluckAndDrop (_dropables, _template) {
+  function pluckAndDrop(_dropables, _template) {
     $(_template).find('[pl-drop]').each(function () {
       var $node, name, dropable;
 
@@ -164,11 +164,11 @@ var Scope = jQProxy.extend(function () {
   }
 
   // Protected
-  function loadComponentAssets (_name, _callback) {
+  function loadComponentAssets(_name, _callback) {
     var scope, path, totalRequests, transcludeMode, dropables;
 
-    function ready () {
-      ready.status +=1;
+    function ready() {
+      ready.status += 1;
 
       if (ready.status === totalRequests) {
         if (_callback) {
@@ -179,38 +179,38 @@ var Scope = jQProxy.extend(function () {
 
     totalRequests = 0;
     scope = this;
-    path = game.config('componentDirectory')+_name+'/';
+    path = game.config('componentDirectory') + _name + '/';
     dropables = captureDropables(this);
     transcludeMode = dropables.length ? this.TRANSCLUDE_PLUCK : this.properties.transclude;
     ready.status = 0;
 
     if (!this.children().length || transcludeMode) {
-      totalRequests+=1;
-      $('<div>').load(path+'template.html', function () {
+      totalRequests += 1;
+      $('<div>').load(path + 'template.html', function () {
         var memory;
 
         memory = [];
 
         switch (transcludeMode) {
-          case scope.TRANSCLUDE_APPEND:
-            scope.append(this.children);
-            break;
+        case scope.TRANSCLUDE_APPEND:
+          scope.append(this.children);
+          break;
 
-          case scope.TRANSCLUDE_PREPEND:
-            scope.prepend(this.children);
-            break;
-            
-          case scope.TRANSCLUDE_PLUCK:
-            pluckAndDrop(dropables, this);
-            scope.empty().append(this.children);
-            break;
+        case scope.TRANSCLUDE_PREPEND:
+          scope.prepend(this.children);
+          break;
 
-          case scope.TRANSCLUDE_REPLACE:
-            scope.empty().append(this.children);
-            break;
+        case scope.TRANSCLUDE_PLUCK:
+          pluckAndDrop(dropables, this);
+          scope.empty().append(this.children);
+          break;
 
-          default:
-            if (transcludeMode) {
+        case scope.TRANSCLUDE_REPLACE:
+          scope.empty().append(this.children);
+          break;
+
+        default:
+          if (transcludeMode) {
               pluckAndDrop(new (function () {
                 this[transcludeMode] = scope.node();
               }), this);
@@ -220,7 +220,7 @@ var Scope = jQProxy.extend(function () {
             else {
               scope.empty().append(this.children);
             }
-            
+
         }
 
         scope.findOwn('[pl-component]').each(function () {
@@ -232,7 +232,7 @@ var Scope = jQProxy.extend(function () {
 
           memory.push(name);
 
-          totalRequests+=1;
+          totalRequests += 1;
 
           game.component.load(name, function () {
             ready();
@@ -242,10 +242,10 @@ var Scope = jQProxy.extend(function () {
       });
     }
 
-    if (!$('style[pl-for-component="'+_name+'"]').length && game.config('shouldLoadComponentStyles') !== false) {
-      totalRequests+=1;
-      $('<style type="text/css" pl-for-component="'+_name+'">')
-        .load(path+'style.css', ready)
+    if (!$('style[pl-for-component="' + _name + '"]').length && game.config('shouldLoadComponentStyles') !== false) {
+      totalRequests += 1;
+      $('<style type="text/css" pl-for-component="' + _name + '">')
+        .load(path + 'style.css', ready)
         .appendTo(document.body);
     }
 
@@ -254,11 +254,11 @@ var Scope = jQProxy.extend(function () {
     return this;
   }
 
-  function captureProperties () {
+  function captureProperties() {
     var i, attr, name, collection;
 
     collection = (function () {
-      
+
       this.has = function (_name) {
         return !!~this.indexOf(_name);
       };
@@ -267,12 +267,12 @@ var Scope = jQProxy.extend(function () {
 
     }).call([]);
 
-    for (i=0; attr = this.$els[0].attributes[i]; i+=1) {
+    for (i = 0; attr = this.$els[0].attributes[i]; i += 1) {
       // I explicitly want it to be at the beginning.
       if (attr.name.indexOf('pl-') === 0) {
         name = attr.name.slice(3);
         collection[util.transformId(name, true)] = attr.value;
-        
+
         collection.push(name);
       }
     }
@@ -282,22 +282,22 @@ var Scope = jQProxy.extend(function () {
     return this;
   }
 
-  function initializeEntities () {
+  function initializeEntities() {
     if (!this.hasOwnProperty('entities')) return this;
 
     this.entities.forEach(this.bind(function (_record, _index) {
       var $nodes, query, index;
 
       $nodes = this.findOwn(_record.selector);
-      query = ['#'+_record.selector, '[pl-id='+_record.selector+']', '[pl-component='+_record.selector+']', '[pl-'+_record.selector+']'];
+      query = ['#' + _record.selector, '[pl-id=' + _record.selector + ']', '[pl-component=' + _record.selector + ']', '[pl-' + _record.selector + ']'];
       index = 0;
 
       while (!$nodes.length) {
         if (index === query.length) {
-          throw new Error("Unable to locate entity with selector", _record.selector);
+          throw new Error('Unable to locate entity with selector', _record.selector);
         }
         $nodes = this.findOwn(query[index]);
-        index+=1;
+        index += 1;
       }
 
       $nodes.each(this.bind(function (_index, _node) {
@@ -311,7 +311,7 @@ var Scope = jQProxy.extend(function () {
         } else {
           instance = _record;
         }
-        
+
         id = util.transformId(instance.id(), true);
         if (id) util.assignRef(this, id, instance);
       }));
@@ -320,7 +320,7 @@ var Scope = jQProxy.extend(function () {
     return this;
   }
 
-  function handleProperties () {
+  function handleProperties() {
     var scope, property, handler;
 
     scope = this;
@@ -339,11 +339,11 @@ var Scope = jQProxy.extend(function () {
 
         handler = this.propertyHandlers[property];
 
-        this.findOwn('[pl-'+property+']').each(function () {
+        this.findOwn('[pl-' + property + ']').each(function () {
           var attr;
 
           if (scope === $(this).scope()) {
-            attr = this.attributes.getNamedItem('pl-'+property);
+            attr = this.attributes.getNamedItem('pl-' + property);
 
             if (handler) handler.call(scope, this, property, attr.value);
           }
@@ -354,7 +354,7 @@ var Scope = jQProxy.extend(function () {
     return this;
   }
 
-  function invokeLocal (_name) {
+  function invokeLocal(_name) {
     var args, owner;
 
     args = [].slice.call(arguments, 1);
@@ -364,7 +364,7 @@ var Scope = jQProxy.extend(function () {
     }
   }
 
-  function init () {
+  function init() {
     var willInitEvent, initEvent;
 
     initEvent = $.Event('initialize', { targetScope: this });
@@ -392,7 +392,7 @@ var Scope = jQProxy.extend(function () {
     return this;
   }
 
-  function ready () {
+  function ready() {
     var readyEvent, entities;
 
     readyEvent = $.Event('ready', { targetScope: this });
@@ -421,11 +421,11 @@ var Scope = jQProxy.extend(function () {
 
         if (!_collection.length) return;
 
-        this.findOwn('audio.'+map[_collection.type]).each(function (_index, _node) {
+        this.findOwn('audio.' + map[_collection.type]).each(function (_index, _node) {
           var id, audio, collection, index;
 
           id = $(_node).id();
-          audio = (_collection.find('#'+id) || [])[0];
+          audio = (_collection.find('#' + id) || [])[0];
           index = _collection.indexOf(audio);
 
           if (index !== _index) {
@@ -473,7 +473,7 @@ var Scope = jQProxy.extend(function () {
     this.item = function (_node) {
       var i, item;
 
-      for (i=0; item = this[i]; i+=1) {
+      for (i = 0; item = this[i]; i += 1) {
         if (item.node === _node) return item;
       }
     };
@@ -501,7 +501,7 @@ var Scope = jQProxy.extend(function () {
   this.propertyHandlers = null;
   this.assetQueue = null;
   this.event = null;
-  
+
   this.initialize = function (_node_selector, _componentName) {
     var scope;
 
@@ -514,21 +514,21 @@ var Scope = jQProxy.extend(function () {
     this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
     if (!this.$els.length) {
-      throw new ReferenceError('Unable to locate the element with selector '+this.$els.selector+'.');
+      throw new ReferenceError('Unable to locate the element with selector ' + this.$els.selector + '.');
     }
 
-    this.addClass('pl-scope '+(_componentName ? _componentName+'-component' : ''));
+    this.addClass('pl-scope ' + (_componentName ? _componentName + '-component' : ''));
     this.data('pl-scope', this);
     this.data('pl-isComponent', !!_componentName);
 
     captureProperties.call(this);
-    
+
     if (_componentName) {
       loadComponentAssets.call(this, _componentName, function () {
         init.call(this);
       });
     }
-    
+
     else {
       init.call(this);
     }
@@ -628,7 +628,7 @@ var Scope = jQProxy.extend(function () {
         }
       });
     }.bind(this);
-    
+
     this.audio = AudioManager.create(this.id());
 
     $audio.each(function (_index, _node) {
@@ -653,19 +653,19 @@ var Scope = jQProxy.extend(function () {
       };
 
       switch (_event.type) {
-        case 'play':
-          [this, this.screen].forEach(function (_scope, _index, _set) {
+      case 'play':
+        [this, this.screen].forEach(function (_scope, _index, _set) {
             if (_index === 1 && _scope === _set[0]) return;
-            if (_scope.$els) _scope.addClass('PLAYING '+map[_event.target.type]);
+            if (_scope.$els) _scope.addClass('PLAYING ' + map[_event.target.type]);
           });
 
-          $(_event.targetNode).addClass('PLAYING');
-          break;
+        $(_event.targetNode).addClass('PLAYING');
+        break;
 
-        case 'pause':
-        case 'stopped':
-        case 'ended':
-          [this, this.screen].forEach(function (_scope, _index, _set) {
+      case 'pause':
+      case 'stopped':
+      case 'ended':
+        [this, this.screen].forEach(function (_scope, _index, _set) {
             var state;
 
             if (_index === 1 && _scope === _set[0]) return;
@@ -677,12 +677,12 @@ var Scope = jQProxy.extend(function () {
             }
           });
 
-          $(_event.targetNode).removeClass('PLAYING');
-          if (_event.type === 'ended') deQ(_event.target);
-          break;
+        $(_event.targetNode).removeClass('PLAYING');
+        if (_event.type === 'ended') deQ(_event.target);
+        break;
       }
 
-      var audioEvent = $.Event('audio-'+_event.type, {
+      var audioEvent = $.Event('audio-' + _event.type, {
         target: _event.target,
         targetSource: _event.targetSource,
         targetNode: _event.targetNode,
@@ -699,13 +699,13 @@ var Scope = jQProxy.extend(function () {
     if (this.propertyHandlers) {
       if (this.hasOwnProperty('propertyHandlers')) {
         switch (typeof _implementation) {
-          case 'function':
-            _implementation.call(this.propertyHandlers);
-            break;
+        case 'function':
+          _implementation.call(this.propertyHandlers);
+          break;
 
-          case 'object':
-            this.propertyHandlers.mixin(_implementation);
-            break;
+        case 'object':
+          this.propertyHandlers.mixin(_implementation);
+          break;
         }
       }
 
@@ -760,7 +760,7 @@ var Scope = jQProxy.extend(function () {
     var type;
 
     type = this.baseType.replace('TYPE_', '');
-    type = type.slice(0,1)+type.slice(1).toLowerCase();
+    type = type.slice(0, 1) + type.slice(1).toLowerCase();
 
     return ['[', this.id() || this.address(), ' ', type, ']'].join('');
   };
@@ -775,12 +775,12 @@ var Scope = jQProxy.extend(function () {
   };
 
   this.handleProperty(function () {
-    
+
     this.component = function (_node, _name, _value, _property) {
       var $node, record, scope, id;
 
       $node = $(_node);
-      
+
       if (!$node.data('pl-isComponent')) {
         record = game.component.get(_value);
 
@@ -791,7 +791,7 @@ var Scope = jQProxy.extend(function () {
 
           if (!scope.isReady) this.assetQueue.add(scope);
         }
-        
+
         else {
           throw new Error('Ahh!');
         }
@@ -801,7 +801,7 @@ var Scope = jQProxy.extend(function () {
     this.action = function (_node, _name, _value) {
       if (!this.hasOwnProperty('actionables')) {
         this.actionables = Actionables.create();
-        attachActionHandler.call(this); 
+        attachActionHandler.call(this);
       }
 
       this.actionables.add(_node, _value);

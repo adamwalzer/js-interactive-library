@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /**
  * Defines an Object type using a named constructor function.
  * @module
@@ -9,7 +9,7 @@
  * @arg {object} _from - Object with methods to bind.
  * @arg {object} _to - Context which methtods should be bound to.
  */
-function Bindings (_from, _to) {
+function Bindings(_from, _to) {
   var method;
 
   // pull all methods from the prototype chain.
@@ -24,7 +24,7 @@ function Bindings (_from, _to) {
  * @arg {object} _itterable
  * @returns {array}
  */
-function toArray (_itterable) {
+function toArray(_itterable) {
   return [].map.call(_itterable, function (m) { return m; });
 }
 
@@ -33,7 +33,7 @@ function toArray (_itterable) {
  * @arg {function} _constructor... - any number of constructor functions.
  * @returns The constructor or an object containing all the defined types.
  */
-export default function type () {
+export default function type() {
   var defs, module;
 
   /**
@@ -42,14 +42,14 @@ export default function type () {
    * @arg {function} _constructor
    * @returns {array} The collection of API functions requested by the constructor.
    */
-  function createApi (_constructor) {
+  function createApi(_constructor) {
     var args, api;
 
     // Matches the names of the arguments defined in the source of the function.
     // [^\(\)\.\s,]+ captures one or more of any character which is NOT a parenthetical, period, white-space character, or comma.
     // It then takes that rule and looks for multiple intances w/o spaces or commas around it, which would be encased in parenthensies.
     // NOTE: since this regex is not matching globally, it will not match any argument clusters past the function definition.
-    args = (Function.prototype.toString.call(_constructor).match(/\(((?:\s*[^\(\)\.\s,]+\s*,?)+)\)/)||['',''])[1].split(/\s*,\s*/);
+    args = (Function.prototype.toString.call(_constructor).match(/\(((?:\s*[^\(\)\.\s,]+\s*,?)+)\)/) || ['', ''])[1].split(/\s*,\s*/);
     api = {
       /**
        * Invokes the specified method closest in the prototype chain. Allowing you to still invoke a method which was overridden.
@@ -59,7 +59,7 @@ export default function type () {
        * @arg {array} _args - A collection of arguments to invoke the method with
        * @returns {*} Whatever the caller returns.
        *
-       * @example 
+       * @example
        * Car.extend(function Ford (proto) {
        *     this.drive = function () {
        *         proto(this, 'drive', arguments);
@@ -74,7 +74,7 @@ export default function type () {
         method = proto[_name];
 
         if (typeof _obj[_name] !== 'function') {
-          throw new TypeError('Member '+_name+' is not a function.');
+          throw new TypeError('Member ' + _name + ' is not a function.');
         }
 
         if (method) {
@@ -112,7 +112,7 @@ export default function type () {
         method = proto[_name];
 
         if (typeof method !== 'function') {
-          throw new TypeError('Member '+_name+' is not a function.');
+          throw new TypeError('Member ' + _name + ' is not a function.');
         }
 
         if (method) {
@@ -183,7 +183,7 @@ export default function type () {
        * A pretty way of define the interface of your object type.
        *
        * You may pass any number of arguments as functions or strings.
-       * 
+       *
        * **Example**
        * ```javascript
        * function Car ($) {$(
@@ -216,37 +216,37 @@ export default function type () {
           memberType = typeof _member;
 
           switch (memberType) {
-            case 'string':
-              props = _member.split(/\s*,\s*/);
+          case 'string':
+            props = _member.split(/\s*,\s*/);
 
-              if (props) {
+            if (props) {
                 props.forEach(function (_def) {
                   var prop, val;
-                  
+
                   prop = _def.split(/\s*[:=]\s*/);
-                  try { val = JSON.parse(prop[1]) } catch (e) {}
+                  try { val = JSON.parse(prop[1]); } catch(e) {}
                   _constructor.prototype[prop[0]] = (typeof prop[1] !== 'undefined') ? val || prop[1] : null;
                 });
               }
-              break;
+            break;
 
-            case 'object':
-              for (key in _member) {
+          case 'object':
+            for (key in _member) {
                 if (!_member.hasOwnProperty(key)) continue;
                 _constructor.prototype[key] = _member[key];
               }
-              break;
+            break;
 
-            case 'function':
-              if (!_member.name) throw TypeError('Member must be a named function.');
-              _constructor.prototype[_member.name] = _member;
-              break;
+          case 'function':
+            if (!_member.name) throw TypeError('Member must be a named function.');
+            _constructor.prototype[_member.name] = _member;
+            break;
           }
         });
 
         return api;
       }
-    }
+    };
 
     return args.map(function (_call) {
       return api[_call] || module[_call];
@@ -296,9 +296,9 @@ export default function type () {
           configureable: false
         }
       });
-      
+
       return type.call(this === _constructor ? null : this, _definition);
-    }
+    };
 
     _constructor.apply(_constructor.prototype, api);
 

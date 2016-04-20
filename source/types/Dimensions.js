@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @module
  * @version 1.1
  * @author Micah Rolon <functionmicah@gmail.com>
@@ -82,12 +82,12 @@ Array.prototype.to = function (_Thing) {
 
   else if (typeof _Thing === 'object' && ~[Point.set, Size.set].indexOf(_Thing.set)) {
     if (!_Thing.isPrototypeOf(this)) {
-      return _Thing.set.apply(_Thing.create(), this); 
+      return _Thing.set.apply(_Thing.create(), this);
     }
   }
-    
+
   return this;
-}
+};
 
 /**
  * <span class="important">NOTE:</span> This is NOT a constructor. use `Dimension.create()` to get a new instance.
@@ -127,7 +127,7 @@ Dimension = BasicArray.extend(function () {
    * @returns {Dimension}
    */
   this.inc = function (_val, _plane2) {
-    var a,b;
+    var a, b;
 
     if (_val.length === 2) {
       a = _val[0];
@@ -156,7 +156,7 @@ Dimension = BasicArray.extend(function () {
    * @returns {Dimension}
    */
   this.dec = function (_val, _plane2) {
-    var a,b;
+    var a, b;
 
     if (_val.length === 2) {
       a = _val[0];
@@ -273,7 +273,7 @@ Dimension = BasicArray.extend(function () {
   this.remainder = function () {
     return this[0] % this[1];
   };
-  
+
 });
 
 /**
@@ -353,7 +353,7 @@ Size = Dimension.extend(function () {
       this[0] = Number(_width);
       this[1] = Number(_height);
     }
-    
+
     return this;
   };
 
@@ -466,7 +466,7 @@ Point = Dimension.extend(function () {
       this[0] = Number(_x);
       this[1] = Number(_y);
     }
-    
+
     return this;
   };
 
@@ -514,7 +514,7 @@ Point = Dimension.extend(function () {
   this.rotate = function (_origin, _angle) {
     var x, y, rad;
 
-    rad = _angle * (Math.PI/180);
+    rad = _angle * (Math.PI / 180);
 
     x = this.x - _origin.x;
     y = this.y - _origin.y;

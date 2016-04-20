@@ -17,7 +17,7 @@ var Basic = {
    * @default
    */
   baseType: 'TYPE_BASIC',
-  
+
   /**
    * Creates a new object with the current object as its prototype.
    * @instance
@@ -41,18 +41,18 @@ var Basic = {
     if (!_implementation) return null;
 
     switch (typeof _implementation) {
-      case 'function':
-        _implementation.prototype = this;
-        instance = new _implementation();
-        break;
+    case 'function':
+      _implementation.prototype = this;
+      instance = new _implementation();
+      break;
 
-      case 'object':
-        instance = this.create();
-        instance.mixin(_implementation);
-        break;
+    case 'object':
+      instance = this.create();
+      instance.mixin(_implementation);
+      break;
 
-      default:
-        console.error('TypeError: Invalid type given for object extention.', typeof _implementation);
+    default:
+      console.error('TypeError: Invalid type given for object extention.', typeof _implementation);
     }
 
     return instance;
@@ -101,9 +101,9 @@ var Basic = {
     else {
       owner = util.getOwner(this, method);
       name = owner.name;
-      prototype = Object.getPrototypeOf(owner.object);  
+      prototype = Object.getPrototypeOf(owner.object);
     }
-    
+
     method = prototype[name];
 
     if (!method) {
@@ -132,7 +132,7 @@ var Basic = {
 
     // Check to see if 'this' owns the method.
     // NOTE: We may want to move this logic into getOwner().
-    // 
+    //
     if (!name) {
       owner = util.getOwner(this, method);
       name = owner.name;
@@ -154,15 +154,15 @@ var Basic = {
    */
   toString: function () {
     var type;
-    
+
     if (this.baseType) {
       type = this.baseType.replace('TYPE_', '');
-      type = type.slice(0,1)+type.slice(1).toLowerCase(); 
+      type = type.slice(0, 1) + type.slice(1).toLowerCase();
     } else {
       type = this.constructor.name || 'Object';
     }
 
-    return '[object '+type+']';
+    return '[object ' + type + ']';
   }
 
 };

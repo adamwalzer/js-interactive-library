@@ -14,7 +14,7 @@ var Events = Basic.extend(function () {
   *  @return (jQuery|*) Either a jQuery object or whatever the original method returns.
   *  @private
   */
-  function createProxyFunction (_name) {
+  function createProxyFunction(_name) {
     return function () {
       var $jq = $();
       // We must wrap our object in jQuery. If 'typeof this' is a function then we need
@@ -29,7 +29,7 @@ var Events = Basic.extend(function () {
 
   this.baseType = 'TYPE_EVENTS';
 
-  for (i=0; method = methods[i]; i+=1) {
+  for (i = 0; method = methods[i]; i += 1) {
     this[method] = createProxyFunction(method);
   }
 });
