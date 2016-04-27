@@ -19,28 +19,28 @@ var pl;
 /**
  * Resolves the event type for user interactions.
  */
-function resolveEventType () {
-	var resolution;
+function resolveEventType() {
+  var resolution;
 
-	if (game.feature('touch')) {
-		resolution = {
-			ACTION: 'touchend',
-			ACTION_DOWN: 'touchstart',
-			ACTION_UP: 'touchend',
-			ACTION_MOVE: 'touchmove',
-			ACTION_OUT: 'touchcancel'
-		};
-	} else {
-		resolution = {
-			ACTION: 'click',
-			ACTION_DOWN: 'mousedown',
-			ACTION_UP: 'mouseup',
-			ACTION_MOVE: 'mousemove',
-			ACTION_OUT: 'mouseout'
-		};
-	}
+  if (game.feature('touch')) {
+    resolution = {
+      ACTION: 'touchend',
+      ACTION_DOWN: 'touchstart',
+      ACTION_UP: 'touchend',
+      ACTION_MOVE: 'touchmove',
+      ACTION_OUT: 'touchcancel'
+    };
+  } else {
+    resolution = {
+      ACTION: 'click',
+      ACTION_DOWN: 'mousedown',
+      ACTION_UP: 'mouseup',
+      ACTION_MOVE: 'mousemove',
+      ACTION_OUT: 'mouseout'
+    };
+  }
 
-	return resolution;
+  return resolution;
 }
 
 /**
@@ -54,19 +54,19 @@ function resolveEventType () {
  * @prop {object} util - Namespace for utility functions.
  */
 pl = {
-	Basic, Point, Size, Queue,
-	game,
-	util,
-	
-	/**
-	 * @namespace
-	 * @prop {string} ACTION - The device normalized `click` event name.
-	 * @prop {string} ACTION_DOWN - The device normalized `mousedown` event name.
-	 * @prop {string} ACTION_UP - The device normalized `mouseup` event name.
-	 * @prop {string} ACTION_MOVE - The device normalized `mousemove` event name.
-	 * @prop {string} ACTION_OUT - The device normalized `mouseout` event name.
-	 */
-	EVENT: resolveEventType()
+  Basic, Point, Size, Queue,
+  game,
+  util,
+
+  /**
+   * @namespace
+   * @prop {string} ACTION - The device normalized `click` event name.
+   * @prop {string} ACTION_DOWN - The device normalized `mousedown` event name.
+   * @prop {string} ACTION_UP - The device normalized `mouseup` event name.
+   * @prop {string} ACTION_MOVE - The device normalized `mousemove` event name.
+   * @prop {string} ACTION_OUT - The device normalized `mouseout` event name.
+   */
+  EVENT: resolveEventType()
 };
 
 export default pl;

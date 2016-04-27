@@ -22,16 +22,16 @@ var COMPONENTS;
  * @arg {function|object} _implementation - Constructor function or object with the behavior's implementation.
  * @returns {@link module:play~pl.game}
  */
-function component (_name, _implementation) {
-	if (!component.get(_name)) {
-		COMPONENTS.push({
-			name: _name,
-			implementation: _implementation,
-			config: {}
-		});
-	}
+function component(_name, _implementation) {
+  if (!component.get(_name)) {
+    COMPONENTS.push({
+      name: _name,
+      implementation: _implementation,
+      config: {}
+    });
+  }
 
-	return this;
+  return this;
 }
 
 COMPONENTS = [];
@@ -43,91 +43,91 @@ COMPONENTS = [];
  * @mixes Events
  */
 (function () {
-	
-	util.mixin(this, Events);
 
-	/**
-	 * Given a name; provides the component record. `{name, implementation}`
-	 * @memberof module:play~pl.game.component
-	 * @arg {string} _name - The name of the component.
-	 * @returns {object} The record.
-	 */
-	this.get = function (_name) {
-		var i, record;
+  util.mixin(this, Events);
 
-		for (i=0; record = COMPONENTS[i]; i+=1) {
-			if (record.name === _name) return record;
-		}
+  /**
+   * Given a name; provides the component record. `{name, implementation}`
+   * @memberof module:play~pl.game.component
+   * @arg {string} _name - The name of the component.
+   * @returns {object} The record.
+   */
+  this.get = function (_name) {
+    var i, record;
 
-		return null;
-	};
+    for (i = 0; record = COMPONENTS[i]; i += 1) {
+      if (record.name === _name) return record;
+    }
 
-	/**
-	 * Loads the script for the component. The HTML and CSS will be loaded when the component scope initalizes.<br>
-	 * The path of the script file is resolved `{pl.game.config.componentDirectory}/{_name}/behavior.js`.
-	 * @memberof module:play~pl.game.component
-	 * @arg {string} _name - The name of the component.
-	 * @arg {function} _callback - Callback for load success.
-	 * @todo Implement Promises.
-	 * @returns `this`
-	 */
-	this.load = function (_name, _callback) {
-		var path
+    return null;
+  };
 
-		if (component.get(_name)) {
-			if (_callback) _callback.call(component, _name);
-			return null;
-		}
+  /**
+   * Loads the script for the component. The HTML and CSS will be loaded when the component scope initalizes.<br>
+   * The path of the script file is resolved `{pl.game.config.componentDirectory}/{_name}/behavior.js`.
+   * @memberof module:play~pl.game.component
+   * @arg {string} _name - The name of the component.
+   * @arg {function} _callback - Callback for load success.
+   * @todo Implement Promises.
+   * @returns `this`
+   */
+  this.load = function (_name, _callback) {
+    var path;
 
-		path = pl.game.config('componentDirectory')+_name+'/behavior.js';
+    if (component.get(_name)) {
+      if (_callback) _callback.call(component, _name);
+      return null;
+    }
 
-		$.getScript(path, function () {
-			if (_callback) _callback.call(component, _name);
-			component.trigger('loaded', [_name]);
-		});
+    path = pl.game.config('componentDirectory') + _name + '/behavior.js';
 
-		return this;
-	};
+    $.getScript(path, function () {
+      if (_callback) _callback.call(component, _name);
+      component.trigger('loaded', [_name]);
+    });
 
-	/**
-	 * Loads all the component scripts for HTML elements with `pl-component` attributes.
-	 * @memberof module:play~pl.game.component
-	 * @arg {function} _callback - Callback for load success.
-	 * @todo Implement Promises.
-	 * @returns `this`
-	 */
-	this.loadAll = function (_callback) {
-		var $components, queue;
+    return this;
+  };
 
-		$components = $('[pl-component]');
-		queue = [];
+  /**
+   * Loads all the component scripts for HTML elements with `pl-component` attributes.
+   * @memberof module:play~pl.game.component
+   * @arg {function} _callback - Callback for load success.
+   * @todo Implement Promises.
+   * @returns `this`
+   */
+  this.loadAll = function (_callback) {
+    var $components, queue;
 
-		$components.each(function (_index) {
-			var name;
+    $components = $('[pl-component]');
+    queue = [];
 
-			name = $(this).attr('pl-component');
+    $components.each(function (_index) {
+      var name;
 
-			if (~queue.indexOf(name)) return;
+      name = $(this).attr('pl-component');
 
-			queue.push(name);
-		});
+      if (~queue.indexOf(name)) return;
 
-		queue.slice(0).forEach(function (_name) {
-			component.load(_name, function () {
-				var index;
+      queue.push(name);
+    });
 
-				index = queue.indexOf(_name);
-				queue.splice(index, 1);
+    queue.slice(0).forEach(function (_name) {
+      component.load(_name, function () {
+        var index;
 
-				if (!queue.length && _callback) _callback.apply(component, arguments)
-			});
-		});
+        index = queue.indexOf(_name);
+        queue.splice(index, 1);
 
-		return this;
-	};
+        if (!queue.length && _callback) _callback.apply(component, arguments);
+      });
+    });
 
-	// Maybe?
-	// this.config = function () {};
+    return this;
+  };
+
+  // Maybe?
+  // this.config = function () {};
 
 }).call(component);
 

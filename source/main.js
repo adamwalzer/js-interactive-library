@@ -14,8 +14,8 @@ import play from 'play';
 /**
  * Begin running the library
  */
-function run () {
-	play.game.run();
+function run() {
+  play.game.run();
 }
 
 // export namespace to global object.

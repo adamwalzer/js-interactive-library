@@ -8,80 +8,80 @@ import { Entity, invokeResponsibilities } from 'types/Entity';
 
 var Screen = Entity.extend(function () {
 
-	function attachBehaviorEvent () {
-		this.on('behavior', function (_event) {
-			// console.log('SCREEN GOT', _event.targetScope.id(), _event.name);
+  function attachBehaviorEvent() {
+    this.on('behavior', function (_event) {
+      // console.log('SCREEN GOT', _event.targetScope.id(), _event.name);
 
-			if (this !== _event.targetScope) {
-				invokeResponsibilities(this,  _event);
-			}
-			
-			this.propagateBehavior(_event);
-		});
-	}
-	
-	this.baseType = 'TYPE_SCREEN';
-	this.game = null;
-	this.screen = null;
+      if (this !== _event.targetScope) {
+        invokeResponsibilities(this, _event);
+      }
 
-	this.__init = function () {
-		this.proto();
+      this.propagateBehavior(_event);
+    });
+  }
 
-		if (this.is(pl.game.config('screenSelector'))) {
-			attachBehaviorEvent.call(this);
-		}
-	};
+  this.baseType = 'TYPE_SCREEN';
+  this.game = null;
+  this.screen = null;
 
-	this.start = function () {
-		this.startAudio();
-		return this;
-	};
+  this.__init = function () {
+    this.proto();
 
-	this.stop = function () {
-		this.stopAudio();
-		return this;
-	};
+    if (this.is(pl.game.config('screenSelector'))) {
+      attachBehaviorEvent.call(this);
+    }
+  };
 
-	this.startAudio = function () {
-		if (!this.audio) return;
-		this.audio.background.play();
-		this.audio.voiceOver.play();
-	};
+  this.start = function () {
+    this.startAudio();
+    return this;
+  };
 
-	this.stopAudio = function () {
-		if (!this.audio) return;
-		this.audio.voiceOver.stop('@ALL');
-	};
+  this.stop = function () {
+    this.stopAudio();
+    return this;
+  };
 
-	this.index = function () {
-		if (this === this.screen) return this.game.screens.indexOf(this);
-		return this.$els.index();
-	};
+  this.startAudio = function () {
+    if (!this.audio) return;
+    this.audio.background.play();
+    this.audio.voiceOver.play();
+  };
 
-	this.next = function () {
-		if (!this.completed()) return false;
-		return this.game.screens[this.screen.index()+1];
-	};
+  this.stopAudio = function () {
+    if (!this.audio) return;
+    this.audio.voiceOver.stop('@ALL');
+  };
 
-	this.prev = function () {
-		return this.game.screens[this.screen.index()-1];
-	};
+  this.index = function () {
+    if (this === this.screen) return this.game.screens.indexOf(this);
+    return this.$els.index();
+  };
 
-	this.quit = function () {
-		this.game.quit.open();
-	};
+  this.next = function () {
+    if (!this.completed()) return false;
+    return this.game.screens[this.screen.index() + 1];
+  };
 
-	this.nextSib = function () {
-		return $.fn.next.apply(this.$els, arguments);
-	};
+  this.prev = function () {
+    return this.game.screens[this.screen.index() - 1];
+  };
 
-	this.prevSib = function () {
-		return $.fn.prev.apply(this.$els, arguments);
-	};
+  this.quit = function () {
+    this.game.quit.open();
+  };
 
-	this.isLast = function () {
-		return this.game.screens.indexOf(this.screen) === this.game.screens.length-1;
-	};
+  this.nextSib = function () {
+    return $.fn.next.apply(this.$els, arguments);
+  };
+
+  this.prevSib = function () {
+    return $.fn.prev.apply(this.$els, arguments);
+  };
+
+  this.isLast = function () {
+    return this.game.screens.indexOf(this.screen) === this.game.screens.length - 1;
+  };
 
 });
 
