@@ -95,10 +95,8 @@ var Basic = {
     // NOTE: We may want to move this logic into getOwner().
     if (name = this.keyOf(method)) {
       prototype = Object.getPrototypeOf(this);
-    }
-
-    // Otherwise find the object which owns the caller function.
-    else {
+    } else {
+      // Otherwise find the object which owns the caller function.
       owner = util.getOwner(this, method);
       name = owner.name;
       prototype = Object.getPrototypeOf(owner.object);

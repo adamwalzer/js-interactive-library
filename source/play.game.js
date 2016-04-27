@@ -77,12 +77,27 @@ function register(_name, _implementation) {
 function initialize(nameCollection, implementation) {
   switch (typeof nameCollection) {
   case 'string':
+      debugger;
     SCOPE[nameCollection] = Game
+        //MPR, ll-trace 8: Now, this is where things start to get interesting
+        //This "Game" object comes from types/Game, which itself is an alias for 
+        // types/GlobalScope, which is an alias for types/Scope, which is a singleton
+        // instance of the jqProxy type. This type inverts a number of jQuery methods
+        // (notably 'extend') to operate on the invoked 'this' object, rather than
+        // taking that object as the first parameter. As such, this will add all of the
+        // properties from the current game's "implementation" function onto the global
+        // "Game" scope object. Note that these are different from the pl.game object
+        // which is being constructed by this module. That function is used to pass
+        // the implementation function in from the games themselves.
         .extend(implementation)
+        //MPR, ll-trace 10: because this is an instance of types/scope, we get the initialize
+        //method from there.
         .initialize('#' + nameCollection);
     break;
 
   case 'object':
+    //MPR, ll-trace 7: This case is soley for convienience. It simply reinvokes itself
+    //to match the string case.
     nameCollection.forEach(function (_item) {
       initialize(_item.id, _item.implementation);
     });
@@ -128,6 +143,10 @@ READY_QUEUE = [];
 
     game.component.loadAll(function () {
       // console.log('** All component sources loaded.');
+      //MPR, ll-trace 6: does this really fire once for each component?
+      //yep.
+      //Note that this games array generally contains a dict containing a single registered game object
+      //Not sure why one would ever need more than one, but there we are.
       initialize(GAMES);
 
       GAMES = null;

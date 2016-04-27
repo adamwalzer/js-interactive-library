@@ -27,9 +27,7 @@ var jQProxy = Basic.extend(function () {
       if (!this.hasOwnProperty('$els')) {
         if (_name === 'on') {
           registerHandler.call(this, arguments);
-        }
-
-        else {
+        } else {
           throw new ReferenceError('Unable to invoke ' + _name + ' because the scope is not initialized.');
         }
         return;
@@ -56,9 +54,7 @@ var jQProxy = Basic.extend(function () {
           args.push((function (_handler) {
             return function () { return _handler.apply(_scope, arguments); };
           }(arg)));
-        }
-
-        else {
+        } else {
           args.push(arg);
         }
       }
@@ -73,9 +69,7 @@ var jQProxy = Basic.extend(function () {
     if (!this.hasOwnProperty('eventRegistry')) {
       if (this.eventRegistry && this.isMemberSafe('eventRegistry')) {
         this.eventRegistry = this.eventRegistry.slice(0);
-      }
-
-      else {
+      } else {
         this.eventRegistry = [];
       }
     }
@@ -102,6 +96,7 @@ var jQProxy = Basic.extend(function () {
   };
 
   this.attachEvents = function () {
+    //MPR, ll-trace 33: This is the function that should be extended by scope's attachEvents
     var self;
 
     self = this;
@@ -147,14 +142,21 @@ var jQProxy = Basic.extend(function () {
 
   // Wraps you function 'this' to the scope.
   //
+  // MPR: Oh for the love of god and all that is holy. @TODO change this functions name.
   this.bind = function (_handler) {
     var args;
 
     args = [].map.call(arguments, function (m) { return m; }).slice(1);
 
+    //MPR: At the very least remove the extra bind in here. Or remove this function entirely and use
+    //fn.bind properly.
     return _handler.bind.apply(_handler, [this].concat(args));
   };
 
+  //MPR: The purpose of this function appears to be to get all items based on a selector
+  // and then filter them to only nodes that share a scope. I do not know how this functions
+  // with the filter bound to whatever "this" happens to be.
+  // Oh. Its not fn.bind. Its scope.bind. That name needs to change.
   this.findOwn = function (_selector) {
     return this.find(_selector).filter(this.bind(function (_index, _node) {
       var $node;
@@ -174,14 +176,17 @@ var jQProxy = Basic.extend(function () {
 
     if (this.hasOwnProperty(_name)) {
       return true;
-    }
-
-    else {
+    } else {
       prototype = Object.getPrototypeOf(this);
       owner = util.getOwner(this, this[_name]);
 
       if (owner.object.hasOwnProperty('$els') || prototype.hasOwnProperty('$els')) return false;
 
+      //MPR, ll-trace 30: so this method is basically checking if a property exists on an element
+      // or in a prototype chain. If it is in the chain or on the element return false, otherwise
+      // return true if it is unique to the current level
+      // As a side note, the existence of this method is evidence of why prototypes are not
+      // used in this fashion
       if (prototype.$els) {
         elOwner = util.getOwner(prototype, prototype.$els);
 
@@ -192,8 +197,6 @@ var jQProxy = Basic.extend(function () {
 
       return true;
     }
-
-    return false;
   };
 
   this.is = function (_obj) {

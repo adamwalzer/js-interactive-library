@@ -47,9 +47,7 @@ function createEntity(_$node, _implementation) {
       if (componentRecord.implementation !== _implementation) {
         prototype = this.extend(componentRecord.implementation);
       }
-    }
-
-    else {
+    } else {
       throw new Error('No implementation record for the ' + component + 'component.');
     }
   }
@@ -78,6 +76,10 @@ var Scope = jQProxy.extend(function () {
 
   function attachActionHandler() {
     this.on(pl.EVENT.ACTION, function (_event) {
+      //MPR, ll-trace 5.5: Checking what events this responds to.
+      //Seems like just click events for the most part? I guess
+      //the purpose of this is to allow arbitrary events in the
+      //html templates as pl-action attributes
       var target, record;
 
       target = $(_event.target).closest('[pl-action]')[0];
@@ -136,7 +138,8 @@ var Scope = jQProxy.extend(function () {
     var collection;
 
     collection = [];
-
+    //MPR, ll-trace 19: find all "pl-pluck" elements that are a child of anything?
+    //ahh that are a child of the provided scope
     _scope.find('> [pl-pluck]').each(function () {
       var name;
 
@@ -170,6 +173,7 @@ var Scope = jQProxy.extend(function () {
     function ready() {
       ready.status += 1;
 
+      //MPR, ll-trace 18: More request counting. @TODO break into promises for failure cases
       if (ready.status === totalRequests) {
         if (_callback) {
           _callback.call(scope, _name);
@@ -179,50 +183,71 @@ var Scope = jQProxy.extend(function () {
 
     totalRequests = 0;
     scope = this;
+    //MPR, ll-trace 23: Nope, this is just loading the template from the game
     path = game.config('componentDirectory') + _name + '/';
+    //MPR, ll-trace 20: dump all of the "pl-pluck" attribute children of this scope into this dropables dict
     dropables = captureDropables(this);
+    //MPR, ll-trace 21: evidently the inclusion of pluck elements indicates a lack of a transclude property
+    //lets keep a watch out for that, and @TODO on renaming pluck to something with meaning
+    // TRANSCLUDE_PLUCK is a string, also, so unless there are no droppables and no pl-transclude prop
+    // transcludeMode will be a string that gets switched on below
     transcludeMode = dropables.length ? this.TRANSCLUDE_PLUCK : this.properties.transclude;
     ready.status = 0;
 
+    //MPR, ll-trace 22: why to we want to do this if we have a transclude mode OR we have no
+    //children?
     if (!this.children().length || transcludeMode) {
       totalRequests += 1;
+        //MPR, ll-trace 24: Create a virtual div and then load into it, to allow us to
+        //manipulate the elements post-parse. Clever.
       $('<div>').load(path + 'template.html', function () {
         var memory;
 
         memory = [];
 
         switch (transcludeMode) {
+        //MPR, ll-trace 25: Just shove them in
         case scope.TRANSCLUDE_APPEND:
           scope.append(this.children);
           break;
 
+        //MPR: On top. Why doesnt this require a container like the next one?
         case scope.TRANSCLUDE_PREPEND:
           scope.prepend(this.children);
           break;
 
+        //MPR: Got it. The Pluck is essentially allowing a second level of templating
+        // within a component. Its like allowing separate Header, Body, and Footer elements
+        // to be popped out of a loading template and replaced. Something to note is that
+        // any child elements without a pl-pluck attribute matching a template section
+        // will be lost. This may not be a bad thing.
         case scope.TRANSCLUDE_PLUCK:
           pluckAndDrop(dropables, this);
           scope.empty().append(this.children);
           break;
 
+        //MPR: Replace em. Not sure why we would ever want to do this, though
         case scope.TRANSCLUDE_REPLACE:
           scope.empty().append(this.children);
           break;
 
         default:
+          //MPR: The else case here is extranneous. @TODO this default can also be refactored such that the other
+          // TRANSCLUDE_PLUCK can be removed.
           if (transcludeMode) {
               pluckAndDrop(new (function () {
                 this[transcludeMode] = scope.node();
               }), this);
               scope.empty().append(this.children);
-            }
-
-            else {
+            } else {
               scope.empty().append(this.children);
             }
 
         }
 
+        //MPR, ll-trace 26: Load every item in this scope labeled pl-component and then fire ready
+        // To up the ready count. We may have a problem lazy loading here if we defer firing ready
+        // until all screen components are loaded.
         scope.findOwn('[pl-component]').each(function () {
           var name;
 
@@ -234,7 +259,9 @@ var Scope = jQProxy.extend(function () {
 
           totalRequests += 1;
 
+          //MPR, ll-trace 28: Recur!
           game.component.load(name, function () {
+            //@TODO: MPR, 4/27/16: give this local ready a different name, this is confusing
             ready();
           });
         });
@@ -257,6 +284,7 @@ var Scope = jQProxy.extend(function () {
   function captureProperties() {
     var i, attr, name, collection;
 
+    //MPR, ll-trace 13: Create an array with an extra "has" wrapper method for indexOf
     collection = (function () {
 
       this.has = function (_name) {
@@ -267,16 +295,20 @@ var Scope = jQProxy.extend(function () {
 
     }).call([]);
 
+    //MPR, ll-trace 15: attach all of the pl- prefixed properties on the game to... the game scope?
+    // Unclear use of this. Assuming that this method is bound?
     for (i = 0; attr = this.$els[0].attributes[i]; i += 1) {
       // I explicitly want it to be at the beginning.
       if (attr.name.indexOf('pl-') === 0) {
         name = attr.name.slice(3);
+        //MPR, ll-trace 14: transformId has the same functionality as _.toCamelCase, @TODO replace it.
         collection[util.transformId(name, true)] = attr.value;
 
         collection.push(name);
       }
     }
 
+    //MPR, ll-trace 15.5: this is where they actually get attached
     if (collection.length) this.properties = collection;
 
     return this;
@@ -365,14 +397,22 @@ var Scope = jQProxy.extend(function () {
   }
 
   function init() {
+    //MPR, ll-trace 29: Will fire once all pl-components are loaded. Watch out here for getting
+    // stuck after lazy loads, or for anything that might get missed were this to only run once
     var willInitEvent, initEvent;
 
     initEvent = $.Event('initialize', { targetScope: this });
     willInitEvent = $.Event('will-initialize', { targetScope: this });
 
+    //MPR, ll-trace 31: Why aught we only invoke this if the method is local to this scope?
+    // That seems arbitrary to me.
     invokeLocal.call(this, 'willInit');
+    //MPR: Moreso, if we are checking if our game has attached any such method to the scope,
+    // why bother firing the event. A quick grep indicates nothing is listening to willInit
+    // @TODO really should be one or the other. The event seems much more sensible.
     this.trigger(willInitEvent);
 
+    //MPR: why hello there.
     this.attachEvents();
 
     initializeEntities.call(this);
@@ -393,6 +433,7 @@ var Scope = jQProxy.extend(function () {
   }
 
   function ready() {
+    //MPR, ll-trace 35: this will fire once all assets are loaded, from inside the attachEvents method in this file
     var readyEvent, entities;
 
     readyEvent = $.Event('ready', { targetScope: this });
@@ -410,6 +451,8 @@ var Scope = jQProxy.extend(function () {
      * Sort audio into DOM order.
      * @todo Consider including this into `AudioManager`. Micah: 2/23/2016.
      */
+    // @TODO MPR 4/27/16: Look into why Micah wanted this in dom order. I am concerned
+    // that they are simply being invoked in order.
     if (this.hasOwnProperty('audio')) {
       (this.game || this).media.addShadow(this.audio);
       this.audio.collections().forEach(function (_collection) {
@@ -421,6 +464,15 @@ var Scope = jQProxy.extend(function () {
 
         if (!_collection.length) return;
 
+        //MPR, ll-trace 37: This is almost certainly the reason that there are problems 
+        // attaching audio during a lazy load. Because this only fires on ready, we miss
+        // attaching the events in the right order. Either this strategy needs to be re-
+        // thought, or this needs to be fully rebuilt and tracked each time a screen
+        // is loaded. Adam's idea to create a "screen" audio context instead of just
+        // a global one is a good idea and may also mitigate this issue.
+        // MPR: Note - the trace should continue here tomorrow. Once this ready is complete
+        // the attachEvents method should finish from whatever event fired it in trace
+        // step 34, and then control will return to this.init after that event is registered.
         this.findOwn('audio.' + map[_collection.type]).each(function (_index, _node) {
           var id, audio, collection, index;
 
@@ -440,8 +492,18 @@ var Scope = jQProxy.extend(function () {
     this.addClass('READY');
 
     this.__ready();
+    //@TODO MPR: We really need to clean up this dual scope method / event invocation pattern
     invokeLocal.call(this, 'ready');
 
+    //MPR, ll-trace 36: The ready event is consumed in many places. In the framework, it is consumed in
+    // components/carousel/behavior.js:82:      this.on('ready', this.beginShow);
+    // source/types/Scope.js:646:    this.on('ready', function (_event) {
+    // source/types/Scope.js:877:        $node.on('ready', this.bind(function (_event) { 
+    // and is additionally triggered in
+    // source/play.game.js:45:  game.trigger(_eventName || 'ready');
+    // source/types/AudioManager.js:423:    readyEvent = $$.Event('ready', {targetScope: this});
+    // lastly, it is disabled later in this file at
+    // source/types/Scope.js:651:      if (!this.assetQueue.length && this.isReady) this.off('ready');
     this.trigger(readyEvent);
   }
 
@@ -511,6 +573,7 @@ var Scope = jQProxy.extend(function () {
     this.isComponent = !!_componentName;
     this.event = null;
     this.assetQueue = Queue.create();
+    //MPR, ll-trace 11: this will be a reference to the game wrapper,
     this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
     if (!this.$els.length) {
@@ -518,18 +581,21 @@ var Scope = jQProxy.extend(function () {
     }
 
     this.addClass('pl-scope ' + (_componentName ? _componentName + '-component' : ''));
+    //MPR, ll-trace 12: probably shouldnt be storing all this data in the DOM but here we are
     this.data('pl-scope', this);
     this.data('pl-isComponent', !!_componentName);
 
+    //MPR, ll-trace 16: after this point, all of the pl- attributes on the game will be located in
+    //the 'properties' property of the scope, which will be the Game global scope when this is called
+    //from "run"
     captureProperties.call(this);
 
     if (_componentName) {
+    //MPR, ll-trace 17: This is probably where we load up the library components
       loadComponentAssets.call(this, _componentName, function () {
         init.call(this);
       });
-    }
-
-    else {
+    } else {
       init.call(this);
     }
 
@@ -583,10 +649,18 @@ var Scope = jQProxy.extend(function () {
 
   this.attachEvents = function () {
 
+    //MPR, ll-trace 32: Another area to be careful. I will make a note of which function this 
+    // proto intends to invoke when using fn.caller so that we can do so correctly once it is
+    // removed.
+    // The correct method is the highest level parent:
+    // source/types/jQProxy.js:98:  this.attachEvents = function () {
     this.proto();
 
+    //MPR, ll-trace 34: This is triggered in types/queue (currently on line 19) and is also listened several times in
+    // types/entity
     this.assetQueue.on('complete', this.bind(function () {
       this.assetQueue.off();
+      debugger;
       ready.call(this);
     }));
 

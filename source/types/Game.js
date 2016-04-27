@@ -425,6 +425,9 @@ var Game = GlobalScope.extend(function () {
 
     if (~pl.EVENT.ACTION.indexOf('touch')) {
       this.on(pl.EVENT.ACTION, function beginAudio(_event) {
+        //MPR, ll-trace 5.5: Checking what events this responds to
+        //Evidently none? Is this how we are starting audio on devices
+        //that require user input? Hmm.
         var ctx, screen;
 
         ctx = game.getAudioContext();

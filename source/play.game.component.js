@@ -74,15 +74,27 @@ COMPONENTS = [];
   this.load = function (_name, _callback) {
     var path;
 
+    //MPR, ll-trace 27: Back here. This is our recursive loop - Load all pulls the top level
+    // game components (including screens), which then in turn load their own. We _should_ now
+    // have loaded all of component templates and behaviors. Everything after this point
+    // should be unrelated to directly loading - hopefully events and audio attachment
     if (component.get(_name)) {
       if (_callback) _callback.call(component, _name);
       return null;
     }
-
+    //MPR, ll-trace 4: Here we load the behavior component from the game, not from the library
+    //It seems likely that the games will invoke the default library behavior either themselves,
+    //or it will somehow be done automatically for them.
     path = pl.game.config('componentDirectory') + _name + '/behavior.js';
 
     $.getScript(path, function () {
       if (_callback) _callback.call(component, _name);
+      //MPR, ll-trace 5: Fires the loaded event. Does not appear to be listened to anywhere explicitly
+      //however there are a few dynamic bindings that may fire. These are:
+      //source/types/Game.js:427:      this.on(pl.EVENT.ACTION, function beginAudio(_event) {
+      //source/types/Scope.js:80:    this.on(pl.EVENT.ACTION, function (_event) {
+      //Checking those now.
+      //These do not seem to ever respond on 'loaded'
       component.trigger('loaded', [_name]);
     });
 
@@ -102,6 +114,10 @@ COMPONENTS = [];
     $components = $('[pl-component]');
     queue = [];
 
+    //MPR, ll-trace 1: here we are collecting all of the
+    //types of component. This will load the component
+    //type into memory, but not the page components
+    //themselves
     $components.each(function (_index) {
       var name;
 
@@ -113,12 +129,17 @@ COMPONENTS = [];
     });
 
     queue.slice(0).forEach(function (_name) {
+      //MPR, ll-trace 2: next, get each of the scripts for the component types
+      //by name.
       component.load(_name, function () {
         var index;
 
         index = queue.indexOf(_name);
         queue.splice(index, 1);
 
+        //MPR, ll-trace 3: I wonder if this approach to firing this callback will encounter
+        //async problems under certain network conditions. On a timeout, it simply
+        //will never fire. @TODO this should become a promise.all.,
         if (!queue.length && _callback) _callback.apply(component, arguments);
       });
     });
