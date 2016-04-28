@@ -59,8 +59,33 @@ var Screen = Entity.extend(function () {
   };
 
   this.next = function () {
-    if (!this.completed()) return false;
-    return this.game.screens[this.screen.index() + 1];
+    var nextScreen = this.game.screens[this.screen.index() + 1];
+    var loadingScreen = this.game.screens[this.screen.index() + 2];
+
+    if (!nextScreen.$els.hasClass('preloading') && !nextScreen.$els.hasClass('preloaded')) {
+      nextScreen.$els.addClass('preloading');
+      $('#' + nextScreen.$els.context.id).load(`screens/${nextScreen.$els.context.id}.html`, function () {
+        nextScreen.$els.addClass('preloaded');
+        nextScreen.$els.removeClass('preloading');
+        //pl.game.component.loadAll(function () {
+        //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
+        //}, true);
+        //pl.game.initializeScreen(nextScreen.$els, 'screen-basic');
+        window.magic[nextScreen.id()]();
+      });
+    }
+
+    if (!this.completed() || !nextScreen.$els.hasClass('preloaded')) return false;
+
+    $('#' + loadingScreen.$els.context.id).load(`screens/${loadingScreen.$els.context.id}.html`, function () {
+      loadingScreen.$els.addClass('preloaded');
+      //pl.game.component.loadAll(function () {
+      //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
+      //}, true);
+      pl.game.initializeScreen(loadingScreen.$els, 'screen-basic');
+    });
+
+    return nextScreen;
   };
 
   this.prev = function () {

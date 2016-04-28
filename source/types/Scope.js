@@ -464,6 +464,7 @@ var Scope = jQProxy.extend(function () {
     // on the scope's propertyHandler property dictionary
     handleProperties.call(this);
 
+    //MPR, ll-trace 51: sets a loading event one each image in the current scope
     this.watchAssets();
     this.captureAudioAssets();
     this.captureReferences();
@@ -607,40 +608,56 @@ var Scope = jQProxy.extend(function () {
   this.event = null;
 
   this.initialize = function (_node_selector, _componentName) {
-    var scope;
+    var doInitialize = function (_node_selector, _componentName) {
+        var scope;
 
-    scope = this;
+        scope = this;
 
-    this.isReady = false;
-    this.isComponent = !!_componentName;
-    this.event = null;
-    this.assetQueue = Queue.create();
-    //MPR, ll-trace 11: this will be a reference to the game wrapper,
-    this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
+        this.isReady = false;
+        this.isComponent = !!_componentName;
+        this.event = null;
+        this.assetQueue = Queue.create();
+        //MPR, ll-trace 11: this will be a reference to the game wrapper,
+        this.$els = (_node_selector.jquery) ? _node_selector : $(_node_selector);
 
-    if (!this.$els.length) {
-      throw new ReferenceError('Unable to locate the element with selector ' + this.$els.selector + '.');
-    }
+        if (!this.$els.length) {
+          throw new ReferenceError('Unable to locate the element with selector ' + this.$els.selector + '.');
+        }
 
-    this.addClass('pl-scope ' + (_componentName ? _componentName + '-component' : ''));
-    //MPR, ll-trace 12: probably shouldnt be storing all this data in the DOM but here we are
-    this.data('pl-scope', this);
-    this.data('pl-isComponent', !!_componentName);
+        this.addClass('pl-scope ' + (_componentName ? _componentName + '-component' : ''));
+        //MPR, ll-trace 12: probably shouldnt be storing all this data in the DOM but here we are
+        this.data('pl-scope', this);
+        this.data('pl-isComponent', !!_componentName);
 
-    //MPR, ll-trace 16: after this point, all of the pl- attributes on the game will be located in
-    //the 'properties' property of the scope, which will be the Game global scope when this is called
-    //from "run"
-    captureProperties.call(this);
+        //MPR, ll-trace 16: after this point, all of the pl- attributes on the game will be located in
+        //the 'properties' property of the scope, which will be the Game global scope when this is called
+        //from "run"
+        captureProperties.call(this);
 
-    if (_componentName) {
-    //MPR, ll-trace 17: This is probably where we load up the library components
-      loadComponentAssets.call(this, _componentName, function () {
-        init.call(this);
-      });
+        if (_componentName) {
+        //MPR, ll-trace 17: This is probably where we load up the library components
+          loadComponentAssets.call(this, _componentName, function () {
+            init.call(this);
+          });
+        } else {
+          init.call(this);
+        }
+
+        return this;
+    }.bind(this, _node_selector, _componentName);
+
+    debugger;
+    if (false && _componentName === 'screen-basic') {
+      window.magic = window.magic || {};
+      window.magic[_node_selector.id()] = doInitialize;
+      window.magic._screenOrder = window.magic._screenOrder || [];
+      window.magic._screenOrder.push(doInitialize);
+      if(window.magic._screenOrder.length < 2) {
+        return doInitialize();
+      }
     } else {
-      init.call(this);
+        return doInitialize();
     }
-
     return this;
   };
 
@@ -695,7 +712,7 @@ var Scope = jQProxy.extend(function () {
 
   this.attachEvents = function () {
 
-    //MPR, ll-trace 32: Another area to be careful. I will make a note of which function this 
+    //MPR, ll-trace 32: Another area to be careful. I will make a note of which function this
     // proto intends to invoke when using fn.caller so that we can do so correctly once it is
     // removed.
     // The correct method is the highest level parent:
@@ -706,7 +723,7 @@ var Scope = jQProxy.extend(function () {
     // types/entity
     this.assetQueue.on('complete', this.bind(function () {
       this.assetQueue.off();
-      //MPR: that was a wild ride from start to finish. 
+      //MPR: that was a wild ride from start to finish.
       // @TODO Clean up this event structure.
       ready.call(this);
     }));

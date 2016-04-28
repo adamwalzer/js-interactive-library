@@ -327,7 +327,6 @@ var Game = GlobalScope.extend(function () {
     if (!this.hasOwnProperty('screens')) this.screens = Collection.create();
 
     if (this.hasOwnProperty('$els')) {
-      debugger;
       screenSelector = pl.game.config('screenSelector');
       prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
       selector = (typeof _id === 'number') ? screenSelector + ':nth-child(' + (_id + 1) + ')' : '#' + _id;
@@ -337,9 +336,7 @@ var Game = GlobalScope.extend(function () {
       if (!instance.game) {
         instance.game = instance.closest('.pl-game').scope();
       }
-    }
-
-    else {
+    } else {
       this.screens.push({
         index: (typeof _id === 'number') ? _id : null,
         name: (typeof _id === 'string') ? _id : null,
@@ -351,7 +348,7 @@ var Game = GlobalScope.extend(function () {
   };
 
   this.captureScreens = function () {
-    var screenSelector, prototype, collection;
+    var screenSelector, prototype, collection, nextScreen;
 
     screenSelector = pl.game.config('screenSelector');
     prototype = (screenPrototype.isPrototypeOf(this)) ? this : screenPrototype;
@@ -369,14 +366,31 @@ var Game = GlobalScope.extend(function () {
       screen.screen = screen;
       screen.game = this;
 
-      if ($node.attr('pl-skip') == null) collection.push(screen);
+      if ($node.attr('pl-skip') == null) {
+          collection.push(screen);
+          if (_index === 1) {
+            nextScreen = screen;
+          }
+      }
 
       if (key === 'name' || component) {
         util.assignRef(this, util.transformId((key === 'name' && id) || component, true), screen);
       }
     }));
 
-    if (collection.length) this.screens = collection;
+    if (collection.length)  {
+        this.screens = collection;
+        //MPR, 4/26/16: Hmm. This doesnt _feel_ like the right time to be loading a screen, but it is the
+        // first time they will be available
+
+        //nextScreen.$els.addClass('preloading');
+        //$('#' + nextScreen.$els.context.id).load(`screens/${nextScreen.$els.context.id}.html`, function () {
+        //  nextScreen.$els.addClass('preloaded');
+        //  nextScreen.$els.removeClass('preloading');
+          //game.initializeScreen(nextScreen.$els, 'screen-basic');
+        //  window.magic[nextScreen.id()]();
+        //});
+    }
 
     return this;
   };

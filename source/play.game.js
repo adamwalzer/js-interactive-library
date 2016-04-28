@@ -77,10 +77,9 @@ function register(_name, _implementation) {
 function initialize(nameCollection, implementation) {
   switch (typeof nameCollection) {
   case 'string':
-      debugger;
     SCOPE[nameCollection] = Game
         //MPR, ll-trace 8: Now, this is where things start to get interesting
-        //This "Game" object comes from types/Game, which itself is an alias for 
+        //This "Game" object comes from types/Game, which itself is an alias for
         // types/GlobalScope, which is an alias for types/Scope, which is a singleton
         // instance of the jqProxy type. This type inverts a number of jQuery methods
         // (notably 'extend') to operate on the invoked 'this' object, rather than
@@ -105,6 +104,9 @@ function initialize(nameCollection, implementation) {
   }
 }
 
+function initializeSingleScreen(node, componentType) {
+  //Game.initialize(node, componentType);
+}
 
 /** @protected */
 GAMES = [];
@@ -129,7 +131,7 @@ READY_QUEUE = [];
   util.mixin(game, Events);
 
   this.on('platform-event', function (_event) {
-    console.log('play.game -', _event.name, _event.gameData);
+    console.log('play.game -', _event.name, _event.gameData); //eslint-disable-line no-console
   });
 
   /**
@@ -142,6 +144,7 @@ READY_QUEUE = [];
     game.trigger('dom-ready');
 
     game.component.loadAll(function () {
+        debugger;
       // console.log('** All component sources loaded.');
       //MPR, ll-trace 6: does this really fire once for each component?
       //yep.
@@ -277,7 +280,7 @@ READY_QUEUE = [];
 
     return function (_name) {
       var tester = detect[_name];
-      if (!tester && console) console.warn('No feature detection for "' + _name + '".');
+      if (!tester && console) console.warn('No feature detection for "' + _name + '".'); //eslint-disable-line no-console
       return tester && tester();
     };
   }());
@@ -309,6 +312,8 @@ READY_QUEUE = [];
     return silence;
   };
 
+  this.initialize = initialize;
+  this.initializeScreen = initializeSingleScreen;
 }).call(game);
 
 export default game;
