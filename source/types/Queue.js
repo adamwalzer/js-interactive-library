@@ -16,6 +16,10 @@ var Queue = Collection.extend(function () {
     if (_record != null) this.remove(_record);
 
     if (!this.length) {
+      //MPR, ll-trace 39: This may be a problematic loop. Complete fires ready, ready fires complete.
+      //Probably the only reason this works is because the only purpose of this function is to remove
+      //the last record and continue the cycle of audio events firing. Even with it working, it seems
+      //unlikely that this is a stable or predictable configuration.
       this.trigger('complete');
     }
 

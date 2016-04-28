@@ -34,6 +34,18 @@ import { AudioManager } from 'types/AudioManager';
 function createEntity(_$node, _implementation) {
   var component, prototype, componentRecord, instance;
 
+    //MPR, ll-trace 43: So, it would appear that sometimes, entities are components. Entities
+    // also appear to always be scopes as well. From the types/entities description, it would
+    // seem that the purpose of entities is to have a scope with visual elements and the
+    // ability to respond to "behaviors". Responding to behaviors here is referred to as a
+    // "responisbility". If an entity is a component and the passed in implementation function
+    // does not match the components implementation, use the components. Otherwise use the
+    // passed in one, and add all of the component's implementation properties to the current
+    // scope.
+    // @TODO All of this scope extension from arbitrary implementation functions is extremelty
+    // unsafe, particularly if the extend function is producing new objects. In the one case,
+    // we are probably overriding properties blindly, and on the other we are creating many
+    // disparate scope objects for a single DOM scope..
   component = _$node.attr('pl-component');
   prototype = this;
 
@@ -54,6 +66,8 @@ function createEntity(_$node, _implementation) {
 
   instance = typeof _implementation === 'function' ? prototype.extend(_implementation) : prototype.create();
 
+    //MPR, ll-trace 44: This seems like an important step, as this will then trigger a cascading initialization
+    // inside of the component or entity that is being touched.
   return instance.initialize(_$node, component);
 }
 
@@ -115,24 +129,24 @@ var Scope = jQProxy.extend(function () {
     });
   }
 
-  function getRecordBy(_key, _member, _collection) {
-    var i, record;
+//  function getRecordBy(_key, _member, _collection) {
+//    var i, record;
+//
+//   if (_collection) {
+//     for (i = 0; record = _collection[i]; i += 1) {
+//       if (record[_key] === _member) return record;
+//     }
+//   }
+//
+//   return null;
+// }
 
-    if (_collection) {
-      for (i = 0; record = _collection[i]; i += 1) {
-        if (record[_key] === _member) return record;
-      }
-    }
-
-    return null;
-  }
-
-  function removeRecord(_record, _collection) {
-    var index;
-
-    index = _collection.indexOf(_record);
-    if (~index) _collection.splice(index, 1);
-  }
+// function removeRecord(_record, _collection) {
+//   var index;
+//
+//   index = _collection.indexOf(_record);
+//   if (~index) _collection.splice(index, 1);
+// }
 
   function captureDropables(_scope) {
     var collection;
@@ -315,6 +329,11 @@ var Scope = jQProxy.extend(function () {
   }
 
   function initializeEntities() {
+    //MPR, ll-trace 41: It is not clear to me what "entities" are, or how the entities property will ultimately
+    // be set. A simple grep indicates it is set frequently in this file. Let us see where.
+    // They are set in the "ready" event for the scope, and appear to be the general set of immediate child scopes
+    // to the current scope. It is not clear why one would set them using the scope.entity method rather than
+    // using a pl-scope attribute.
     if (!this.hasOwnProperty('entities')) return this;
 
     this.entities.forEach(this.bind(function (_record, _index) {
@@ -337,6 +356,12 @@ var Scope = jQProxy.extend(function () {
 
         $node = $(_node);
 
+        //MPR, ll-trace 42: So, for each child of the given scope, get all of _that_ scope's children
+        // matching a provided selector and see if they prototypically inherit from the given scope
+        // if not, create a new instance of entity, binding the create entity to the given scope, and passing
+        // the child scope the entity belongs to, and the provided entity implementation, and queue it to load
+        // its assets if it is not already ready. Otherwise, the entity has already been initialized somehow,
+        // so just store its reference.
         if (!Scope.isPrototypeOf(_record)) {
           instance = createEntity.call(this, $node, _record.implementation);
           if (!instance.isReady) this.assetQueue.add(instance);
@@ -345,6 +370,11 @@ var Scope = jQProxy.extend(function () {
         }
 
         id = util.transformId(instance.id(), true);
+        //MPR, ll-trace 45: More scope property danger. Once we have created an instance, we
+        // then add a reference to that entity scope by name with no namespace on the parent scope
+        // I have to assume that these are never used, and this is being done for debugging
+        // convienience, because to get one back out one would need to first obtain its transformed
+        // name from within child scopes somehow, and then dynamically reference it.
         if (id) util.assignRef(this, id, instance);
       }));
     }));
@@ -357,6 +387,13 @@ var Scope = jQProxy.extend(function () {
 
     scope = this;
 
+    //MPR, ll-trace 47: So, if we have any additional pl-properties set on our scope object
+    // check if we have a "propertyHandler" set for it, and call it.
+    // This seems sensible enough, except that these aren't "handlers", but fine
+    // The issue is that then, below, we go over each handler and check to see if there are
+    // any matching properties inside of our scope, and then we fire each handler again for
+    // each one. This seems extremely likely to fire each handler a whole bunch of times.
+    // Lastly, at this stage we haven't seen where these get set yet.
     if (this.hasOwnProperty('properties')) {
       this.properties.forEach(function (_name) {
         handler = scope.propertyHandlers[_name];
@@ -377,6 +414,9 @@ var Scope = jQProxy.extend(function () {
           if (scope === $(this).scope()) {
             attr = this.attributes.getNamedItem('pl-' + property);
 
+            //MPR: because of the default 'component' handler, this may be picking up the slack
+            // on initializing some child component entities. Something to watch for while 
+            // attempting to lazt load.
             if (handler) handler.call(scope, this, property, attr.value);
           }
         });
@@ -415,7 +455,13 @@ var Scope = jQProxy.extend(function () {
     //MPR: why hello there.
     this.attachEvents();
 
+    //MPR, ll-trace 46: Finds all of the "entities" of the current scope and creates and initializes
+    // them, attaching them as properties to the current scope, based on the selector that was used
+    // to find their DOM nodes
     initializeEntities.call(this);
+    //MPR, ll-trace 50: Goes through and calls the "handlers" for all of the entities of the given scope
+    // including those for all present children's properties for which there are matching named handlers
+    // on the scope's propertyHandler property dictionary
     handleProperties.call(this);
 
     this.watchAssets();
@@ -440,11 +486,7 @@ var Scope = jQProxy.extend(function () {
     entities = this.findOwn('.pl-scope').scope();
 
     if (entities) {
-      if (entities.length > 0) {
-        this.entities = entities;
-      } else {
-        this.entities = [entities];
-      }
+      entities = [].concat(entities);
     }
 
     /**
@@ -641,7 +683,11 @@ var Scope = jQProxy.extend(function () {
       return this;
     }
 
-    this.each(watch);
+    //MPR: So evidently were watching each child but ignoring them if they arenet images
+    // then getting all of our children who are images and running over them again? I have
+    // to see if everything still works without this first line.
+    // oh we totally can.
+    //this.each(watch);
     this.findOwn('img').each(watch);
 
     return this;
@@ -660,15 +706,24 @@ var Scope = jQProxy.extend(function () {
     // types/entity
     this.assetQueue.on('complete', this.bind(function () {
       this.assetQueue.off();
-      debugger;
+      //MPR: that was a wild ride from start to finish. 
+      // @TODO Clean up this event structure.
       ready.call(this);
     }));
 
+    //MPR, ll-trace 38: This is triggered by the ready call in the above assetQueue.on('complete')
     this.on('ready', function (_event) {
+      //MPR: only fire assetQueue ready if this ready event was issued for both the current and asset scopes?
       if (this.has(_event.targetScope) && this.assetQueue.has(_event.targetScope)) {
         this.assetQueue.ready(_event.targetScope);
       }
 
+      //MPR, ll-trace 40: Given that this event will only be triggered when all assets have loaded
+      // it is unclear to me what the purpose of this is. This event is fired very frequently however,
+      // and upon inspection this.isReady is generally false. It must be that many events trigger ready
+      // but only the trace leading here in code produces the final result. Additionally, this result
+      // seems totally independent of the above assetQueue contitional, which additionally does not
+      // seem to affect assetQueue.length
       if (!this.assetQueue.length && this.isReady) this.off('ready');
     });
 
@@ -769,6 +824,7 @@ var Scope = jQProxy.extend(function () {
     return this;
   };
 
+    //MPR, ll-trace 48: What the fuck
   this.handleProperty = function (_implementation) {
     if (this.propertyHandlers) {
       if (this.hasOwnProperty('propertyHandlers')) {
@@ -781,20 +837,20 @@ var Scope = jQProxy.extend(function () {
           this.propertyHandlers.mixin(_implementation);
           break;
         }
-      }
-
-      else {
+      } else {
         this.propertyHandlers = this.propertyHandlers.extend(_implementation);
       }
-    }
-
-    else {
+    } else {
       this.propertyHandlers = Basic.extend(_implementation);
     }
 
     return this;
   };
 
+  //MPR: only called from components. Seems to be used to attach "entities" to scopes. 
+  // The entity itself is a jquery selector with a "implementation" function, similar to
+  // the way games and components are initialized. It is unclear why entities are distinct
+  // from these other types.
   this.entity = function (_selector, _implementation) {
     var Entity, prototype, id;
 
@@ -810,9 +866,7 @@ var Scope = jQProxy.extend(function () {
 
       // this.entities.push(instance);
       if (id) this[id] = instance;
-    }
-
-    else {
+    } else {
       this.entities.push({
         selector: _selector,
         implementation: _implementation
@@ -848,6 +902,13 @@ var Scope = jQProxy.extend(function () {
     return this;
   };
 
+    //MPR, ll-trace 49: So each scope will attach either an object containing a demi-constructor
+    // or a flat object that accomplishes the same thing. All of this appears to be done to avoid
+    // needing to have a separate function to invoke the handlers from the one that sets them. In
+    // theory this could be used to avoid overriding methods, but this doesnt do that. It will
+    // simply overwrite any that happen to be there in a variety of ways.
+    // By default, the global scope will respond to the 4 properties defined here: component, action, required, and require
+    // component appears to try to recreate the component entity, which should also have happened in initializeEntities.
   this.handleProperty(function () {
 
     this.component = function (_node, _name, _value, _property) {
@@ -864,9 +925,7 @@ var Scope = jQProxy.extend(function () {
           util.assignRef(this, id, scope);
 
           if (!scope.isReady) this.assetQueue.add(scope);
-        }
-
-        else {
+        } else {
           throw new Error('Ahh!');
         }
       }
