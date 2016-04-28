@@ -647,18 +647,19 @@ var Scope = jQProxy.extend(function () {
     }.bind(this, _node_selector, _componentName);
 
     debugger;
-    if (false && _componentName === 'screen-basic') {
+    if (_componentName === 'screen-basic') {
       window.magic = window.magic || {};
       window.magic[_node_selector.id()] = doInitialize;
       window.magic._screenOrder = window.magic._screenOrder || [];
       window.magic._screenOrder.push(doInitialize);
-      if(window.magic._screenOrder.length < 2) {
-        return doInitialize();
-      }
+      //if(window.magic._screenOrder.length < 2) {
+      //  return doInitialize();
+     // }
     } else {
-        return doInitialize();
+      //  return doInitialize();
     }
-    return this;
+    //return this;
+        return doInitialize();
   };
 
   // only for use in base types
@@ -704,7 +705,7 @@ var Scope = jQProxy.extend(function () {
     // then getting all of our children who are images and running over them again? I have
     // to see if everything still works without this first line.
     // oh we totally can.
-    //this.each(watch);
+    this.each(watch);
     this.findOwn('img').each(watch);
 
     return this;
@@ -769,6 +770,7 @@ var Scope = jQProxy.extend(function () {
 
     deQ = function (_item) {
       [this, this.screen].forEach(function (_scope) {
+          debugger;
         if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
           _scope.requiredQueue.ready(_item);
         }

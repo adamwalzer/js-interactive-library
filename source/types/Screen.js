@@ -82,7 +82,8 @@ var Screen = Entity.extend(function () {
       //pl.game.component.loadAll(function () {
       //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
       //}, true);
-      pl.game.initializeScreen(loadingScreen.$els, 'screen-basic');
+      //pl.game.initializeScreen(loadingScreen.$els, 'screen-basic');
+      window.magic[loadingScreen.id()]();
     });
 
     return nextScreen;
