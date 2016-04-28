@@ -46,7 +46,7 @@ var Screen = Entity.extend(function () {
 		this.pauseMedia();
 		if(this.hasOwnProperty('entities') && this.entities) {
 			this.entities.forEach(function(entity) {
-				entity.pause();
+				if(typeof entity.pause === 'function') entity.pause();
 			});
 		}
 		return this;
@@ -56,7 +56,7 @@ var Screen = Entity.extend(function () {
 		this.resumeMedia();
 		if(this.hasOwnProperty('entities') && this.entities) {
 			this.entities.forEach(function(entity) {
-				entity.resume();
+				if(typeof entity.resume === 'function') entity.resume();
 			});
 		}
 		return this;
