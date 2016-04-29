@@ -646,7 +646,6 @@ var Scope = jQProxy.extend(function () {
         return this;
     }.bind(this, _node_selector, _componentName);
 
-    debugger;
     if (_componentName === 'screen-basic') {
       window.magic = window.magic || {};
       window.magic[_node_selector.id()] = doInitialize;
@@ -770,7 +769,6 @@ var Scope = jQProxy.extend(function () {
 
     deQ = function (_item) {
       [this, this.screen].forEach(function (_scope) {
-          debugger;
         if (_scope.requiredQueue && _scope.isMemberSafe('requiredQueue') && _scope.requiredQueue.has(_item)) {
           _scope.requiredQueue.ready(_item);
         }
