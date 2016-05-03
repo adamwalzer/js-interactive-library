@@ -501,6 +501,7 @@ var Scope = jQProxy.extend(function () {
   this.propertyHandlers = null;
   this.assetQueue = null;
   this.event = null;
+  this.currentMedia = {};
 
   this.initialize = function (_node_selector, _componentName) {
     var scope;
@@ -656,7 +657,10 @@ var Scope = jQProxy.extend(function () {
       case 'play':
         [this, this.screen].forEach(function (_scope, _index, _set) {
             if (_index === 1 && _scope === _set[0]) return;
-            if (_scope.$els) _scope.addClass('PLAYING ' + map[_event.target.type]);
+            if (_scope.$els) {
+              _scope.addClass('PLAYING '+map[_event.target.type]);
+              _scope.currentMedia[map[_event.target.type]] = _event.target;
+            }
           });
 
         $(_event.targetNode).addClass('PLAYING');
@@ -674,6 +678,7 @@ var Scope = jQProxy.extend(function () {
               _scope.removeClass(map[_event.target.type]);
               state = _scope.attr('class');
               if (!(/BACKGROUND|VOICE-OVER|SFX/).test(state)) _scope.removeClass('PLAYING');
+              if(_scope.currentMedia[map[_event.target.type]] === _event.target) _scope.currentMedia[map[_event.target.type]] = null;
             }
           });
 

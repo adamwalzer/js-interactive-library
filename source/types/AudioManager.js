@@ -387,9 +387,9 @@ function MediaCollection($, sup) { $(
  * @arg {function} $ - Passed by `type()`, gives you a pritier interface for defining the instance members.
  * @classdesc An itterable with a collection of Audio objects. This interface also exposes methods for working with it members.
  */
-function Audio($) {
+function Audio ($) {
 
-  function accessConfig(_augment, _val) {
+  function accessConfig (_augment, _val) {
     if (_val) {
       return this[_augment] = _val;
     } else if (typeof _augment === 'string') {
@@ -406,7 +406,7 @@ function Audio($) {
    */
   util.mixin(this, EventTargetInterface, PlayableInterface, StateInterface);
 
-  $(
+$(
   'type, media, activeSource, buffer, config, fileName, gain, delay, delayID',
 
   /**
@@ -414,7 +414,7 @@ function Audio($) {
    * @arg {HTMLAudioElement|AudioBufferRecord} _audio - The object being wrapped.
    * @arg {string} _type - The collection type.
    */
-  function alloc(_audio, _type) {
+  function alloc (_audio, _type) {
     var $audio, config, ctx, readyEvent, id;
 
     $audio = $$(_audio.node || _audio);
@@ -440,7 +440,7 @@ function Audio($) {
       writeable: false
     });
 
-    this.initialize(id, 'audio ' + this.type);
+    this.initialize(id, 'audio '+this.type);
 
     $$(this.media).trigger(readyEvent);
   },
@@ -450,10 +450,10 @@ function Audio($) {
    *  - `MediaElementSouceNode` for audio elements.
    *  - `AudioBufferSourceNode` for an ArrayBuffer.
    */
-  function getSource() {
+  function getSource () {
     var ctx, src;
 
-    ctx = pl.game.getAudioContext();
+    ctx = this.audioContext || pl.game.getAudioContext();
 
     if (ctx) {
       if (this.buffer) {
@@ -477,23 +477,29 @@ function Audio($) {
    * Get the owning collection interface for an Audio object.
    * @returns {AudioCollection}
    */
-  function collection() {
+  function collection () {
     return this.$el.closest('.collection').data('context');
   },
   /**
    * Get the owning manager interface for an Audio object.
    * @returns {AudioManager}
    */
-  function manager() {
+  function manager () {
     return this.$el.closest('#man').data('context');
   },
   /**
    * Proveds a string representation of the object type.
    */
-  function toString() {
-    return '[audio#' + this.id() + ' ' + this.fileName + ']';
+  function toString () {
+    return '[audio#'+this.id()+' '+this.fileName+']';
+  },
+  function setContext (ctx) {
+    this.gain = ctx.createGain();
+    this.gain.disconnect();
+    this.gain.connect(ctx.destination);
+    this.audioContext = ctx;
   }
-);}
+)}
 
 /**
  * A virtual DOM to handle navigation and propagation of events through the API interfaces.
@@ -656,45 +662,61 @@ StateInterface = {
  * Interface for methods involving audio control for any API level.
  */
 PlayableInterface = {
+  proxyEvent: function(_event) {
+    var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
+    
+    // proxy event to shadow DOM only when it has an active source.
+    if (this.activeSource) {
+      if (_event.type === 'ended') {
+        this.removeState('PLAYING');
+        this.activeSource = null;
+      }
+
+      this.trigger(theEvent);
+    }
+
+    _event.target.removeEventListener(_event.type, this.handler.bind(this), false);
+  },
+  handler: function(_event) {
+    if (_event.type === 'ended' && _event.activeSource) {
+      _event.activeSource.disconnect();
+    }
+    this.proxyEvent.call(this,_event);
+  },
+  simEnd: function() {
+    if (this.activeSource) {
+      console.warn('Native `ended` failed to fire, simulating...');
+      this.handler({target: this.activeSource, type: 'ended'});
+    }
+  },
+  playSource: function() {
+    var time;
+    if (this.buffer) {
+      this.activeSource.start(0);
+      this.startTime = new Date();
+
+      if (!this.activeSource.loop) {
+        time = Math.ceil(this.buffer.duration * 1000) + 250;
+        this.timeout = setTimeout(this.simEnd.bind(this), time);
+      }
+    } else {
+      this.media.play();
+    }
+
+    this.delayID = null;
+  },
   /**
    * Play an audio object.
    */
   play: function (_selector) {
-    var ctx, src, proxyEvent, dest, delay, shouldPlay;
+    var ctx, src, dest, delay, shouldPlay;
 
-    function handler(_event) {
-      if (_event.type === 'ended' && _event.activeSource) {
-        _event.activeSource.disconnect();
-      }
-      proxyEvent(_event);
-    }
 
-    function playSource() {
-      var time;
-      if (this.buffer) {
-        this.activeSource.start(0);
-
-        if (!this.activeSource.loop) {
-          time = Math.ceil(this.buffer.duration * 1000) + 500;
-          setTimeout(function () {
-            if (this.activeSource) {
-              console.warn('Native `ended` failed to fire, simulating...');
-              handler({target: this.activeSource, type: 'ended'});
-            }
-          }.bind(this), time);
-        }
-      } else {
-        this.media.play();
-      }
-
-      this.delayID = null;
-    }
-
-    function response(_val) {
+    function response (_val) {
       shouldPlay = _val;
     }
 
-    ctx = pl.game.getAudioContext();
+    ctx = this.audioContext || pl.game.getAudioContext();
     shouldPlay = true;
 
     /*
@@ -717,24 +739,9 @@ PlayableInterface = {
     }
 
     if (!(src = this.getSource())) return false;
-    proxyEvent = (function (_event) {
-      var theEvent = $$.Event(_event.type, { target: this, targetSource: _event.target, targetNode: this.media });
-
-      // proxy event to shadow DOM only when it has an active source.
-      if (this.activeSource) {
-        if (_event.type === 'ended') {
-          this.removeState('PLAYING');
-          this.activeSource = null;
-        }
-
-        this.trigger(theEvent);
-      }
-
-      _event.target.removeEventListener(_event.type, handler, false);
-    }.bind(this));
 
     src.connect(this.gain);
-    src.addEventListener('ended', handler, false);
+    src.addEventListener('ended', this.handler.bind(this), false);
 
     this.trigger($$.Event('shouldPlay', { target: this, targetSource: src, targetNode: this.media, response: response }));
 
@@ -743,12 +750,12 @@ PlayableInterface = {
       this.activeSource = src;
 
       if (delay = this.config('delay')) {
-        this.delayID = setTimeout(playSource.bind(this), util.toMillisec(delay));
+        this.delayID = setTimeout(this.playSource.bind(this), util.toMillisec(delay));
       } else {
-        playSource.call(this);
+        this.playSource.call(this);
       }
 
-      handler({target: src, type: 'play'});
+      this.handler({target: src, type: 'play'});
     }
 
     return this;
@@ -757,6 +764,26 @@ PlayableInterface = {
    * Pause an audio object.
    */
   pause: function () {
+    if (this.buffer) {
+      this.pauseTime = new Date();
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+
+    return this;
+  },
+  /**
+   * Resume an audio object.
+   */
+  resume: function () {
+    var time;
+    if (this.buffer) {
+      if (!this.activeSource.loop) {
+        time = Math.ceil(this.buffer.duration * 1000 - (this.pauseTime - this.startTime)) + 250;
+        this.timeout = setTimeout(this.simEnd.bind(this), time);
+      }
+    }
+
     return this;
   },
   /**
@@ -789,7 +816,7 @@ PlayableInterface = {
       clearTimeout(this.delayID);
       this.delayID = null;
     }
-
+    
     this.activeSource = null;
 
     this.removeState('PLAYING');
@@ -813,7 +840,9 @@ PlayableInterface = {
     }
 
     this.gain.gain.value = _level;
-  }
+  },
+  startTime: 0,
+  pauseTime: 0,
 };
 
 export default type(MediaManager, AudioManager, AudioCollection, Audio);
