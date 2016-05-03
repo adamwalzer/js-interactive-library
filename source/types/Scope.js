@@ -487,7 +487,7 @@ var Scope = jQProxy.extend(function () {
     entities = this.findOwn('.pl-scope').scope();
 
     if (entities) {
-      entities = [].concat(entities);
+      this.entities = [].concat(entities);
     }
 
     /**
