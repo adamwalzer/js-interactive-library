@@ -8,18 +8,18 @@ import { Entity, invokeResponsibilities } from 'types/Entity';
 
 var Screen = Entity.extend(function () {
 
-  function attachBehaviorEvent() {
+  function attachBehaviorEvent () {
     this.on('behavior', function (_event) {
       // console.log('SCREEN GOT', _event.targetScope.id(), _event.name);
 
       if (this !== _event.targetScope) {
-        invokeResponsibilities(this, _event);
+        invokeResponsibilities(this,  _event);
       }
-
+      
       this.propagateBehavior(_event);
     });
   }
-
+  
   this.baseType = 'TYPE_SCREEN';
   this.game = null;
   this.screen = null;
@@ -42,6 +42,26 @@ var Screen = Entity.extend(function () {
     return this;
   };
 
+  this.pause = function() {
+    this.pauseMedia();
+    if(this.hasOwnProperty('entities') && this.entities) {
+      this.entities.forEach(function(entity) {
+        if(typeof entity.pause === 'function') entity.pause();
+      });
+    }
+    return this;
+  };
+
+  this.resume = function() {
+    this.resumeMedia();
+    if(this.hasOwnProperty('entities') && this.entities) {
+      this.entities.forEach(function(entity) {
+        if(typeof entity.resume === 'function') entity.resume();
+      });
+    }
+    return this;
+  };
+
   this.startAudio = function () {
     if (!this.audio) return;
     this.audio.background.play();
@@ -51,6 +71,24 @@ var Screen = Entity.extend(function () {
   this.stopAudio = function () {
     if (!this.audio) return;
     this.audio.voiceOver.stop('@ALL');
+  };
+
+  this.pauseMedia = function() {
+    if(!this.currentMedia) return;
+    for(var media in this.currentMedia) { 
+      if(this.currentMedia.hasOwnProperty(media)) {
+        if(this.currentMedia[media]) this.currentMedia[media].pause();
+      }
+    }
+  };
+
+  this.resumeMedia = function() {
+    if(!this.currentMedia) return;
+    for(var media in this.currentMedia) { 
+      if(this.currentMedia.hasOwnProperty(media)) {
+        if(this.currentMedia[media]) this.currentMedia[media].resume();
+      }
+    }
   };
 
   this.index = function () {
@@ -90,7 +128,7 @@ var Screen = Entity.extend(function () {
   };
 
   this.prev = function () {
-    return this.game.screens[this.screen.index() - 1];
+    return this.game.screens[this.screen.index()-1];
   };
 
   this.quit = function () {
@@ -106,7 +144,7 @@ var Screen = Entity.extend(function () {
   };
 
   this.isLast = function () {
-    return this.game.screens.indexOf(this.screen) === this.game.screens.length - 1;
+    return this.game.screens.indexOf(this.screen) === this.game.screens.length-1;
   };
 
 });
