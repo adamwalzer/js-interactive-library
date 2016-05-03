@@ -16,17 +16,17 @@ import Basic from 'types/Basic';
  * @mixes module:types/Basic~Basic
  */
 var BasicArray = (function () {
-	/**
-	 * Objects with this as an own property will be identified as the root object.
-	 * @memberof module:types/BasicArray~BasicArray
-	 * @readonly
-	 * @default
-	 */
-	this.baseType = 'TYPE_BASIC_ARRAY';
-	
-	util.mixin(this, Basic);
+  /**
+   * Objects with this as an own property will be identified as the root object.
+   * @memberof module:types/BasicArray~BasicArray
+   * @readonly
+   * @default
+   */
+  this.baseType = 'TYPE_BASIC_ARRAY';
 
-	return this;
+  util.mixin(this, Basic);
+
+  return this;
 
 }).call([]);
 
