@@ -109,20 +109,22 @@ var Screen = Entity.extend(function () {
         //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
         //}, true);
         //pl.game.initializeScreen(nextScreen.$els, 'screen-basic');
-        window.magic[nextScreen.id()]();
+        window.magic[nextScreen.id()] && window.magic[nextScreen.id()]();
       });
     }
 
     if (!this.completed() || !nextScreen.$els.hasClass('preloaded')) return false;
 
-    $('#' + loadingScreen.$els.context.id).load(`screens/${loadingScreen.$els.context.id}.html`, function () {
-      loadingScreen.$els.addClass('preloaded');
-      //pl.game.component.loadAll(function () {
-      //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
-      //}, true);
-      //pl.game.initializeScreen(loadingScreen.$els, 'screen-basic');
-      window.magic[loadingScreen.id()]();
-    });
+    if(loadingScreen && !loadingScreen.$els.hasClass('preloading') && !loadingScreen.$els.hasClass('preloaded')) {
+      $('#' + loadingScreen.$els.context.id).load(`screens/${loadingScreen.$els.context.id}.html`, function () {
+        loadingScreen.$els.addClass('preloaded');
+        //pl.game.component.loadAll(function () {
+        //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
+        //}, true);
+        //pl.game.initializeScreen(loadingScreen.$els, 'screen-basic');
+        window.magic[loadingScreen.id()] && window.magic[loadingScreen.id()]();
+      });
+    }
 
     return nextScreen;
   };

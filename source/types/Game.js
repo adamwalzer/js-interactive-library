@@ -363,7 +363,7 @@ var Game = GlobalScope.extend(function () {
   };
 
   this.screen = function (_id, _implementation) {
-    var prototype, selector, screenSelector, instance;
+    var prototype, selector, screenSelector, instance, oldScreen;
 
     if (arguments.length === 1 && typeof _id === 'function') {
       screenPrototype = Screen.extend(_id);
@@ -381,6 +381,16 @@ var Game = GlobalScope.extend(function () {
       instance.screen = instance;
       if (!instance.game) {
         instance.game = instance.closest('.pl-game').scope();
+      }
+
+      if(typeof _id === 'string') {
+        oldScreen = this.screens.find(function(_screen) {
+          return _screen.$els.id() === _id;
+        });
+
+        if(typeof oldScreen === 'object') {
+          this.screens[this.screens.indexOf(oldScreen)] = instance;
+        }
       }
     } else {
       this.screens.push({
@@ -414,7 +424,7 @@ var Game = GlobalScope.extend(function () {
 
       if ($node.attr('pl-skip') == null) {
           collection.push(screen);
-          if (_index === 1) {
+          if (_index === 2) {
             nextScreen = screen;
           }
       }
@@ -429,13 +439,13 @@ var Game = GlobalScope.extend(function () {
         //MPR, 4/26/16: Hmm. This doesnt _feel_ like the right time to be loading a screen, but it is the
         // first time they will be available
 
-        //nextScreen.$els.addClass('preloading');
-        //$('#' + nextScreen.$els.context.id).load(`screens/${nextScreen.$els.context.id}.html`, function () {
-        //  nextScreen.$els.addClass('preloaded');
-        //  nextScreen.$els.removeClass('preloading');
-          //game.initializeScreen(nextScreen.$els, 'screen-basic');
-        //  window.magic[nextScreen.id()]();
-        //});
+        nextScreen.$els.addClass('preloading');
+        $('#' + nextScreen.$els.context.id).load(`screens/${nextScreen.$els.context.id}.html`, function () {
+         nextScreen.$els.addClass('preloaded');
+         nextScreen.$els.removeClass('preloading');
+          game.initializeScreen(nextScreen.$els, 'screen-basic');
+         window.magic[nextScreen.id()]();
+        });
     }
 
     return this;

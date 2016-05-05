@@ -61,7 +61,6 @@ function invokeResponsibilities(_scope, _event) {
  * @extends GlobalScope
  */
 var Entity = GlobalScope.extend(function () {
-debugger;
   function resolveTarget(_target) {
 
     switch (typeof _target) {

@@ -144,7 +144,6 @@ READY_QUEUE = [];
     game.trigger('dom-ready');
 
     game.component.loadAll(function () {
-        debugger;
       // console.log('** All component sources loaded.');
       //MPR, ll-trace 6: does this really fire once for each component?
       //yep.
