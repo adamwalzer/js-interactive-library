@@ -32,8 +32,8 @@ var platform = new (function () {
   this.EVENT_EXIT = 'exit';
   this.EVENT_FLIPPED = 'flipped';
 
-  this.emit = function (_name) {
-    if (window.frameElement) window.frameElement.dispatchEvent(createEvent(_name));
+  this.emit = function (_name, data) {
+    if (window.frameElement) window.frameElement.dispatchEvent(createEvent(_name, data));
   };
 
   this.saveGameState = function (_data) {
