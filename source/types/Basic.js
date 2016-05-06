@@ -106,7 +106,6 @@ var Basic = {
 
     if (!method) {
       console.error('ReferenceError: Unable to locate prototype method.', this.proto.caller);
-      debugger;
       return null;
     }
 

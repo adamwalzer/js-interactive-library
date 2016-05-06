@@ -127,7 +127,7 @@ READY_QUEUE = [];
 
   this.component = component;
   this.manager = manager;
-  
+
   util.mixin(game, Events);
 
   this.on('platform-event', function (_event) {
@@ -170,14 +170,14 @@ READY_QUEUE = [];
     return this;
   };
 
-  this.report.flip = function (_gameScope) {
+  this.report.flip = function (_gameScope, data = {}) {
+    platform.emit(platform.EVENT_FLIPPED, data);
     platform.saveGameState(_gameScope.progress());
-    platform.emit(platform.EVENT_FLIPPED);
 
     return this;
   };
 
-  
+
   /**
    * Getter/Setter for game level configuration.
    * @function module:play~pl.game.config
@@ -192,11 +192,11 @@ READY_QUEUE = [];
    * @arg {object} _mixin - Object to set properties on configuration.
    * @returns {this}
    */
-  this.config = function (_key_mixin) {
-    switch (typeof _key_mixin) {
-      case 'string': return util.resolvePath(CONFIG, _key_mixin);
-      case 'object':
-        if (_key_mixin) util.mixin(CONFIG, _key_mixin);
+  this.config = function (keyMixin) {
+    switch (typeof keyMixin) {
+    case 'string': return util.resolvePath(CONFIG, keyMixin);
+    case 'object':
+      if (keyMixin) util.mixin(CONFIG, keyMixin);
     }
 
     return this;
@@ -287,8 +287,12 @@ READY_QUEUE = [];
   this.getAudioContext = function () {
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext);
-      // window.onfocus = function() { audioContext.resume(); };
-      // window.onblur = function() { audioContext.suspend(); };
+      window.onfocus = function () {
+        audioContext.resume();
+      };
+      window.onblur = function () {
+        audioContext.suspend();
+      };
     }
     return audioContext;
   };
