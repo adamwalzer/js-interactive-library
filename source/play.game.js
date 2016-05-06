@@ -171,6 +171,9 @@ READY_QUEUE = [];
   };
 
   this.report.flip = function (_gameScope, data = {}) {
+    if (_gameScope.game) {
+      _gameScope = _gameScope.game;
+    }
     platform.emit(platform.EVENT_FLIPPED, data);
     platform.saveGameState(_gameScope.progress());
 
