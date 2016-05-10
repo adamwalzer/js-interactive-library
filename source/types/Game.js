@@ -389,7 +389,7 @@ var Game = GlobalScope.extend(function () {
         });
 
         if(typeof oldScreen === 'object') {
-          this.screens[this.screens.indexOf(oldScreen)] = instance;
+          this[_id] = this.screens[this.screens.indexOf(oldScreen)] = instance;
         }
       }
     } else {

@@ -117,8 +117,10 @@ var Screen = Entity.extend(function () {
     if (!this.completed() || !nextScreen.$els.hasClass('preloaded')) return false;
 
     if(loadingScreen && !loadingScreen.$els.hasClass('preloading') && !loadingScreen.$els.hasClass('preloaded')) {
+      loadingScreen.$els.addClass('preloading');
       $('#' + loadingScreen.$els.context.id).load(`screens/${loadingScreen.$els.context.id}.html`, function () {
         loadingScreen.$els.addClass('preloaded');
+        loadingScreen.$els.removeClass('preloading');
         //pl.game.component.loadAll(function () {
         //  pl.game.initialize([{id: 'animal-id', implementation: _.noop}]);
         //}, true);
