@@ -9,7 +9,7 @@ import { Entity, invokeResponsibilities } from 'types/Entity';
 var Screen = Entity.extend(function () {
 
   function attachBehaviorEvent () {
-    if(this.state('READY')) return;
+    if (this.state('READY')) return;
     this.on('behavior', function (_event) {
       // console.log('SCREEN GOT', _event.targetScope.id(), _event.name);
 
