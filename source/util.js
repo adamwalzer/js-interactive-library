@@ -8,16 +8,13 @@ var util = new (function () {
 
   /**
    * Accepts one or more objects to combine their own properties to single object.
-   * @arg {object} _target - The object that will recieve all members.
+   * @arg {object} target - The object that will recieve all members.
    * @arg {object} _sources... - The object(s) to join with the '_target'.
    * @returns {object} _target
    */
-  this.mixin = function () {
-    var member, i, target, objs;
+  this.mixin = function (target) {
+    var member, i, objs;
 
-    //@TODO MPR 4/28/16: This feels like its trying to invent named arguments...
-    //even if objs remains like this, target doesnt need to
-    target = arguments[0];
     objs = [].slice.call(arguments, 1);
 
     for (i = 0; i < objs.length; i += 1) {
