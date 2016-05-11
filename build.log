@@ -1,0 +1,13 @@
+******************** Build Started in development mode at 1463006692374
+Hash: [1m6703b234785508892160[22m
+Version: webpack [1m1.12.10[22m
+Time: [1m49[22mms
+      [1mAsset[22m     [1mSize[22m  [1mChunks[22m  [1m[22m           [1mChunk Names[22m
+    [1m[32mplay.js[39m[22m  1.64 kB       [1m0[22m  [1m[32m[emitted][39m[22m  main
+[1m[32mplay.js.map[39m[22m  1.44 kB       [1m0[22m  [1m[32m[emitted][39m[22m  main
+chunk    {[1m[33m0[39m[22m} [1m[32mplay.js, play.js.map[39m[22m (main) 28 bytes[1m[32m [rendered][39m[22m
+    [0] [1mmulti main[22m 28 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m[1m[31m [1 error][39m[22m
+
+[1m[31mERROR in multi main
+Module not found: Error: Cannot resolve 'file' or 'directory' ./source/main.js in /Users/adamwalzer/Sites/js-interactive-library
+ @ multi main[39m[22m
