@@ -1,19 +1,15 @@
-class Component {
+import React from 'react';
+
+class Component extends React.Component {
   constructor() {
-  	/*
-    events
-    init
-	init complete
-	loading
-	loaded
-	displaying
-	displayed
-	destroying
-	destroyed
-    */
+    
   }
 
-
+  render() {
+    return (
+      <div>woohoo!</div>
+    );
+  }
 }
 
 export default Component;

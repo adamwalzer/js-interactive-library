@@ -10,22 +10,33 @@
   "scripts": {
     "install": "gulp"
   },
-  "dependencies" : {
+  "dependencies": {
+    "babel-plugin-dev-expression": "^0.1.0",
     "babel-runtime": "^6.3.13",
-    "babel-plugin-dev-expression": "^0.1.0"
+    "react": "^15.0.2",
+    "react-dom": "^15.0.2"
   },
   "devDependencies": {
     "babel": "^5.8.29",
     "babel-loader": "^5.3.3",
+    "del": "^2.2.0",
+    "extract-text-webpack-plugin": "^1.0.1",
     "gulp": "^3.9.0",
+    "gulp-env": "^0.4.0",
+    "gulp-eslint": "^2.0.0",
+    "gulp-inject": "^4.0.0",
+    "gulp-mocha": "^2.2.0",
     "gulp-sourcemaps": "^1.6.0",
+    "gulp-sri": "^0.3.0",
     "gulp-util": "^3.0.7",
     "gulp-watch": "^4.3.5",
     "ink-docstrap": "^0.5.2",
     "jsdoc": "^3.4.0",
     "lodash": "^4.11.1",
+    "merge-stream": "^1.0.0",
     "webpack": "^1.12.2",
-    "webpack-dev-server": "^1.12.1"
+    "webpack-dev-server": "^1.12.1",
+    "webpack-stream": "^3.2.0"
   },
   "author": "Micah Rolon",
   "license": "ISC"
