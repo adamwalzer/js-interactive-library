@@ -23,6 +23,7 @@
     "gulp-watch": "^4.3.5",
     "ink-docstrap": "^0.5.2",
     "jsdoc": "^3.4.0",
+    "lodash": "^4.11.1",
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   },

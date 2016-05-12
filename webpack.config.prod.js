@@ -8,6 +8,21 @@ module.exports = {
       extensions: ['', '.js']
     },
   entry: ['./source/main.js'],
+  plugins: [
+      new webpack.DefinePlugin({
+          'process.env': {
+              'BABEL_ENV': JSON.stringify('production')
+            }
+        }),
+      new webpack.optimize.UglifyJsPlugin({
+          mangle: false,
+          sourceMap: true,
+          compress: {
+              unused: false,
+              warnings: false
+            }
+        })
+    ],
   output: {
       path: path.join(__dirname, 'build'),
       filename: 'play.js',

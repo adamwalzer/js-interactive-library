@@ -1,31 +1,31 @@
 pl.game.component('screen-basic', function () {
-	
-	this.next = function () {
-		var nextScreen;
-		nextScreen = this.proto();
+  
+  this.next = function () {
+    var nextScreen;
+    nextScreen = this.proto();
 
-		if (nextScreen) {
-			this.leave();
-			nextScreen.open();
-		}
+    if (nextScreen) {
+      this.leave();
+      nextScreen.open();
+    }
 
-		return nextScreen;
-	};
+    return nextScreen;
+  };
 
-	this.on('ui-open', function (_event) {
-		if (this.isReady && this === _event.targetScope) {
-			this.start();
-		}
+  this.on('ui-open', function (_event) {
+    if (this.isReady && this === _event.targetScope) {
+      this.start();
+    }
 
-		if (!this.requiredQueue || (this.hasOwnProperty('requiredQueue') && !this.requiredQueue.length)) {
-			this.complete();
-		}
-	});
+    if (!this.requiredQueue || (this.hasOwnProperty('requiredQueue') && !this.requiredQueue.length)) {
+      this.complete();
+    }
+  });
 
-	this.on('ui-leave', function (_event) {
-		if (this.isReady && this === _event.targetScope) {
-			this.stop();
-		}
-	});
+  this.on('ui-leave', function (_event) {
+    if (this.isReady && this === _event.targetScope) {
+      this.stop();
+    }
+  });
 
 });
