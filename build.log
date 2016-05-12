@@ -1,11 +1,11 @@
-******************** Build Started in development mode at 1463084776193
-Hash: [1m4dd099553c39798b2322[22m
+******************** Build Started in development mode at 1463092550636
+Hash: [1md7660d4ba837bae1926f[22m
 Version: webpack [1m1.13.0[22m
-Time: [1m1028[22mms
+Time: [1m990[22mms
        [1mAsset[22m     [1mSize[22m  [1mChunks[22m  [1m[22m           [1mChunk Names[22m
-    [1m[32mbuild.js[39m[22m   968 kB       [1m0[22m  [1m[32m[emitted][39m[22m  main
+    [1m[32mbuild.js[39m[22m   976 kB       [1m0[22m  [1m[32m[emitted][39m[22m  main
 [1m[32mbuild.js.map[39m[22m  1.12 MB       [1m0[22m  [1m[32m[emitted][39m[22m  main
-chunk    {[1m[33m0[39m[22m} [1m[32mbuild.js, build.js.map[39m[22m (main) 894 kB[1m[32m [rendered][39m[22m
+chunk    {[1m[33m0[39m[22m} [1m[32mbuild.js, build.js.map[39m[22m (main) 902 kB[1m[32m [rendered][39m[22m
     [0] [1mmulti main[22m 40 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
     [1] [1m(webpack)-hot-middleware/client.js[22m 4.18 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
     [2] [1m(webpack)/buildin/module.js[22m 251 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
@@ -18,8 +18,8 @@ chunk    {[1m[33m0[39m[22m} [1m[32mbuild.js, build.js.map[39m[22m (main)
     [9] [1m./~/html-entities/lib/html4-entities.js[22m 6.57 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
    [10] [1m./~/html-entities/lib/html5-entities.js[22m 49 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
    [11] [1m(webpack)-hot-middleware/process-update.js[22m 3.88 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-   [12] [1m./src/app.js[22m 872 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-   [13] [1m./src/components/component.js[22m 3.61 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+   [12] [1m./src/app.js[22m 1.1 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+   [13] [1m./src/components/component.js[22m 4.34 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
    [14] [1m./~/redbox-react/lib/index.js[22m 8.28 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
    [15] [1m./~/react/react.js[22m 56 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
    [16] [1m./~/react/lib/React.js[22m 1.49 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
@@ -324,7 +324,9 @@ chunk    {[1m[33m0[39m[22m} [1m[32mbuild.js, build.js.map[39m[22m (main)
   [315] [1m./~/react-proxy/modules/deleteUnknownAutoBindMethods.js[22m 2.63 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
   [316] [1m./~/react-deep-force-update/lib/index.js[22m 1.29 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
   [317] [1m./~/global/window.js[22m 243 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-  [318] [1m./src/components/screen.js[22m 5.47 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-  [319] [1m./src/components/game.js[22m 7.99 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-  [320] [1m./src/methods/start.js[22m 542 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
-  [321] [1m./~/react-dom/index.js[22m 63 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [318] [1m./src/components/screen.js[22m 5.33 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [319] [1m./src/components/game.js[22m 8.14 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [320] [1m./src/components/image.js[22m 3.46 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [321] [1m./src/components/audio.js[22m 3.47 kB {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [322] [1m./src/methods/start.js[22m 542 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m
+  [323] [1m./~/react-dom/index.js[22m 63 bytes {[1m[33m0[39m[22m}[1m[32m [built][39m[22m

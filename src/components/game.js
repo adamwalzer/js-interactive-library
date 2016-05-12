@@ -71,13 +71,19 @@ class Game extends Component {
   goto(opts) {
     var oldScreen, newScreen;
 
-    if (oldScreen = this.refs['screen-'+this.state.currentScreenIndex]) {
-      oldScreen.leave();
+    oldScreen = this.refs['screen-'+this.state.currentScreenIndex];
+    this.state.currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
+    newScreen = this.refs['screen-'+this.state.currentScreenIndex]
+
+    if (oldScreen) {
+      if (oldScreen.props.index > newScreen.props.index) {
+        oldScreen.close();
+      } else {
+        oldScreen.leave();
+      }
     }
 
-    this.state.currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
-
-    if (newScreen = this.refs['screen-'+this.state.currentScreenIndex]) {
+    if (newScreen) {
       newScreen.open();
     }
   }

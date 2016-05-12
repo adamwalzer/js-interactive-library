@@ -7,17 +7,11 @@ class Screen extends Component {
     super();
 
     this.state = {
-      ready: false,
+      ready: true,
       open: false,
       leave: false,
       close: true,
     };
-  }
-
-  componentDidMount() {
-    this.setState({
-      ready: true
-    });
   }
 
   goto(index) {
