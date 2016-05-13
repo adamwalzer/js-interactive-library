@@ -19,6 +19,19 @@ class Screen extends Component {
     this.props.trigger('goto',{index});
   }
 
+  start() {
+    Object.keys(this.refs).map(key => {
+      this.refs[key].start();
+    });
+    this.startAudio();
+  }
+
+  startAudio() {
+    if (this.audio.voiceOver[0]) {
+      this.audio.voiceOver[0].play();
+    }
+  }
+
   open() {
     this.setState({
       open: true,

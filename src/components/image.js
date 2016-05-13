@@ -6,8 +6,9 @@ class Image extends Asset {
   }
 
   render() {
+    var self = this;
     return (
-      <img width="100px" onLoad={this.ready.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
+      <img width="100px" onLoad={() => {self.ready()}} className={this.props.className} src={this.props.src} draggable={false} />
     );
   }
 }

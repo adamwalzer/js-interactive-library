@@ -1,8 +1,12 @@
 import Component from './component.js';
 
-class Image extends Component {
+class Asset extends Component {
   constructor() {
     super();
+  }
+
+  checkReady() {
+    
   }
 
   checkComplete() {
@@ -14,4 +18,4 @@ class Image extends Component {
   }
 }
 
-export default Image;
+export default Asset;

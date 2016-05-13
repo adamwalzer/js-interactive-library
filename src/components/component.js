@@ -28,11 +28,6 @@ class Component extends React.Component {
     Object.keys(this.refs).map(key => {
       this.refs[key].start();
     });
-    this.startAudio();
-  }
-
-  startAudio() {
-
   }
 
   componentDidMount() {
@@ -67,7 +62,7 @@ class Component extends React.Component {
   collectAudio(key) {
     this.audio[key] = this.refs[key];
     if (this.refs[key].props.type) {
-      this.audio[this.refs[key].props.type][key] = this.refs[key];
+      this.audio[this.refs[key].props.type].push(this.refs[key]);
     }
   }
 

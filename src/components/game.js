@@ -88,6 +88,11 @@ class Game extends Component {
     }
   }
 
+  audioReady(opts) {
+    console.log(opts);
+    console.log(opts.currentTarget.isReady());
+  }
+
   trigger(event,opts) {
     var fn = this[event];
     if (typeof fn === 'function') {
