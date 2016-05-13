@@ -7,15 +7,16 @@ class Screen extends Component {
     super();
 
     this.state = {
-      ready: true,
+      ready: false,
       open: false,
       leave: false,
       close: true,
+      complete: false,
     };
   }
 
   goto(index) {
-    this.props.emit('goto',{index});
+    this.props.trigger('goto',{index});
   }
 
   open() {
@@ -24,7 +25,7 @@ class Screen extends Component {
       leave: false,
       close: false,
     });
-    setTimeout(this.complete.bind(this), 500);
+    this.start();
   }
 
   leave() {

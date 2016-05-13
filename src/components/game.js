@@ -89,7 +89,10 @@ class Game extends Component {
   }
 
   trigger(event,opts) {
-    this[event](opts);
+    var fn = this[event];
+    if (typeof fn === 'function') {
+      this[event](opts);
+    }
   }
 
   getClassNames() {
@@ -104,7 +107,7 @@ class Game extends Component {
   renderScreens() {
     return this.screens.map((Screen, key) => {
       return (
-        <Screen key={key} index={key} ref={'screen-'+key} emit={this.trigger.bind(this)} />
+        <Screen key={key} index={key} ref={'screen-'+key} trigger={this.trigger.bind(this)} />
       );
     });
   }

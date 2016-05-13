@@ -1,13 +1,13 @@
-import Component from './component.js';
+import Asset from './asset.js';
 
-class Image extends Component {
+class Image extends Asset {
   constructor() {
     super();
   }
 
   render() {
     return (
-      <img onLoad={this.ready.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
+      <img width="100px" onLoad={this.ready.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
     );
   }
 }

@@ -8,8 +8,10 @@ import Video from 'components/video';
 import start from 'methods/start';
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 window.React = React;
+window.ReactDOM = ReactDOM;
 
 window.play = {
   Component,
