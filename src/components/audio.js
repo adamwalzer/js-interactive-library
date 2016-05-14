@@ -6,17 +6,21 @@ class Audio extends Asset {
   }
 
   play() {
-    createjs.Sound.play(this._reactInternalInstance._rootNodeID);
+    createjs.Sound.play(this._reactInternalInstance._rootNodeID)
+      .on('complete', this.complete, this);
+  }
+
+  stop() {
+    createjs.Sound.stop(this._reactInternalInstance._rootNodeID);
   }
 
   componentDidMount() {
-    this.audio = createjs.Sound.registerSound(this.props.src, this._reactInternalInstance._rootNodeID);
-
+    createjs.Sound.registerSound(this.props.src, this._reactInternalInstance._rootNodeID);
     this.checkReady();
   }
 
   checkReady() {
-    if (createjs.Sound.isReady(this.audio)) {
+    if (createjs.Sound.isReady(this._reactInternalInstance._rootNodeID)) {
       this.ready();
     } else {
       setTimeout(this.checkReady.bind(this), 100);

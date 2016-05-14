@@ -4,8 +4,10 @@ import Component from 'components/component';
 import Screen from 'components/screen';
 
 class Game extends Component {
-  constructor(config, gameSelector) {
+  constructor(config) {
     super();
+
+    this.config = config;
 
     // 1 - build dictionary of screens
     this.screens = [
@@ -23,14 +25,11 @@ class Game extends Component {
 
   componentWillMount() {
     this.detechDevice();
+    this.scale();
   }
 
   componentDidMount() {
-    var screen;
-
-    if (screen = this.refs['screen-'+this.state.currentScreenIndex]) {
-      screen.open();
-    }
+    this.goto({index:this.state.currentScreenIndex});
   }
 
   /**
@@ -69,11 +68,12 @@ class Game extends Component {
   }
 
   goto(opts) {
-    var oldScreen, newScreen;
+    var oldScreen, newScreen, nextScreen;
 
     oldScreen = this.refs['screen-'+this.state.currentScreenIndex];
     this.state.currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
     newScreen = this.refs['screen-'+this.state.currentScreenIndex]
+    nextScreen = this.refs['screen-'+(this.state.currentScreenIndex+1)];
 
     if (oldScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
@@ -84,13 +84,19 @@ class Game extends Component {
     }
 
     if (newScreen) {
+      newScreen.load();
       newScreen.open();
+    }
+
+    if (nextScreen) {
+      nextScreen.load();
     }
   }
 
-  audioReady(opts) {
-    console.log(opts);
-    console.log(opts.currentTarget.isReady());
+  scale() {
+    this.setState({
+      scale: window.innerWidth / this.config.dimensions.width
+    });
   }
 
   trigger(event,opts) {
@@ -109,6 +115,12 @@ class Game extends Component {
     return classNames;
   }
 
+  getStyles() {
+    return {
+      transform: 'scale3d('+this.state.scale+','+this.state.scale+',1)'
+    }
+  }
+
   renderScreens() {
     return this.screens.map((Screen, key) => {
       return (
@@ -119,7 +131,7 @@ class Game extends Component {
 
   render() {
     return (
-      <div className={"pl-game"+this.getClassNames()}>
+      <div className={"pl-game"+this.getClassNames()} style={this.getStyles()}>
         {this.renderScreens()}
       </div>
     )

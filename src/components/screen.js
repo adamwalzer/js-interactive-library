@@ -7,11 +7,13 @@ class Screen extends Component {
     super();
 
     this.state = {
+      started: false,
       ready: false,
       open: false,
       leave: false,
       close: true,
       complete: false,
+      load: false,
     };
   }
 
@@ -19,15 +21,33 @@ class Screen extends Component {
     this.props.trigger('goto',{index});
   }
 
+  load() {
+    if (!this.state.load) {
+      this.setState({
+        load: true,
+        ready: false,
+      });
+    }
+
+    this.componentDidMount();
+  }
+
   start() {
+    this.setState({
+      started: true
+    }, this.checkComplete.bind(this));
+
     Object.keys(this.refs).map(key => {
       this.refs[key].start();
     });
-    this.startAudio();
+
+    this.startMedia();
   }
 
-  startAudio() {
-    if (this.audio.voiceOver[0]) {
+  startMedia() {
+    if (this.video[0]) {
+      this.video[0].play();
+    } else if (this.audio.voiceOver[0]) {
       this.audio.voiceOver[0].play();
     }
   }
@@ -47,6 +67,7 @@ class Screen extends Component {
       leave: true,
       close: false,
     });
+    this.stop();
   }
 
   close() {
@@ -55,6 +76,7 @@ class Screen extends Component {
       leave: false,
       close: true,
     });
+    this.stop();
   }
 
   getClassNames() {
@@ -70,6 +92,10 @@ class Screen extends Component {
   }
 
   renderContent() {
+    if (!this.state.load) {
+      return null;
+    }
+
     return (
       <div>screen content</div>
     );

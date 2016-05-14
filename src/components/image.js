@@ -5,10 +5,16 @@ class Image extends Asset {
     super();
   }
 
+  componentDidMount() {
+    this.setState({
+      complete: true
+    });
+  }
+
   render() {
     var self = this;
     return (
-      <img width="100px" onLoad={() => {self.ready()}} className={this.props.className} src={this.props.src} draggable={false} />
+      <img onLoad={() => {self.ready()}} className={this.props.className} src={this.props.src} draggable={false} />
     );
   }
 }

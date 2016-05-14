@@ -10,6 +10,10 @@ class Video extends Asset {
     this.el.play();
   }
 
+  stop() {
+    this.el.pause();
+  }
+
   componentDidMount() {
     this.el = ReactDOM.findDOMNode(this);
   }

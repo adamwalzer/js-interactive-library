@@ -3,8 +3,12 @@ import React from 'react';
 class Component extends React.Component {
   constructor() {
     super();
+
+    this.state = {
+      started: false
+    };
     
-    this.video = {};
+    this.video = [];
     this.audio = {
       background: [],
       sfx: [],
@@ -25,8 +29,27 @@ class Component extends React.Component {
   }
 
   start() {
+    this.setState({
+      started: true
+    }, this.checkComplete.bind(this));
+
     Object.keys(this.refs).map(key => {
       this.refs[key].start();
+    });
+  }
+
+  stop() {
+    this.setState({
+      started: false
+    });
+    Object.keys(this.refs).map(key => {
+      this.refs[key].stop();
+    });
+  }
+
+  componentWillMount() {
+    this.setState({
+      ready: false,
     });
   }
 
@@ -38,7 +61,6 @@ class Component extends React.Component {
 
     this.collectMedia();
     this.checkReady();
-    this.checkComplete();
   }
 
   collectMedia() {
@@ -56,7 +78,7 @@ class Component extends React.Component {
   }
 
   collectVideo(key) {
-    this.video[key] = this.refs[key];
+    this.video.push(this.refs[key]);
   }
 
   collectAudio(key) {
@@ -83,9 +105,17 @@ class Component extends React.Component {
   }
 
   checkComplete() {
+    var self = this;
+
+    this.requireForComplete.map((key, index) => {
+      if(self.refs[key].state && self.refs[key].state.complete) {
+        this.requireForComplete.splice(index, 1);
+      }
+    });
+
     if (this.requireForComplete.length === 0) {
       this.complete();
-    } else if (this.state.open) {
+    } else if (this.state.started) {
       setTimeout(this.checkComplete.bind(this), 100);
     }
   }
