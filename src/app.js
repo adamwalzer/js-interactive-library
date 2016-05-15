@@ -21,7 +21,6 @@ window.play = {
   Audio,
   Video,
   start,
-  createElement: React.createElement,
 };
 
 export default window.play;
