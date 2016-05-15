@@ -114,8 +114,9 @@ class Screen extends Component {
   }
 
   render() {
+    console.log(this.props);
     return (
-      <div className={'screen'+this.getClassNames()}>
+      <div id={this.state.id} className={'screen'+this.getClassNames()}>
         {this.renderContent()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
