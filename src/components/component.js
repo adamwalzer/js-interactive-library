@@ -7,13 +7,6 @@ class Component extends React.Component {
     this.state = {
       started: false
     };
-    
-    this.video = [];
-    this.audio = {
-      background: [],
-      sfx: [],
-      voiceOver: [],
-    };
   }
 
   complete() {
@@ -39,11 +32,16 @@ class Component extends React.Component {
   }
 
   stop() {
+    var self = this;
+
     this.setState({
       started: false
     });
+
     Object.keys(this.refs).map(key => {
-      this.refs[key].stop();
+      if (self.refs[key] && typeof self.refs[key].stop === 'function') {
+        self.refs[key].stop();
+      }
     });
   }
 
@@ -54,9 +52,10 @@ class Component extends React.Component {
   }
 
   componentDidMount() {
+    var self = this;
     this.requireForReady = Object.keys(this.refs);
-    this.requireForComplete = this.requireForReady.filter(component => {
-      return !component.state || !component.state.complete;
+    this.requireForComplete = this.requireForReady.filter(key => {
+      return !self.refs[key].state || !self.refs[key].state.complete;
     });
 
     this.collectMedia();
@@ -65,6 +64,13 @@ class Component extends React.Component {
 
   collectMedia() {
     var self = this;
+
+    this.video = [];
+    this.audio = {
+      background: [],
+      sfx: [],
+      voiceOver: [],
+    };
 
     Object.keys(this.refs).map(key => {
       if (play.Video && self.refs[key] instanceof play.Video) {
@@ -91,15 +97,18 @@ class Component extends React.Component {
   checkReady() {
     var self = this;
 
-    this.requireForReady.map((key, index) => {
-      if(self.refs[key].state && self.refs[key].state.ready) {
-        this.requireForReady.splice(index, 1);
+    this.requireForReady = this.requireForReady.filter((key) => {
+      if (self.refs[key].state && !self.refs[key].state.ready) {
+        self.refs[key].componentDidMount();
+        return true;
       }
+      return false;
     });
 
     if (this.requireForReady.length === 0) {
       this.ready();
     } else {
+      this.state.ready = false;
       setTimeout(this.checkReady.bind(this), 100);
     }
   }
@@ -107,15 +116,19 @@ class Component extends React.Component {
   checkComplete() {
     var self = this;
 
-    this.requireForComplete.map((key, index) => {
-      if(self.refs[key].state && self.refs[key].state.complete) {
-        this.requireForComplete.splice(index, 1);
+    this.requireForComplete = this.requireForComplete.filter((key) => {
+      if (self.refs[key].state && !self.refs[key].state.complete) {
+        self.refs[key].componentDidMount();
+        self.refs[key].checkComplete();
+        return true;
       }
+      return false;
     });
 
     if (this.requireForComplete.length === 0) {
       this.complete();
     } else if (this.state.started) {
+      this.state.complete = false;
       setTimeout(this.checkComplete.bind(this), 100);
     }
   }

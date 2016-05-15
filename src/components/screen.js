@@ -7,7 +7,6 @@ class Screen extends Component {
     super();
 
     this.state = {
-      started: false,
       ready: false,
       open: false,
       leave: false,
@@ -17,28 +16,42 @@ class Screen extends Component {
     };
   }
 
+  componentDidMount() {
+    var self = this;
+    this.requireForReady = Object.keys(this.refs);
+    this.requireForComplete = this.requireForReady.filter(key => {
+      return !self.refs[key].state || !self.refs[key].state.complete;
+    });
+
+    this.collectMedia();
+    this.checkReady();
+  }
+
   goto(index) {
     this.props.trigger('goto',{index});
   }
 
   load() {
+    var self = this;
+
     if (!this.state.load) {
       this.setState({
         load: true,
         ready: false,
+      }, () => {
+        self.componentDidMount();
       });
     }
 
-    this.componentDidMount();
   }
 
   start() {
-    this.setState({
-      started: true
-    }, this.checkComplete.bind(this));
+    this.componentDidMount();
 
     Object.keys(this.refs).map(key => {
-      this.refs[key].start();
+      if (typeof this.refs[key].start === 'function') {
+        this.refs[key].start();
+      }
     });
 
     this.startMedia();
@@ -58,7 +71,10 @@ class Screen extends Component {
       leave: false,
       close: false,
     });
-    this.start();
+    setTimeout(
+      this.start.bind(this),
+      250
+    )
   }
 
   leave() {
@@ -82,20 +98,30 @@ class Screen extends Component {
   getClassNames() {
     var classNames = '';
 
-    if(this.state.ready) classNames += ' READY';
-    if(this.state.open) classNames += ' OPEN';
-    if(this.state.leave) classNames += ' LEAVE';
-    if(this.state.close) classNames += ' CLOSE';
-    if(this.state.complete) classNames += ' COMPLETE';
+    if (!(this.state.open || this.state.leave)) {
+      this.state.close = true;
+    }
+
+    if (this.state.ready) classNames += ' READY';
+    if (this.state.load) classNames += ' LOAD';
+    if (this.state.open) classNames += ' OPEN';
+    if (this.state.leaving) classNames += ' LEAVING';
+    if (this.state.leave) classNames += ' LEAVE';
+    if (this.state.close || !(this.state.open || this.state.leave)) classNames += ' CLOSE';
+    if (this.state.complete) classNames += ' COMPLETE';
 
     return classNames;
   }
 
-  renderContent() {
+  renderScreen() {
     if (!this.state.load) {
       return null;
     }
 
+    return this.renderContent();
+  }
+
+  renderContent() {
     return (
       <div>screen content</div>
     );
@@ -114,10 +140,9 @@ class Screen extends Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div id={this.state.id} className={'screen'+this.getClassNames()}>
-        {this.renderContent()}
+        {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
       </div>

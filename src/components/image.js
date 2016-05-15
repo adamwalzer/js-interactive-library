@@ -11,10 +11,26 @@ class Image extends Asset {
     });
   }
 
+  ready() {
+    if (!this.state.error) {
+      this.setState({
+        ready: true,
+      });
+    }
+  }
+
+  error() {
+    console.log("error");
+    this.setState({
+      error: true,
+      ready: false
+    });
+  }
+
   render() {
     var self = this;
     return (
-      <img onLoad={() => {self.ready()}} className={this.props.className} src={this.props.src} draggable={false} />
+      <img onLoad={this.ready.bind(this)} onError={this.error.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
     );
   }
 }

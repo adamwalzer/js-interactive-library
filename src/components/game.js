@@ -29,7 +29,42 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    this.goto({index:this.state.currentScreenIndex});
+    var self = this;
+
+    if (!this.state.iOS) {
+      this.state.currentScreenIndex = 1;
+    }
+
+    this.requireForReady = Object.keys(this.refs);
+    this.requireForComplete = this.requireForReady.filter(key => {
+      return !self.refs[key].state || !self.refs[key].state.complete;
+    });
+
+    this.collectMedia();
+    this.loadScreens();
+  }
+
+  loadScreens() {
+    var firstScreen, secondScreen, self = this;
+
+    firstScreen = this.refs['screen-'+this.state.currentScreenIndex];
+    secondScreen = this.refs['screen-'+this.state.currentScreenIndex+1];
+
+    if (firstScreen) firstScreen.load();
+    if (secondScreen) secondScreen.load();
+
+    setTimeout(() => {
+      self.checkReady();
+    }, 0);
+  }
+
+  ready() {
+    this.setState({
+      ready: true,
+    });
+    this.goto({
+      index: this.state.currentScreenIndex,
+    })
   }
 
   /**
@@ -68,24 +103,29 @@ class Game extends Component {
   }
 
   goto(opts) {
-    var oldScreen, newScreen, nextScreen;
+    var oldScreen, oldIndex, newScreen, nextScreen;
 
-    oldScreen = this.refs['screen-'+this.state.currentScreenIndex];
+    oldIndex = this.state.currentScreenIndex;
+    oldScreen = this.refs['screen-'+oldIndex];
     this.state.currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
     newScreen = this.refs['screen-'+this.state.currentScreenIndex]
     nextScreen = this.refs['screen-'+(this.state.currentScreenIndex+1)];
 
-    if (oldScreen) {
+    if (newScreen) {
+      if (!newScreen.state.load || !newScreen.state.ready) {
+        this.state.currentScreenIndex = oldIndex;
+        this.loadScreens();
+        return;
+      }
+      newScreen.open();
+    }
+
+    if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
         oldScreen.close();
       } else {
         oldScreen.leave();
       }
-    }
-
-    if (newScreen) {
-      newScreen.load();
-      newScreen.open();
     }
 
     if (nextScreen) {
@@ -121,6 +161,14 @@ class Game extends Component {
     }
   }
 
+  renderLoader() {
+    return null;
+  }
+
+  renderAssets() {
+    return null;
+  }
+
   renderScreens() {
     return this.screens.map((Screen, key) => {
       return (
@@ -132,6 +180,8 @@ class Game extends Component {
   render() {
     return (
       <div className={"pl-game"+this.getClassNames()} style={this.getStyles()}>
+        {this.renderLoader()}
+        {this.renderAssets()}
         {this.renderScreens()}
       </div>
     )
