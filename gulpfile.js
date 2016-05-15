@@ -1,13 +1,3 @@
-var childProcess = require("child_process");
-// var oldSpawn = childProcess.spawn;
-// function mySpawn() {
-//     console.log('spawn called');
-//     console.log(arguments);
-//     var result = oldSpawn.apply(this, arguments);
-//     return result;
-// }
-// childProcess.spawn = mySpawn;
-
 require('babel-core/register');//for mocha to use es6
 /*global require process*/
 /*eslint-env node */
@@ -22,6 +12,7 @@ var gulpWebpack = require('webpack-stream');
 var webpackDevConfig = require('./webpack.config.dev.js');
 var webpackProdConfig = require('./webpack.config.prod.js');
 var appPackage = require('./package.json');
+var childProcess = require("child_process");
 var exec = childProcess.exec;
 var spawn = childProcess.spawn;
 var eslint = require('gulp-eslint');
@@ -86,10 +77,7 @@ var executeAsProcess = function (command, flags) {
 };
 
 var buildDevelopment = function () {
-    console.log("buildDevelopment");
-    console.log('---------------------------1');
     var wpStream = gulpWebpack(webpackDevConfig, null, function (err, stats) {
-        console.log('---------------------------5');
         var statsStr = stats.toString({
             colors: true
         });
@@ -99,12 +87,10 @@ var buildDevelopment = function () {
         fs.appendFile('build.log', statsStr);
         gutil.log('[webpack:build-dev]', statsStr);
     });
-    console.log('---------------------------2');
 
     fs.writeFile('build_errors.log', '');
     fs.writeFile('build.log', ''); //remove this line to persist logs
     fs.appendFile('build.log', `******************** Build Started in ${mode} mode at ${Date.now()}\r\n`);
-    console.log('---------------------------3');
 
     env({
         vars: {
@@ -115,7 +101,6 @@ var buildDevelopment = function () {
         fs.writeFile('build_errors.log', err);
         wpStream.end();
     });
-    console.log('---------------------------4');
     return gulp.src('./src/app.js')
         .pipe(wpStream)
         .pipe(gulp.dest('./build'));
@@ -123,9 +108,7 @@ var buildDevelopment = function () {
 
 var buildProduction = function () {
     // modify some webpack config options
-    var myConfig = webpackProdConfig;
-
-    var wpStream = gulpWebpack(myConfig, webpack, function (err, stats) {
+    var wpStream = gulpWebpack(webpackProdConfig, webpack, function (err, stats) {
         var statsStr = stats.toString({
             colors: true
         });
@@ -179,7 +162,7 @@ ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
 (______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)
 */
 
-gulp.task('default', ['build', 'watch', 'development-server']);
+gulp.task('default', ['build', 'watch']);
 
 gulp.task('watch', function () {
     gulp.watch('src/**/*.js', ['build']);
@@ -205,8 +188,8 @@ gulp.task('webpack:build-development', ['build-warning'], buildDevelopment);
 // as such, this is how we need to alias build commands.
 gulp.task('build-dev', executeAsProcess('gulp build', ['build', '--development']));
 gulp.task('build-development', executeAsProcess('gulp build', ['build', '--development']));
-gulp.task('build-prod', executeAsProcess('gulp build', ['build', '--development']));
-gulp.task('build-production', executeAsProcess('gulp build', ['build', '--development']));
+gulp.task('build-prod', executeAsProcess('gulp build', ['build', '--production']));
+gulp.task('build-production', executeAsProcess('gulp build', ['build', '--production']));
 
 /*·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´Resource and Static Asset Tasks`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·*/
 
