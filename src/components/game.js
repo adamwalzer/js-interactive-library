@@ -37,7 +37,13 @@ class Game extends Component {
   }
 
   getState() {
-    return this.state;
+    return new Object(this.state);
+  }
+
+  demo() {
+    this.setState({
+      demo: true,
+    });
   }
 
   componentWillMount() {
@@ -45,7 +51,7 @@ class Game extends Component {
     this.scale();
   }
 
-  componentDidMount() {
+  bootstrap() {
     var self = this;
 
     if (!this.state.iOS) {
@@ -157,6 +163,7 @@ class Game extends Component {
     nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
 
     if (newScreen) {
+      // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
         currentScreenIndex = oldIndex;
         this.loadScreens();
@@ -177,12 +184,12 @@ class Game extends Component {
       nextScreen.load();
     }
 
-    this.playBackground();
-
     this.setState({
       loading: false,
       currentScreenIndex,
     });
+
+    this.playBackground();
   }
 
   getBackgroundIndex() {
@@ -195,7 +202,9 @@ class Game extends Component {
     index = this.getBackgroundIndex();
 
     if (this.state.playingBKG[0] === this.audio.background[index]) {
-      return;
+      if (this.state.playingBKG[0].audio.playState === 'playSucceeded') {
+        return;
+      }
     }
 
     if (self.state.playingBKG[0]) {
@@ -222,6 +231,7 @@ class Game extends Component {
       goto: 'goto',
       audioPlay: 'audioPlay',
       audioStop: 'audioStop',
+      demo: 'demo',
     }
 
     fn = this[events[event]];
@@ -291,6 +301,7 @@ class Game extends Component {
     if (this.state.playingVO.length) classNames += ' VOICE-OVER';
     if (this.state.paused) classNames += ' PAUSED';
     if (this.state.loading) classNames += ' LOADING';
+    if (this.state.demo) classNames += ' DEMO';
 
     return classNames;
   }

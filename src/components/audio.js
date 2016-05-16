@@ -24,6 +24,8 @@ class Audio extends Asset {
   }
 
   playAudio() {
+    var self = this;
+
     if (this.state.paused) {
       this.setState({
         playAfterResume: true,
@@ -33,6 +35,12 @@ class Audio extends Asset {
 
     this.audio.play();
     this.audio.on('complete', this.complete, this);
+
+    if (this.audio.playState === 'playFailed') {
+      setTimeout(() => {
+        self.play();
+      }, 100)
+    }
   }
 
   pause() {
@@ -95,8 +103,9 @@ class Audio extends Asset {
   }
 
   render() {
+      // <audio {...this.props} preload='none'></audio>
     return (
-      <audio {...this.props} preload='none'></audio>
+      null
     );
   }
 }

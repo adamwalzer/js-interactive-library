@@ -16,17 +16,6 @@ class Screen extends Component {
     };
   }
 
-  componentDidMount() {
-    var self = this;
-    this.requireForReady = Object.keys(this.refs);
-    this.requireForComplete = this.requireForReady.filter(key => {
-      return !self.refs[key].state || !self.refs[key].state.complete;
-    });
-
-    this.collectMedia();
-    this.checkReady();
-  }
-
   goto(index) {
     play.trigger('goto',{index});
   }
@@ -39,14 +28,14 @@ class Screen extends Component {
         load: true,
         ready: false,
       }, () => {
-        self.componentDidMount();
+        self.bootstrap();
       });
     }
 
   }
 
   start() {
-    this.componentDidMount();
+    this.bootstrap();
 
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
@@ -74,7 +63,7 @@ class Screen extends Component {
     setTimeout(
       this.start.bind(this),
       250
-    )
+    );
   }
 
   leave() {

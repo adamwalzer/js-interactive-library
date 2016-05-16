@@ -54,6 +54,10 @@ class Component extends React.Component {
   }
 
   componentDidMount() {
+    this.bootstrap();
+  }
+
+  bootstrap() {
     var self = this;
     this.requireForReady = Object.keys(this.refs);
     this.requireForComplete = this.requireForReady.filter(key => {
@@ -101,7 +105,7 @@ class Component extends React.Component {
 
     this.requireForReady = this.requireForReady.filter((key) => {
       if (self.refs[key].state && !self.refs[key].state.ready) {
-        self.refs[key].componentDidMount();
+        self.refs[key].bootstrap();
         return true;
       }
       return false;
