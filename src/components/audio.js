@@ -6,6 +6,9 @@ class Audio extends Asset {
   }
 
   play() {
+    var self = this,
+        delay = this.props.delay || 0;
+
     if (!createjs.Sound.isReady(this.props.src)) {
       this.componentDidMount();
       this.play();
@@ -13,17 +16,44 @@ class Audio extends Asset {
       play.trigger('audioPlay', {
         audio: this
       });
-      this.audio = createjs.Sound.play(this.props.src);
-      this.audio.on('complete', this.complete, this);
+      setTimeout(() => {
+        self.playAudio();
+      }, delay);
     }
+
+  }
+
+  playAudio() {
+    if (this.state.paused) {
+      this.setState({
+        playAfterResume: true,
+      });
+      return;
+    }
+
+    this.audio.play();
+    this.audio.on('complete', this.complete, this);
   }
 
   pause() {
     this.audio.setPaused(true);
+    this.setState({
+      paused: true,
+    });
   }
 
   resume() {
     this.audio.setPaused(false);
+    this.setState({
+      paused: false,
+    });
+
+    if (this.state.playAfterResume) {
+      this.playAudio();
+      this.setState({
+        playAfterResume: false,
+      });
+    }
   }
 
   stop() {
@@ -44,14 +74,12 @@ class Audio extends Asset {
   }
 
   componentDidMount() {
-    var loop, delay;
+    var loop;
 
     if (!this.state.ready) {
       loop = this.props.loop ? -1 : 0;
-      delay = this.props.delay ? this.props.delay : 0;
       createjs.Sound.registerSound(this.props.src, this.props.src, 4, './', {
         loop,
-        delay,
       });
       this.checkReady();
     }
@@ -59,6 +87,7 @@ class Audio extends Asset {
 
   checkReady() {
     if (createjs.Sound.isReady(this.props.src)) {
+      this.audio = createjs.Sound.createInstance(this.props.src);
       this.ready();
     } else {
       setTimeout(this.checkReady.bind(this), 100);

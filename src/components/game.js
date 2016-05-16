@@ -22,6 +22,7 @@ class Game extends Component {
     };
 
     play.trigger = this.trigger.bind(this);
+    play.getState = this.getState.bind(this);
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', function() {
@@ -33,6 +34,10 @@ class Game extends Component {
     window.addEventListener('resize', function() {
       this.scale();
     }.bind(this));
+  }
+
+  getState() {
+    return this.state;
   }
 
   componentWillMount() {
