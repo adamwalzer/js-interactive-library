@@ -9,18 +9,27 @@ class Game extends Component {
 
     this.config = config;
 
-    // 1 - build dictionary of screens
     this.screens = [
       Screen
     ];
 
     this.state = {
-      currentScreenIndex: 0
+      currentScreenIndex: 0,
+      playingSFX: [],
+      playingVO: [],
+      playingBKG: [],
+      loading: true,
     };
 
-    // 2 - load splash
+    play.trigger = this.trigger.bind(this);
 
-
+    window.addEventListener('load', window.focus);
+    window.addEventListener('focus', function() {
+      this.resume();
+    }.bind(this));
+    window.addEventListener('blur', function() {
+      this.pause();
+    }.bind(this));
   }
 
   componentWillMount() {
@@ -65,6 +74,32 @@ class Game extends Component {
     this.goto({
       index: this.state.currentScreenIndex,
     })
+  }
+
+  resume() {
+    this.setPause(false);
+  }
+
+  pause() {
+    this.setPause(true);
+  }
+
+  setPause(pause) {
+    this.setState({
+      paused: pause
+    });
+
+    this.state.playingSFX.map(audio => {
+      audio.audio.setPaused(pause);
+    });
+
+    this.state.playingVO.map(audio => {
+      audio.audio.setPaused(pause);
+    });
+
+    this.state.playingBKG.map(audio => {
+      audio.audio.setPaused(pause);
+    });
   }
 
   /**
@@ -131,6 +166,36 @@ class Game extends Component {
     if (nextScreen) {
       nextScreen.load();
     }
+
+    this.playBackground();
+
+    this.setState({
+      loading: false,
+    });
+  }
+
+  getBackgroundIndex() {
+    return 0;
+  }
+
+  playBackground() {
+    var index, self = this;
+
+    index = this.getBackgroundIndex();
+
+    if (this.state.playingBKG[0] === this.audio.background[index]) {
+      return;
+    }
+
+    if (self.state.playingBKG[0]) {
+      self.state.playingBKG[0].stop();
+    }
+
+    if (this.audio.background[index]) {
+      setTimeout(() => {
+        self.audio.background[index].play();
+      }, 500);
+    }
   }
 
   scale() {
@@ -140,17 +205,81 @@ class Game extends Component {
   }
 
   trigger(event,opts) {
-    var fn = this[event];
+    var events, fn;
+
+    events = {
+      goto: 'goto',
+      audioPlay: 'audioPlay',
+      audioStop: 'audioStop',
+    }
+
+    fn = this[events[event]];
     if (typeof fn === 'function') {
       this[event](opts);
     }
   }
 
+  audioPlay(opts) {
+    var playingSFX, playingVO, playingBKG;
+
+    playingSFX = this.state.playingSFX || [];
+    playingVO = this.state.playingVO || [];
+    playingBKG = this.state.playingBKG || [];
+
+    switch(opts.audio.props.type) {
+      case 'sfx':
+        playingSFX.push(opts.audio);
+        break;
+      case 'voiceOver':
+        playingVO.push(opts.audio);
+        break;
+      case 'background':
+        playingBKG.push(opts.audio);
+        break;
+    }
+
+    this.setState({
+      playingSFX,
+      playingVO,
+      playingBKG,
+    });
+  }
+
+  audioStop(opts) {
+    var playingSFX, playingVO, playingBKG;
+
+    playingSFX = this.state.playingSFX || [];
+    playingVO = this.state.playingVO || [];
+    playingBKG = this.state.playingBKG || [];
+
+    switch(opts.audio.props.type) {
+      case 'sfx':
+        playingSFX.splice(opts.audio,1);
+        break;
+      case 'voiceOver':
+        playingVO.splice(opts.audio,1);
+        break;
+      case 'background':
+        playingBKG.splice(opts.audio,1);
+        break;
+    }
+
+    this.setState({
+      playingSFX,
+      playingVO,
+      playingBKG,
+    });
+  }
+
   getClassNames() {
     var classNames = '';
 
-    if(this.state.iOS) classNames += ' iOS';
-    if(this.state.mobile) classNames += ' MOBILE';
+    if (this.state.iOS) classNames += ' iOS';
+    if (this.state.mobile) classNames += ' MOBILE';
+    if (this.state.playingSFX.length) classNames += ' SFX';
+    if (this.state.playingVO.length) classNames += ' VOICE-OVER';
+    if (this.state.paused) classNames += ' PAUSED';
+    if (this.state.loading) classNames += ' LOADING';
 
     return classNames;
   }

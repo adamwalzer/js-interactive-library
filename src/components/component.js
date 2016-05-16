@@ -24,11 +24,13 @@ class Component extends React.Component {
   start() {
     this.setState({
       started: true
-    }, this.checkComplete.bind(this));
+    });
 
     Object.keys(this.refs).map(key => {
-      this.refs[key].start();
+      if (typeof this.refs[key].start === 'function') this.refs[key].start();
     });
+
+    this.checkComplete();
   }
 
   stop() {
@@ -117,9 +119,10 @@ class Component extends React.Component {
     var self = this;
 
     this.requireForComplete = this.requireForComplete.filter((key) => {
-      if (self.refs[key].state && !self.refs[key].state.complete) {
-        self.refs[key].componentDidMount();
-        self.refs[key].checkComplete();
+      if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
+        if (typeof self.refs[key].checkComplete === 'function') {
+          self.refs[key].checkComplete();
+        }
         return true;
       }
       return false;
