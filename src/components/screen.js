@@ -28,7 +28,7 @@ class Screen extends Component {
   }
 
   goto(index) {
-    this.props.trigger('goto',{index});
+    play.trigger('goto',{index});
   }
 
   load() {

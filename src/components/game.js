@@ -30,6 +30,9 @@ class Game extends Component {
     window.addEventListener('blur', function() {
       this.pause();
     }.bind(this));
+    window.addEventListener('resize', function() {
+      this.scale();
+    }.bind(this));
   }
 
   componentWillMount() {
@@ -85,20 +88,22 @@ class Game extends Component {
   }
 
   setPause(pause) {
+    var fn = pause ? 'pause' : 'resume';
+
     this.setState({
       paused: pause
     });
 
     this.state.playingSFX.map(audio => {
-      audio.audio.setPaused(pause);
+      audio[fn](pause);
     });
 
     this.state.playingVO.map(audio => {
-      audio.audio.setPaused(pause);
+      audio[fn](pause);
     });
 
     this.state.playingBKG.map(audio => {
-      audio.audio.setPaused(pause);
+      audio[fn](pause);
     });
   }
 
@@ -138,17 +143,17 @@ class Game extends Component {
   }
 
   goto(opts) {
-    var oldScreen, oldIndex, newScreen, nextScreen;
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen;
 
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-'+oldIndex];
-    this.state.currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
-    newScreen = this.refs['screen-'+this.state.currentScreenIndex]
-    nextScreen = this.refs['screen-'+(this.state.currentScreenIndex+1)];
+    currentScreenIndex = Math.min(this.screens.length-1,Math.max(0,opts.index));
+    newScreen = this.refs['screen-'+currentScreenIndex]
+    nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
 
     if (newScreen) {
       if (!newScreen.state.load || !newScreen.state.ready) {
-        this.state.currentScreenIndex = oldIndex;
+        currentScreenIndex = oldIndex;
         this.loadScreens();
         return;
       }
@@ -171,6 +176,7 @@ class Game extends Component {
 
     this.setState({
       loading: false,
+      currentScreenIndex,
     });
   }
 
@@ -200,7 +206,7 @@ class Game extends Component {
 
   scale() {
     this.setState({
-      scale: window.innerWidth / this.config.dimensions.width
+      scale: window.innerWidth / this.config.dimensions.width,
     });
   }
 
@@ -285,8 +291,15 @@ class Game extends Component {
   }
 
   getStyles() {
+    var transformOrigin = '50% 0px 0px';
+
+    if (this.state.scale < 1) {
+      transformOrigin = '0px 0px 0px';
+    }
+
     return {
-      transform: 'scale3d('+this.state.scale+','+this.state.scale+',1)'
+      transform: 'scale3d('+this.state.scale+','+this.state.scale+',1)',
+      transformOrigin,
     }
   }
 
@@ -301,7 +314,7 @@ class Game extends Component {
   renderScreens() {
     return this.screens.map((Screen, key) => {
       return (
-        <Screen key={key} index={key} ref={'screen-'+key} trigger={this.trigger.bind(this)} />
+        <Screen key={key} index={key} ref={'screen-'+key} />
       );
     });
   }

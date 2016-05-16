@@ -18,6 +18,14 @@ class Audio extends Asset {
     }
   }
 
+  pause() {
+    this.audio.setPaused(true);
+  }
+
+  resume() {
+    this.audio.setPaused(false);
+  }
+
   stop() {
     if (!this.audio || (this.audio.playState === 'playFinished')) return;
     play.trigger('audioStop', {
@@ -36,8 +44,15 @@ class Audio extends Asset {
   }
 
   componentDidMount() {
+    var loop, delay;
+
     if (!this.state.ready) {
-      createjs.Sound.registerSound(this.props.src, this.props.src);
+      loop = this.props.loop ? -1 : 0;
+      delay = this.props.delay ? this.props.delay : 0;
+      createjs.Sound.registerSound(this.props.src, this.props.src, 4, './', {
+        loop,
+        delay,
+      });
       this.checkReady();
     }
   }
@@ -51,7 +66,9 @@ class Audio extends Asset {
   }
 
   render() {
-    return null;
+    return (
+      <audio {...this.props} preload='none'></audio>
+    );
   }
 }
 
