@@ -271,6 +271,7 @@ class Game extends Component {
         break;
       case 'voiceOver':
         playingVO.push(opts.audio);
+        this.fadeBackground();
         break;
       case 'background':
         playingBKG.push(opts.audio);
@@ -297,6 +298,7 @@ class Game extends Component {
         break;
       case 'voiceOver':
         playingVO.splice(opts.audio,1);
+        this.raiseBackground();
         break;
       case 'background':
         playingBKG.splice(opts.audio,1);
@@ -308,6 +310,20 @@ class Game extends Component {
       playingVO,
       playingBKG,
     });
+  }
+
+  fadeBackground() {
+    this.state.playingBKG.map((bkg) => {
+      bkg.setVolume(.5);
+    });
+  }
+
+  raiseBackground() {
+    if(this.state.playingVO.length === 0) {
+      this.state.playingBKG.map((bkg) => {
+        bkg.setVolume(1);
+      });
+    }
   }
 
   getClassNames() {

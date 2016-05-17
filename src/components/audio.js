@@ -9,7 +9,7 @@ class Audio extends Asset {
     var self = this,
         delay = this.props.delay || 0;
 
-    if (!createjs.Sound.isReady(this.props.src)) {
+    if (!this.state.ready) {
       this.componentDidMount();
       this.play();
     } else {
@@ -34,7 +34,6 @@ class Audio extends Asset {
     }
 
     this.audio.play();
-    this.audio.on('complete', this.complete, this);
 
     if (this.audio.playState === 'playFailed') {
       setTimeout(() => {
@@ -72,6 +71,10 @@ class Audio extends Asset {
     createjs.Sound.stop(this.props.src);
   }
 
+  setVolume(value) {
+    this.audio.setVolume(value);
+  }
+
   complete() {
     play.trigger('audioStop', {
       audio: this
@@ -96,6 +99,7 @@ class Audio extends Asset {
   checkReady() {
     if (createjs.Sound.isReady(this.props.src)) {
       this.audio = createjs.Sound.createInstance(this.props.src);
+      this.audio.on('complete', this.complete, this);
       this.ready();
     } else {
       setTimeout(this.checkReady.bind(this), 100);
