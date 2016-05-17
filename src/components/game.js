@@ -34,6 +34,9 @@ class Game extends Component {
     window.addEventListener('resize', function() {
       this.scale();
     }.bind(this));
+    window.addEventListener('keydown', function(e) {
+      this.onKeyUp(e);
+    }.bind(this));
   }
 
   getState() {
@@ -41,9 +44,20 @@ class Game extends Component {
   }
 
   demo() {
+    var demo = !this.state.demo;
     this.setState({
-      demo: true,
+      demo
     });
+  }
+
+  onKeyUp(e) {
+    if (e.keyCode === 39) { // right
+      this.goto({index:this.state.currentScreenIndex+1});
+    } else if (e.keyCode === 37) { // left
+      this.goto({index:this.state.currentScreenIndex-1});
+    } else if (e.altKey && e.ctrlKey && e.keyCode === 68) { // alt + ctrl + d
+      this.demo()
+    }
   }
 
   componentWillMount() {
@@ -165,9 +179,7 @@ class Game extends Component {
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
-        currentScreenIndex = oldIndex;
         this.loadScreens();
-        return;
       }
       newScreen.open();
     }
