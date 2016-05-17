@@ -34,6 +34,8 @@ class Audio extends Asset {
       return;
     }
 
+    console.log('play');
+    window.audio = this.audio;
     this.audio.play();
 
     if (this.audio.playState === 'playFailed') {
@@ -85,13 +87,22 @@ class Audio extends Asset {
     });
   }
 
-  bootstrap() {
+  componentDidMount() {
+    console.log('audio', this.props.src);
     this.audio = new Howl({
       urls: [this.props.src],
       loop: this.props.loop || false,
       onend: this.complete.bind(this),
       onload: this.ready.bind(this)
     });
+  }
+
+  bootstrap() {
+    // this is to prevent the audio component from collecting it's own audio
+  }
+
+  componentDidUpdate() {
+    console.log('audio update', this.props.src);
   }
 
   render() {
