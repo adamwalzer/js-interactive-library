@@ -1,3 +1,4 @@
+import { Howl, Howler } from 'howler';
 import Asset from './asset.js';
 
 class Audio extends Asset {
@@ -10,7 +11,7 @@ class Audio extends Asset {
         delay = this.props.delay || 0;
 
     if (!this.state.ready) {
-      this.componentDidMount();
+      this.bootstrap();
       this.play();
     } else {
       play.trigger('audioPlay', {
@@ -43,14 +44,14 @@ class Audio extends Asset {
   }
 
   pause() {
-    this.audio.setPaused(true);
+    this.audio.pause();
     this.setState({
       paused: true,
     });
   }
 
   resume() {
-    this.audio.setPaused(false);
+    this.audio.play();
     this.setState({
       paused: false,
     });
@@ -84,26 +85,13 @@ class Audio extends Asset {
     });
   }
 
-  componentDidMount() {
-    var loop;
-
-    if (!this.state.ready) {
-      loop = this.props.loop ? -1 : 0;
-      createjs.Sound.registerSound(this.props.src, this.props.src, 4, './', {
-        loop,
-      });
-      this.checkReady();
-    }
-  }
-
-  checkReady() {
-    if (createjs.Sound.isReady(this.props.src)) {
-      this.audio = createjs.Sound.createInstance(this.props.src);
-      this.audio.on('complete', this.complete, this);
-      this.ready();
-    } else {
-      setTimeout(this.checkReady.bind(this), 100);
-    }
+  bootstrap() {
+    this.audio = new Howl({
+      urls: [this.props.src],
+      loop: this.props.loop || false,
+      onend: this.complete.bind(this),
+      onload: this.ready.bind(this)
+    });
   }
 
   render() {
