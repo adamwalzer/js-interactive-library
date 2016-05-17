@@ -176,6 +176,12 @@ class Game extends Component {
     newScreen = this.refs['screen-'+currentScreenIndex]
     nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
 
+    if (oldScreen.props.index < newScreen.props.index) {
+      if (!this.state.demo && !oldScreen.state.complete) {
+        return;
+      }
+    }
+
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
