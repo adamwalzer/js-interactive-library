@@ -37,6 +37,10 @@ class Screen extends Component {
   start() {
     this.bootstrap();
 
+    this.setState({
+      started: true,
+    });
+
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
         this.refs[key].start();
@@ -44,6 +48,8 @@ class Screen extends Component {
     });
 
     this.startMedia();
+
+    this.checkComplete();
   }
 
   startMedia() {
@@ -54,16 +60,25 @@ class Screen extends Component {
     }
   }
 
+  complete() {
+    Component.prototype.complete.call(this);
+    play.trigger('screenComplete');
+  }
+
   open() {
+    var self = this;
+
     this.setState({
       open: true,
       leave: false,
       close: false,
     });
-    setTimeout(
-      this.start.bind(this),
-      250
-    );
+
+    setTimeout(() => {
+      if (!self.state.started) {
+        self.start.bind(this);
+      }
+    }, 250);
   }
 
   leave() {

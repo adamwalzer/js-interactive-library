@@ -250,13 +250,14 @@ class Game extends Component {
     var events, fn;
 
     events = {
-      goto: 'goto',
-      audioPlay: 'audioPlay',
-      audioStop: 'audioStop',
-      demo: 'demo',
+      goto: this.goto,
+      audioPlay: this.audioPlay,
+      audioStop: this.audioStop,
+      demo: this.demo,
+      screenComplete: this.screenComplete,
     }
 
-    fn = this[events[event]];
+    fn = events[event];
     if (typeof fn === 'function') {
       this[event](opts);
     }
@@ -327,6 +328,12 @@ class Game extends Component {
       this.state.playingBKG.map((bkg) => {
         bkg.setVolume(1);
       });
+    }
+  }
+
+  screenComplete() {
+    if (this.audio['screen-complete']) {
+      this.audio['screen-complete'].play();
     }
   }
 
