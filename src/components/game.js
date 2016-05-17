@@ -182,6 +182,12 @@ class Game extends Component {
       }
     }
 
+    if (oldScreen.props.index > newScreen.props.index) {
+      if (newScreen.props.index === 0) {
+        return;
+      }
+    }
+
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
