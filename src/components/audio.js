@@ -68,11 +68,11 @@ class Audio extends Asset {
     play.trigger('audioStop', {
       audio: this
     });
-    createjs.Sound.stop(this.props.src);
+    this.audio.stop();
   }
 
   setVolume(value) {
-    this.audio.setVolume(value);
+    this.audio.volume = value;
   }
 
   complete() {
