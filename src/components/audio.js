@@ -34,7 +34,6 @@ class Audio extends Asset {
       return;
     }
 
-    console.log('play');
     window.audio = this.audio;
     this.audio.play();
 
@@ -75,7 +74,7 @@ class Audio extends Asset {
   }
 
   setVolume(value) {
-    this.audio.volume = value;
+    this.audio.volume(value);
   }
 
   complete() {
@@ -88,7 +87,6 @@ class Audio extends Asset {
   }
 
   componentDidMount() {
-    console.log('audio', this.props.src);
     this.audio = new Howl({
       urls: [this.props.src],
       loop: this.props.loop || false,
@@ -101,8 +99,8 @@ class Audio extends Asset {
     // this is to prevent the audio component from collecting it's own audio
   }
 
-  componentDidUpdate() {
-    console.log('audio update', this.props.src);
+  shouldComponentUpdate() {
+    return false;
   }
 
   render() {

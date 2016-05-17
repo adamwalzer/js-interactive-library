@@ -220,9 +220,7 @@ class Game extends Component {
     index = this.getBackgroundIndex();
 
     if (this.state.playingBKG[0] === this.audio.background[index]) {
-      if (this.state.playingBKG[0].audio.playState === 'playSucceeded') {
-        return;
-      }
+      return;
     }
 
     if (self.state.playingBKG[0]) {
@@ -314,7 +312,7 @@ class Game extends Component {
 
   fadeBackground() {
     this.state.playingBKG.map((bkg) => {
-      bkg.setVolume(.5);
+      bkg.setVolume(.25);
     });
   }
 
