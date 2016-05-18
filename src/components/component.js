@@ -123,6 +123,9 @@ class Component extends React.Component {
     var self = this;
 
     this.requireForComplete = this.requireForComplete.filter((key) => {
+      if (self.refs[key] instanceof Node) {
+        return false;
+      }
       if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
         if (typeof self.refs[key].checkComplete === 'function') {
           self.refs[key].checkComplete();

@@ -4,6 +4,7 @@ import Game from 'components/game';
 import Image from 'components/image';
 import Audio from 'components/audio';
 import Video from 'components/video';
+import ListItem from 'components/list_item';
 
 import start from 'methods/start';
 
@@ -20,6 +21,7 @@ window.play = {
   Image,
   Audio,
   Video,
+  ListItem,
   start,
 };
 

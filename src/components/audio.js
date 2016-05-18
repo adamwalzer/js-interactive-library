@@ -34,14 +34,7 @@ class Audio extends Asset {
       return;
     }
 
-    window.audio = this.audio;
     this.audio.play();
-
-    if (this.audio.playState === 'playFailed') {
-      setTimeout(() => {
-        self.play();
-      }, 100)
-    }
   }
 
   pause() {
@@ -66,7 +59,7 @@ class Audio extends Asset {
   }
 
   stop() {
-    if (!this.audio || (this.audio.playState === 'playFinished')) return;
+    if (!this.audio) return;
     play.trigger('audioStop', {
       audio: this
     });
@@ -93,6 +86,9 @@ class Audio extends Asset {
       onend: this.complete.bind(this),
       onload: this.ready.bind(this)
     });
+    if(this.props.complete) {
+      this.complete();
+    }
   }
 
   bootstrap() {

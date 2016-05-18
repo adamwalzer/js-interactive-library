@@ -13,11 +13,16 @@ class Game extends Component {
       Screen
     ];
 
+    this.menus = [
+      Screen
+    ];
+
     this.state = {
       currentScreenIndex: 0,
       playingSFX: [],
       playingVO: [],
       playingBKG: [],
+      openMenus: [],
       loading: true,
     };
 
@@ -101,7 +106,8 @@ class Game extends Component {
     });
     this.goto({
       index: this.state.currentScreenIndex,
-    })
+      silent: true,
+    });
   }
 
   resume() {
@@ -213,7 +219,36 @@ class Game extends Component {
       currentScreenIndex,
     });
 
+    if (!opts.silent && this.audio.button) {
+      this.audio.button.play();
+    }
+
     this.playBackground();
+  }
+
+  openMenu(opts) {
+    var menu, openMenus;
+
+    menu = this.refs['menu-'+opts.id];
+
+    if (menu) {
+      menu.open();
+      openMenus = this.state.openMenus || [];
+      openMenus.push(opts.id);
+      this.setState({
+        openMenus,
+      })
+    }
+  }
+
+  menuClose(opts) {
+    var openMenus;
+
+    openMenus = this.state.openMenus || [];
+    openMenus.splice(opts.id,1);
+    this.setState({
+      openMenus,
+    });
   }
 
   getBackgroundIndex() {
@@ -255,7 +290,8 @@ class Game extends Component {
       audioStop: this.audioStop,
       demo: this.demo,
       screenComplete: this.screenComplete,
-    }
+      menuClose: this.menuClose,
+    };
 
     fn = events[event];
     if (typeof fn === 'function') {
@@ -346,6 +382,7 @@ class Game extends Component {
     if (this.state.playingVO.length) classNames += ' VOICE-OVER';
     if (this.state.paused) classNames += ' PAUSED';
     if (this.state.loading) classNames += ' LOADING';
+    if (this.state.openMenus.length) classNames += ' MENU';
     if (this.state.demo) classNames += ' DEMO';
 
     return classNames;
@@ -372,10 +409,27 @@ class Game extends Component {
     return null;
   }
 
+  renderMenu() {
+    return (
+      <div className="menu">
+        <button className="close" onClick={this.openMenu.bind(this,{id:'quit'})}></button>
+      </div>
+    );
+  }
+
   renderScreens() {
     return this.screens.map((Screen, key) => {
       return (
         <Screen key={key} index={key} ref={'screen-'+key} />
+      );
+    });
+  }
+
+  renderMenuScreens() {
+    return Object.keys(this.menus).map((key, index) => {
+      var Menu = this.menus[key];
+      return (
+        <Menu key={index} index={index} ref={'menu-'+key} />
       );
     });
   }
@@ -385,7 +439,9 @@ class Game extends Component {
       <div className={"pl-game"+this.getClassNames()} style={this.getStyles()}>
         {this.renderLoader()}
         {this.renderAssets()}
+        {this.renderMenu()}
         {this.renderScreens()}
+        {this.renderMenuScreens()}
       </div>
     )
   }

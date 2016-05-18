@@ -37,10 +37,6 @@ class Screen extends Component {
   start() {
     this.bootstrap();
 
-    this.setState({
-      started: true,
-    });
-
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
         this.refs[key].start();
@@ -49,7 +45,9 @@ class Screen extends Component {
 
     this.startMedia();
 
-    this.checkComplete();
+    this.setState({
+      started: true,
+    }, this.checkComplete.bind(this));
   }
 
   startMedia() {
@@ -79,6 +77,8 @@ class Screen extends Component {
         self.start.bind(this);
       }
     }, 250);
+
+    this.start();
   }
 
   leave() {
