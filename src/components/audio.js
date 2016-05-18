@@ -67,7 +67,20 @@ class Audio extends Asset {
   }
 
   setVolume(value) {
-    this.audio.volume(value);
+    var volume = this.audio.volume();
+    if (value > volume) {
+      this.increaseVolume(value);
+    } else {
+      this.decreaseVolume(value);
+    }
+  }
+
+  increaseVolume(value) {
+    this.audio.fadeIn(value);
+  }
+
+  decreaseVolume(value) {
+    this.audio.fadeOut(value);
   }
 
   complete() {

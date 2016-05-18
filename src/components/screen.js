@@ -56,6 +56,10 @@ class Screen extends Component {
     } else if (this.audio.voiceOver[0]) {
       this.audio.voiceOver[0].play();
     }
+
+    if(this.audio.start) {
+      this.audio.start.play();
+    }
   }
 
   complete() {
@@ -74,11 +78,9 @@ class Screen extends Component {
 
     setTimeout(() => {
       if (!self.state.started) {
-        self.start.bind(this);
+        self.start();
       }
     }, 250);
-
-    this.start();
   }
 
   leave() {

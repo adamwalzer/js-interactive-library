@@ -7,11 +7,28 @@ class Video extends Asset {
   }
 
   play() {
+    if (this.state.playing) return;
     this.el.play();
+    play.trigger('videoPlay', {
+      video: this
+    });
+    this.setState({
+      playing: true,
+    });
+  }
+
+  start() {
+    this.play();
   }
 
   stop() {
     this.el.pause();
+    play.trigger('videoStop', {
+      video: this
+    });
+    this.setState({
+      playing: false,
+    });
   }
 
   componentDidMount() {

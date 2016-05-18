@@ -22,6 +22,7 @@ class Game extends Component {
       playingSFX: [],
       playingVO: [],
       playingBKG: [],
+      playingVideo: null,
       openMenus: [],
       loading: true,
     };
@@ -288,6 +289,8 @@ class Game extends Component {
       goto: this.goto,
       audioPlay: this.audioPlay,
       audioStop: this.audioStop,
+      videoPlay: this.videoPlay,
+      videoStop: this.videoStop,
       demo: this.demo,
       screenComplete: this.screenComplete,
       menuClose: this.menuClose,
@@ -353,16 +356,42 @@ class Game extends Component {
     });
   }
 
-  fadeBackground() {
-    this.state.playingBKG.map((bkg) => {
-      bkg.setVolume(.25);
+  videoPlay(opts) {
+    var playingVideo = this.state.playingVideo;
+
+    if (playingVideo) {
+      playingVideo.stop();
+    }
+
+    playingVideo = opts.video;
+
+    this.fadeBackground(0);
+
+    this.setState({
+      playingVideo,
     });
   }
 
-  raiseBackground() {
+  videoStop(opts) {
+    this.raiseBackground(1);
+
+    this.setState({
+      playingVideo: null,
+    });
+  }
+
+  fadeBackground(value) {
+    if (typeof value === 'undefined') value = .25
+    this.state.playingBKG.map((bkg) => {
+      bkg.decreaseVolume(value);
+    });
+  }
+
+  raiseBackground(value) {
+    if (typeof value === 'undefined') value = 1
     if(this.state.playingVO.length === 0) {
       this.state.playingBKG.map((bkg) => {
-        bkg.setVolume(1);
+        bkg.increaseVolume(value);
       });
     }
   }
