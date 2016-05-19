@@ -10,7 +10,7 @@
   "dependencies": {
     "Base64": "^0.3.0",
     "babel-polyfill": "^6.0.16",
-    "classnames": "^2.2.0",
+    "classnames": "^2.2.5",
     "howler": "git@github.com:goldfire/howler.js.git",
     "lodash": "^4.3.0",
     "moment": "^2.12.0",
@@ -91,4 +91,3 @@
   "author": "Max Rafferty",
   "license": "ISC"
 }
-
