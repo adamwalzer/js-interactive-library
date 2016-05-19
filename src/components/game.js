@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import Component from 'components/component';
 import Screen from 'components/screen';
+import Audio from 'components/audio';
 
 class Game extends Component {
   constructor(config) {
@@ -129,15 +130,15 @@ class Game extends Component {
     });
 
     this.state.playingSFX.map(audio => {
-      audio[fn](pause);
+      audio[fn]();
     });
 
     this.state.playingVO.map(audio => {
-      audio[fn](pause);
+      audio[fn]();
     });
 
     this.state.playingBKG.map(audio => {
-      audio[fn](pause);
+      audio[fn]();
     });
   }
 
@@ -264,21 +265,27 @@ class Game extends Component {
   }
 
   playBackground() {
-    var index, self = this;
+    var index, playingBKG, self = this;
 
     index = this.getBackgroundIndex();
+    playingBKG = this.state.playingBKG;
 
-    if (this.state.playingBKG[0] === this.audio.background[index]) {
+    if (playingBKG[0] === this.audio.background[index]) {
       return;
     }
 
-    if (self.state.playingBKG[0]) {
-      self.state.playingBKG[0].stop();
+    if (playingBKG[0]) {
+      playingBKG[0].stop();
+      playingBKG.shift();
     }
 
     if (this.audio.background[index]) {
       setTimeout(() => {
         self.audio.background[index].play();
+        playingBKG.push(self.audio.background[index]);
+        self.setState({
+          playingBKG,
+        });
       }, 500);
     }
   }

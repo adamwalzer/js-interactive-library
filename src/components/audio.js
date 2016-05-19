@@ -21,12 +21,9 @@ class Audio extends Asset {
         self.playAudio();
       }, delay);
     }
-
   }
 
   playAudio() {
-    var self = this;
-
     if (this.state.paused) {
       this.setState({
         playAfterResume: true,
@@ -45,17 +42,11 @@ class Audio extends Asset {
   }
 
   resume() {
-    this.audio.play();
+    this.playAudio();
     this.setState({
+      playAfterResume: false,
       paused: false,
     });
-
-    if (this.state.playAfterResume) {
-      this.playAudio();
-      this.setState({
-        playAfterResume: false,
-      });
-    }
   }
 
   stop() {
