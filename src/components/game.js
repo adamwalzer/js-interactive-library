@@ -347,19 +347,20 @@ class Game extends Component {
     event = new Event('game-event', {bubbles: true, cancelable: false});
 
     event.name = data.name;
+    event.gameData = data;
     event.respond = data => {
       var platformEvent;
 
-      platformEvent = new Event('game-event');
+      platformEvent = new Event('platform-event');
       platformEvent.name = data.name;
       platformEvent.gameData = data;
 
-      window.dispatchEvent(platformEvent);
+      if (window.frameElement) {
+        window.frameElement.dispatchEvent(platformEvent);
+      }
     };
 
-    event.gameData = data;
-
-    if (data && window.frameElement) {
+    if (window.frameElement) {
       window.frameElement.dispatchEvent(event);
     }
   };
