@@ -1,5 +1,7 @@
 import React from 'react';
 
+import classNames from 'classnames';
+
 import Component from 'components/component';
 
 class Screen extends Component {
@@ -102,21 +104,21 @@ class Screen extends Component {
   }
 
   getClassNames() {
-    var classNames = '';
-
     if (!(this.state.open || this.state.leave)) {
-      this.state.close = true;
+      this.state.setState({
+        close: true,
+      });
     }
 
-    if (this.state.ready) classNames += ' READY';
-    if (this.state.load) classNames += ' LOAD';
-    if (this.state.open) classNames += ' OPEN';
-    if (this.state.leaving) classNames += ' LEAVING';
-    if (this.state.leave) classNames += ' LEAVE';
-    if (this.state.close || !(this.state.open || this.state.leave)) classNames += ' CLOSE';
-    if (this.state.complete) classNames += ' COMPLETE';
-
-    return classNames;
+    return classNames({
+      READY: this.state.ready,
+      LOAD: this.state.load,
+      OPEN: this.state.open,
+      LEAVING: this.state.leaving,
+      LEAVE: this.state.leave,
+      CLOSE: this.state.close,
+      COMPLETE: this.state.complete,
+    });
   }
 
   renderScreen() {
@@ -147,7 +149,7 @@ class Screen extends Component {
 
   render() {
     return (
-      <div id={this.state.id} className={'screen'+this.getClassNames()}>
+      <div id={this.state.id} className={'screen '+this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
