@@ -31,7 +31,6 @@ class Game extends Component {
     };
 
     play.trigger = this.trigger.bind(this);
-    play.getState = this.getState.bind(this);
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', function() {
@@ -308,11 +307,12 @@ class Game extends Component {
       demo: this.demo,
       screenComplete: this.screenComplete,
       menuClose: this.menuClose,
+      getState: this.getState,
     };
 
     fn = events[event];
     if (typeof fn === 'function') {
-      this[event](opts);
+      return this[event](opts);
     }
   }
 
@@ -395,9 +395,9 @@ class Game extends Component {
   }
 
   fadeBackground(value) {
-    if (typeof value === 'undefined') value = .25
+    if (typeof value === 'undefined') value = .25;
     this.state.playingBKG.map((bkg) => {
-      bkg.decreaseVolume(value);
+      bkg.setVolume(value);
     });
   }
 
@@ -405,7 +405,7 @@ class Game extends Component {
     if (typeof value === 'undefined') value = 1
     if(this.state.playingVO.length === 0) {
       this.state.playingBKG.map((bkg) => {
-        bkg.increaseVolume(value);
+        bkg.setVolume(value);
       });
     }
   }

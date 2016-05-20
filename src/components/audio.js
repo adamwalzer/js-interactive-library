@@ -8,7 +8,9 @@ class Audio extends Asset {
 
   play() {
     var self = this,
-        delay = this.props.delay || 0;
+        delay = this.props.delay || 0,
+        state = play.trigger('getState');
+
 
     if (!this.state.ready) {
       this.bootstrap();
@@ -17,9 +19,16 @@ class Audio extends Asset {
       play.trigger('audioPlay', {
         audio: this
       });
-      setTimeout(() => {
-        self.playAudio();
-      }, delay);
+
+      if (state.paused) {
+        this.setState({
+          paused: true,
+        }, this.playAudio.bind(this));
+      } else {
+        setTimeout(() => {
+          self.playAudio();
+        }, delay);
+      }
     }
   }
 
@@ -58,12 +67,7 @@ class Audio extends Asset {
   }
 
   setVolume(value) {
-    var volume = this.audio.volume();
-    if (value > volume) {
-      this.increaseVolume(value);
-    } else {
-      this.decreaseVolume(value);
-    }
+    this.audio.volume(value);
   }
 
   increaseVolume(value) {
