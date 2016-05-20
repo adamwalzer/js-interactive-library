@@ -22,6 +22,7 @@ class Game extends Component {
 
     this.state = {
       currentScreenIndex: 0,
+      highestScreenIndex: 0,
       playingSFX: [],
       playingVO: [],
       playingBKG: [],
@@ -69,6 +70,10 @@ class Game extends Component {
   }
 
   componentWillMount() {
+    this.emit({
+      name: 'init',
+      game: this.config.id,
+    });
     this.detechDevice();
     this.scale();
   }
@@ -104,6 +109,10 @@ class Game extends Component {
   }
 
   ready() {
+    this.emit({
+      name: 'ready',
+      game: this.config.id,
+    });
     this.setState({
       ready: true,
     });
@@ -182,13 +191,14 @@ class Game extends Component {
   }
 
   goto(opts) {
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen;
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex;
 
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-'+oldIndex];
     currentScreenIndex = Math.min(this.screensLength-1,Math.max(0,opts.index));
     newScreen = this.refs['screen-'+currentScreenIndex]
     nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
+    highestScreenIndex = Math.max(this.state.highestScreenIndex,currentScreenIndex);
 
     if (oldScreen.props.index < newScreen.props.index) {
       if (!this.state.demo && !oldScreen.state.complete) {
@@ -225,6 +235,13 @@ class Game extends Component {
     this.setState({
       loading: false,
       currentScreenIndex,
+      highestScreenIndex,
+    });
+
+    this.emit({
+      name: 'save',
+      game: this.config.id,
+      screenIndex: highestScreenIndex,
     });
 
     if (!opts.silent && this.audio.button) {
@@ -308,12 +325,50 @@ class Game extends Component {
       screenComplete: this.screenComplete,
       menuClose: this.menuClose,
       getState: this.getState,
+      emit: this.emit,
+      quit: this.quit,
     };
 
     fn = events[event];
     if (typeof fn === 'function') {
       return this[event](opts);
     }
+  }
+
+  emit(data) {
+    var event;
+
+    if (typeof data !== 'object') return;
+
+    if (!data.game) {
+      data.game = this.config.id;
+    }
+
+    event = new Event('game-event', {bubbles: true, cancelable: false});
+
+    event.name = data.name;
+    event.respond = data => {
+      var platformEvent;
+
+      platformEvent = new Event('game-event');
+      platformEvent.name = data.name;
+      platformEvent.gameData = data;
+
+      window.dispatchEvent(platformEvent);
+    };
+
+    event.gameData = data;
+
+    if (data && window.frameElement) {
+      window.frameElement.dispatchEvent(event);
+    }
+  };
+
+  quit() {
+    this.emit({
+      name: 'quit',
+      game: this.config.id,
+    });
   }
 
   audioPlay(opts) {

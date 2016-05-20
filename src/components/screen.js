@@ -104,12 +104,6 @@ class Screen extends Component {
   }
 
   getClassNames() {
-    if (!(this.state.open || this.state.leave)) {
-      this.state.setState({
-        close: true,
-      });
-    }
-
     return classNames({
       READY: this.state.ready,
       LOAD: this.state.load,
