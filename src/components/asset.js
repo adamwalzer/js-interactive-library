@@ -6,11 +6,11 @@ class Asset extends Component {
   }
 
   checkReady() {
-    
+
   }
 
   checkComplete() {
-    
+
   }
 
   render() {

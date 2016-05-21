@@ -19,7 +19,7 @@ class Screen extends Component {
   }
 
   goto(index) {
-    play.trigger('goto',{index});
+    play.trigger('goto', {index});
   }
 
   load() {
@@ -59,7 +59,7 @@ class Screen extends Component {
       this.audio.voiceOver[0].play();
     }
 
-    if(this.audio.start) {
+    if (this.audio.start) {
       this.audio.start.play();
     }
   }
@@ -131,19 +131,19 @@ class Screen extends Component {
 
   renderPrevButton() {
     return (
-      <button className='prev-screen' onClick={this.goto.bind(this,this.props.index-1)}></button>
+      <button className="prev-screen" onClick={this.goto.bind(this, this.props.index - 1)}></button>
     );
   }
 
   renderNextButton() {
     return (
-      <button className='next-screen' onClick={this.goto.bind(this,this.props.index+1)}></button>
+      <button className="next-screen" onClick={this.goto.bind(this, this.props.index + 1)}></button>
     );
   }
 
   render() {
     return (
-      <div id={this.state.id} className={'screen '+this.getClassNames()}>
+      <div id={this.state.id} className={'screen ' + this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}

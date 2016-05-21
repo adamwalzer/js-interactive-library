@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 
 var start = function (Game, id) {
@@ -16,6 +15,6 @@ var start = function (Game, id) {
     <Game />,
     el
   );
-}
+};
 
 export default start;

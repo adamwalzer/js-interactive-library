@@ -21,7 +21,7 @@ class Image extends Asset {
   }
 
   error() {
-    console.log("error");
+    console.log('error');
     this.setState({
       error: true,
       ready: false
