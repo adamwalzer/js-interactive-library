@@ -21,7 +21,6 @@ class Image extends Asset {
   }
 
   error() {
-    console.log('error');
     this.setState({
       error: true,
       ready: false
@@ -29,7 +28,6 @@ class Image extends Asset {
   }
 
   render() {
-    var self = this;
     return (
       <img onLoad={this.ready.bind(this)} onError={this.error.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
     );
