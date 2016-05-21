@@ -202,10 +202,15 @@ class Game extends Component {
 
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-'+oldIndex];
-    currentScreenIndex = Math.min(this.screensLength-1,Math.max(0,opts.index));
+    if (typeof opts.index === 'number') {
+      currentScreenIndex = Math.min(this.screensLength-1,Math.max(0,opts.index));
+      nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
+      highestScreenIndex = Math.max(this.state.highestScreenIndex,currentScreenIndex);
+    } else if (typeof opts.index === 'string') {
+      currentScreenIndex = opts.index;
+      highestScreenIndex = this.state.highestScreenIndex;
+    }
     newScreen = this.refs['screen-'+currentScreenIndex]
-    nextScreen = this.refs['screen-'+(currentScreenIndex+1)];
-    highestScreenIndex = Math.max(this.state.highestScreenIndex,currentScreenIndex);
 
     if (oldScreen.props.index < newScreen.props.index) {
       if (!this.state.demo && !oldScreen.state.complete) {
