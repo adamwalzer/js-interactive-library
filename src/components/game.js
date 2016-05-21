@@ -34,15 +34,18 @@ class Game extends Component {
     play.trigger = this.trigger.bind(this);
 
     window.addEventListener('load', window.focus);
-    window.addEventListener('focus', function() {
+    window.addEventListener('focus', () => {
       this.resume();
     }.bind(this));
-    window.addEventListener('blur', function() {
+    window.addEventListener('blur', () => {
       this.pause();
     }.bind(this));
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', () => {
       this.scale();
     }.bind(this));
+    window.addEventListener('orientationchange', () => {
+      window.onresize();
+    });
     window.addEventListener('keydown', function(e) {
       this.onKeyUp(e);
     }.bind(this));
