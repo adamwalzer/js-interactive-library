@@ -8,7 +8,11 @@ import Audio from 'components/audio';
 
 class Game extends Component {
   constructor(config) {
+    var self;
+
     super();
+
+    self = this;
 
     this.config = config;
 
@@ -35,20 +39,20 @@ class Game extends Component {
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
-      this.resume();
-    }.bind(this));
+      self.resume();
+    });
     window.addEventListener('blur', () => {
-      this.pause();
-    }.bind(this));
+      self.pause();
+    });
     window.addEventListener('resize', () => {
-      this.scale();
-    }.bind(this));
+      self.scale();
+    });
     window.addEventListener('orientationchange', () => {
       window.onresize();
     });
     window.addEventListener('keydown', function(e) {
-      this.onKeyUp(e);
-    }.bind(this));
+      self.onKeyUp(e);
+    });
   }
 
   getState() {
