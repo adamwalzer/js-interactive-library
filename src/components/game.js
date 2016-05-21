@@ -253,7 +253,8 @@ class Game extends Component {
     this.emit({
       name: 'save',
       game: this.config.id,
-      screenIndex: highestScreenIndex,
+      highestScreenIndex,
+      currentScreenIndex,
     });
 
     if (!opts.silent && this.audio.button) {
