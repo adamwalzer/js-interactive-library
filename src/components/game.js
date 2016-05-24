@@ -30,6 +30,8 @@ class Game extends Component {
       playingVideo: null,
       openMenus: [],
       loading: true,
+      demo: false,
+      data: {},
     };
 
     play.trigger = this.trigger.bind(this);
@@ -41,14 +43,20 @@ class Game extends Component {
     window.addEventListener('blur', () => {
       self.pause();
     });
+
     window.addEventListener('resize', () => {
       self.scale();
     });
     window.addEventListener('orientationchange', () => {
       window.onresize();
     });
+
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
+    });
+
+    window.frameElement.addEventListener('platform-event', function (e) {
+      self.trigger(e.name, e.gameData);
     });
   }
 
@@ -336,6 +344,8 @@ class Game extends Component {
       videoPlay: this.videoPlay,
       videoStop: this.videoStop,
       demo: this.demo,
+      'toggle-demo-mode': this.demo,
+      'update-data': this.updateData,
       screenComplete: this.screenComplete,
       menuClose: this.menuClose,
       getState: this.getState,
@@ -345,7 +355,7 @@ class Game extends Component {
 
     fn = events[event];
     if (typeof fn === 'function') {
-      return this[event](opts);
+      return fn.call(this, opts);
     }
   }
 
@@ -365,6 +375,7 @@ class Game extends Component {
     event.respond = gameData => {
       var platformEvent;
 
+
       platformEvent = new Event('platform-event');
       platformEvent.name = gameData.name;
       platformEvent.gameData = gameData;
@@ -377,6 +388,8 @@ class Game extends Component {
     if (window.frameElement) {
       window.frameElement.dispatchEvent(event);
     }
+
+    return event;
   }
 
   quit() {
@@ -384,6 +397,28 @@ class Game extends Component {
       name: 'quit',
       game: this.config.id,
     });
+  }
+
+  updateData(opts) {
+    var data = this.mergeObjects(this.state.data, opts.data);
+
+    this.setState({
+      data,
+    });
+  }
+
+  mergeObjects(data1, data2) {
+    Object.keys(data2).map((key) => {
+      if (data1[key]) {
+        if (typeof data1[key] === 'object' && typeof data2[key] === 'object') {
+          data1[key] = this.mergeObjects(data1[key], data2[key]);
+        }
+      } else {
+        data1[key] = data2[key];
+      }
+    });
+
+    return data1;
   }
 
   audioPlay(opts) {
