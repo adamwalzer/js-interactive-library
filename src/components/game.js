@@ -238,7 +238,7 @@ class Game extends Component {
       if (!newScreen.state.load || !newScreen.state.ready) {
         this.loadScreens();
       }
-      newScreen.open();
+      newScreen.open(opts);
     }
 
     if (oldScreen && oldScreen !== newScreen) {
