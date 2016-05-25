@@ -67,13 +67,15 @@ class Screen extends Component {
     play.trigger('screenComplete');
   }
 
-  open() {
+  open(opts) {
     var self = this;
 
     this.setState({
+      load: true,
       open: true,
       leave: false,
       close: false,
+      opts,
     });
 
     setTimeout(() => {

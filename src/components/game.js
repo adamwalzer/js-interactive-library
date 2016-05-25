@@ -121,17 +121,19 @@ class Game extends Component {
   }
 
   ready() {
-    this.emit({
-      name: 'ready',
-      game: this.config.id,
-    });
-    this.setState({
-      ready: true,
-    });
-    this.goto({
-      index: this.state.currentScreenIndex,
-      silent: true,
-    });
+    if (!this.state.ready) {
+      this.emit({
+        name: 'ready',
+        game: this.config.id,
+      });
+      this.setState({
+        ready: true,
+      });
+      this.goto({
+        index: this.state.currentScreenIndex,
+        silent: true,
+      });
+    }
   }
 
   resume() {
@@ -345,6 +347,10 @@ class Game extends Component {
       videoStop: this.videoStop,
       demo: this.demo,
       'toggle-demo-mode': this.demo,
+      getData: this.getData,
+      'get-data': this.getData,
+      passData: this.passData,
+      'pass-data': this.passData,
       'update-data': this.updateData,
       screenComplete: this.screenComplete,
       menuClose: this.menuClose,
@@ -378,7 +384,8 @@ class Game extends Component {
 
       platformEvent = new Event('platform-event');
       platformEvent.name = gameData.name;
-      platformEvent.gameData = gameData;
+      platformEvent.gameData = gameData || {};
+      platformEvent.gameData.callback = data.callback;
 
       if (window.frameElement) {
         window.frameElement.dispatchEvent(platformEvent);
@@ -390,6 +397,15 @@ class Game extends Component {
     }
 
     return event;
+  }
+
+  getData(opts) {
+    opts.name = 'get-data';
+    this.emit(opts);
+  }
+
+  passData() {
+    // this is should be implemented per game
   }
 
   quit() {
@@ -404,7 +420,7 @@ class Game extends Component {
 
     this.setState({
       data,
-    });
+    }, opts.callback);
   }
 
   mergeObjects(data1, data2) {
