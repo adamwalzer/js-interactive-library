@@ -7,6 +7,7 @@ import Video from 'components/video';
 import ListItem from 'components/list_item';
 
 import start from 'methods/start';
+import util from 'methods/util';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -23,6 +24,7 @@ window.play = {
   Video,
   ListItem,
   start,
+  util,
 };
 
 export default window.play;
