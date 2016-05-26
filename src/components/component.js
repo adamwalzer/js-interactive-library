@@ -66,6 +66,8 @@ class Component extends React.Component {
 
     this.collectMedia();
     this.checkReady();
+
+    this.setState(this.props);
   }
 
   collectMedia() {

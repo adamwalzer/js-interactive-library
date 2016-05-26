@@ -15,7 +15,7 @@ class Image extends Asset {
     if (!this.state.error) {
       this.setState({
         ready: true,
-        complete: true,
+        complete: !this.props.incomplete,
       });
     }
   }

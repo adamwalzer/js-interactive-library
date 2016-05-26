@@ -34,7 +34,13 @@ class Screen extends Component {
 
   }
 
+  checkCompleteOnStart() {
+    return true;
+  }
+
   start() {
+    var self = this;
+
     this.bootstrap();
 
     Object.keys(this.refs).map(key => {
@@ -47,7 +53,11 @@ class Screen extends Component {
 
     this.setState({
       started: true,
-    }, this.checkComplete.bind(this));
+    }, () => {
+      if (this.props.checkComplete !== false) {
+        self.checkComplete();
+      }
+    });
   }
 
   startMedia() {
@@ -105,6 +115,7 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
+      screen: true,
       READY: this.state.ready,
       LOAD: this.state.load,
       OPEN: this.state.open,
@@ -143,7 +154,7 @@ class Screen extends Component {
 
   render() {
     return (
-      <div id={this.state.id} className={'screen ' + this.getClassNames()}>
+      <div id={this.state.id} className={this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
