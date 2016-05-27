@@ -138,7 +138,9 @@ class Component extends React.Component {
     });
 
     if (this.requireForComplete.length === 0) {
-      this.complete();
+      if (!this.state.complete) {
+        this.complete();
+      }
     } else if (this.state.started) {
       this.state.complete = false;
       setTimeout(this.checkComplete.bind(this), 100);

@@ -272,7 +272,7 @@ class Game extends Component {
       this.audio.button.play();
     }
 
-    this.playBackground();
+    this.playBackground(currentScreenIndex);
   }
 
   openMenu(opts) {
@@ -304,10 +304,10 @@ class Game extends Component {
     return 0;
   }
 
-  playBackground() {
+  playBackground(currentScreenIndex) {
     var index, playingBKG, self = this;
 
-    index = this.getBackgroundIndex();
+    index = this.getBackgroundIndex(currentScreenIndex);
     playingBKG = this.state.playingBKG;
 
     if (playingBKG[0] === this.audio.background[index]) {
@@ -547,6 +547,7 @@ class Game extends Component {
       LOADING: this.state.loading,
       MENU: this.state.openMenus.length,
       DEMO: this.state.demo,
+      ['SCREEN-' + this.state.currentScreenIndex]: true,
     });
   }
 

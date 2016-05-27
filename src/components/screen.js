@@ -85,6 +85,7 @@ class Screen extends Component {
       open: true,
       leave: false,
       close: false,
+      return: this.state.complete,
       opts,
     });
 
@@ -123,6 +124,7 @@ class Screen extends Component {
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
       COMPLETE: this.state.complete,
+      RETURN: this.state.return,
     });
   }
 
