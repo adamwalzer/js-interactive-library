@@ -67,7 +67,9 @@ class Component extends React.Component {
     this.collectMedia();
     this.checkReady();
 
-    this.setState(this.props);
+    // this seems to duplicate a lot of data
+    // let's think more about this before adding this code
+    // this.setState(this.props);
   }
 
   collectMedia() {

@@ -405,7 +405,7 @@ class Game extends Component {
   }
 
   passData() {
-    // this is should be implemented per game
+    // this should be implemented per game
   }
 
   quit() {
@@ -424,6 +424,8 @@ class Game extends Component {
   }
 
   mergeObjects(data1, data2) {
+    if (!data2) return data1;
+
     Object.keys(data2).map((key) => {
       if (data1[key]) {
         if (typeof data1[key] === 'object' && typeof data2[key] === 'object') {
