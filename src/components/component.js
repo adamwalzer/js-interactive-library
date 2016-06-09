@@ -5,7 +5,8 @@ class Component extends React.Component {
     super();
 
     this.state = {
-      started: false
+      started: false,
+      ready: false,
     };
   }
 
@@ -44,12 +45,6 @@ class Component extends React.Component {
       if (self.refs[key] && typeof self.refs[key].stop === 'function') {
         self.refs[key].stop();
       }
-    });
-  }
-
-  componentWillMount() {
-    this.setState({
-      ready: false,
     });
   }
 
