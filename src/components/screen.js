@@ -23,8 +23,8 @@ class Screen extends Component {
   load() {
     var self = this;
 
-    if (!this.state.load) {
-      this.setState({
+    if (!self.state.load) {
+      self.setState({
         load: true,
         ready: false,
       }, () => {
@@ -70,7 +70,7 @@ class Screen extends Component {
   open() {
     var self = this;
 
-    this.setState({
+    self.setState({
       open: true,
       leave: false,
       close: false,

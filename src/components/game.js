@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import classNames from 'classnames';
 
 import Component from 'components/component';
@@ -46,7 +47,7 @@ class Game extends Component {
   }
 
   getState() {
-    return new Object(this.state);
+    return this.state;
   }
 
   demo() {
@@ -510,7 +511,7 @@ class Game extends Component {
   renderMenu() {
     return (
       <div className="menu">
-        <button className="close" onClick={this.openMenu.bind(this, {id:'quit'})}></button>
+        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
       </div>
     );
   }
@@ -527,7 +528,7 @@ class Game extends Component {
   }
 
   renderMenuScreens() {
-    return Object.keys(this.menus).map((key, index) => {
+    return _.map(this.menus, (index, key) => {
       var Menu = this.menus[key];
       return (
         <Menu key={key} index={index} ref={'menu-' + key} />

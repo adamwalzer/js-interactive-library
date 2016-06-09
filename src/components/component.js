@@ -1,4 +1,4 @@
-import React from 'react';
+import _ from 'lodash';
 
 class Component extends React.Component {
   constructor() {
@@ -27,23 +27,21 @@ class Component extends React.Component {
       started: true
     });
 
-    Object.keys(this.refs).map(key => {
-      if (typeof this.refs[key].start === 'function') this.refs[key].start();
+    _.each(this.refs, ref => {
+      if (typeof ref.start === 'function') ref.start();
     });
 
     this.checkComplete();
   }
 
   stop() {
-    var self = this;
-
     this.setState({
       started: false
     });
 
-    Object.keys(this.refs).map(key => {
-      if (self.refs[key] && typeof self.refs[key].stop === 'function') {
-        self.refs[key].stop();
+    _.each(this.refs, ref => {
+      if (ref && typeof ref.stop === 'function') {
+        ref.stop();
       }
     });
   }
@@ -54,7 +52,7 @@ class Component extends React.Component {
 
   bootstrap() {
     var self = this;
-    this.requireForReady = Object.keys(this.refs);
+    this.requireForReady = Object.keys(self.refs);
     this.requireForComplete = this.requireForReady.filter(key => {
       return !self.refs[key].state || !self.refs[key].state.complete;
     });
@@ -66,19 +64,19 @@ class Component extends React.Component {
   collectMedia() {
     var self = this;
 
-    this.video = [];
-    this.audio = {
+    self.video = [];
+    self.audio = {
       background: [],
       sfx: [],
       voiceOver: [],
     };
 
-    Object.keys(this.refs).map(key => {
-      if (play.Video && self.refs[key] instanceof play.Video) {
+    _.each(self.refs, (ref, key) => {
+      if (play.Video && ref instanceof play.Video) {
         self.collectVideo(key);
       }
 
-      if (play.Audio && self.refs[key] instanceof play.Audio) {
+      if (play.Audio && ref instanceof play.Audio) {
         self.collectAudio(key);
       }
     });
@@ -98,7 +96,7 @@ class Component extends React.Component {
   checkReady() {
     var self = this;
 
-    this.requireForReady = this.requireForReady.filter((key) => {
+    self.requireForReady = this.requireForReady.filter((key) => {
       if (self.refs[key].state && !self.refs[key].state.ready) {
         self.refs[key].bootstrap();
         return true;
@@ -106,18 +104,18 @@ class Component extends React.Component {
       return false;
     });
 
-    if (this.requireForReady.length === 0) {
-      this.ready();
+    if (self.requireForReady.length) {
+      self.ready();
     } else {
-      this.state.ready = false;
-      setTimeout(this.checkReady.bind(this), 100);
+      self.state.ready = false;
+      setTimeout(self.checkReady.bind(self), 100);
     }
   }
 
   checkComplete() {
     var self = this;
 
-    this.requireForComplete = this.requireForComplete.filter((key) => {
+    self.requireForComplete = self.requireForComplete.filter(key => {
       if (self.refs[key] instanceof Node) {
         return false;
       }
@@ -130,11 +128,11 @@ class Component extends React.Component {
       return false;
     });
 
-    if (this.requireForComplete.length === 0) {
-      this.complete();
-    } else if (this.state.started) {
-      this.state.complete = false;
-      setTimeout(this.checkComplete.bind(this), 100);
+    if (self.requireForComplete.length) {
+      self.complete();
+    } else if (self.state.started) {
+      self.state.complete = false;
+      setTimeout(self.checkComplete.bind(self), 100);
     }
   }
 

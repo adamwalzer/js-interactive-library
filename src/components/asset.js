@@ -13,6 +13,10 @@ class Asset extends Component {
 
   }
 
+  bootstrap() {
+    // this is to prevent the audio component from collecting it's own audio
+  }
+
   render() {
     return null;
   }
