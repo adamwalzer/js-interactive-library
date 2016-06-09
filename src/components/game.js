@@ -338,33 +338,27 @@ class Game extends Component {
   }
 
   emit(data) {
-    var event;
+    return new Promise((resolve) => {
+      var event;
 
-    if (typeof data !== 'object') return;
+      if (typeof data !== 'object') return;
 
-    if (!data.game) {
-      data.game = this.config.id;
-    }
+      if (!data.game) {
+        data.game = this.config.id;
+      }
 
-    event = new Event('game-event', {bubbles: true, cancelable: false});
+      event = new Event('game-event', {bubbles: true, cancelable: false});
 
-    event.name = data.name;
-    event.gameData = data;
-    event.respond = gameData => {
-      var platformEvent;
-
-      platformEvent = new Event('platform-event');
-      platformEvent.name = gameData.name;
-      platformEvent.gameData = gameData;
+      event.name = data.name;
+      event.gameData = data;
+      event.respond = gameData => {
+        resolve(gameData);
+      };
 
       if (window.frameElement) {
-        window.frameElement.dispatchEvent(platformEvent);
+        window.frameElement.dispatchEvent(event);
       }
-    };
-
-    if (window.frameElement) {
-      window.frameElement.dispatchEvent(event);
-    }
+    });
   }
 
   quit() {
