@@ -1,5 +1,3 @@
-import ReactDOM from 'react-dom';
-
 var start = function (Game, id) {
   var el;
 

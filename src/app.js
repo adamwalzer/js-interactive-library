@@ -9,12 +9,6 @@ import ListItem from 'components/list_item';
 import start from 'methods/start';
 import util from 'methods/util';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-window.React = React;
-window.ReactDOM = ReactDOM;
-
 window.play = {
   Component,
   Screen,

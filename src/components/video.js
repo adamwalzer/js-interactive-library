@@ -1,5 +1,3 @@
-import ReactDOM from 'react-dom';
-
 import Asset from './asset.js';
 
 class Video extends Asset {
