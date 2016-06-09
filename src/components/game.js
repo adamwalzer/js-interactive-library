@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 
+import util from 'methods/util';
+
 import Component from 'components/component';
 import Screen from 'components/screen';
 
@@ -406,27 +408,11 @@ class Game extends Component {
   }
 
   updateData(opts) {
-    var data = this.mergeObjects(this.state.data, opts.data);
+    var data = util.mergeObjects(this.state.data, opts.data);
 
     this.setState({
       data,
     }, opts.callback);
-  }
-
-  mergeObjects(data1, data2) {
-    if (!data2) return data1;
-
-    Object.keys(data2).map((key) => {
-      if (data1[key]) {
-        if (typeof data1[key] === 'object' && typeof data2[key] === 'object') {
-          data1[key] = this.mergeObjects(data1[key], data2[key]);
-        }
-      } else {
-        data1[key] = data2[key];
-      }
-    });
-
-    return data1;
   }
 
   audioPlay(opts) {
