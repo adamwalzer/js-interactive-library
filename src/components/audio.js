@@ -12,23 +12,23 @@ class Audio extends Asset {
       state = play.trigger('getState');
 
 
-    if (!this.state.ready) {
-      this.bootstrap();
+    if (!self.state.ready) {
+      self.bootstrap();
       setTimeout(
-        this.play.bind(this),
+        self.play.bind(self),
         50
       );
     } else {
       play.trigger('audioPlay', {
-        audio: this
+        audio: self
       });
 
       if (state.paused) {
-        this.setState(
+        self.setState(
           {
             paused: true,
           },
-          this.playAudio.bind(this)
+          self.playAudio.bind(self)
         );
       } else {
         setTimeout(() => {

@@ -305,10 +305,10 @@ class Game extends Component {
   playBackground(currentScreenIndex) {
     var index, playingBKG, self = this;
 
-    index = this.getBackgroundIndex(currentScreenIndex);
-    playingBKG = this.state.playingBKG;
+    index = self.getBackgroundIndex(currentScreenIndex);
+    playingBKG = self.state.playingBKG;
 
-    if (playingBKG[0] === this.audio.background[index]) {
+    if (playingBKG[0] === self.audio.background[index]) {
       return;
     }
 
@@ -317,14 +317,12 @@ class Game extends Component {
       playingBKG.shift();
     }
 
-    if (this.audio.background[index]) {
-      setTimeout(() => {
-        self.audio.background[index].play();
-        playingBKG.push(self.audio.background[index]);
-        self.setState({
-          playingBKG,
-        });
-      }, 500);
+    if (self.audio.background[index]) {
+      self.audio.background[index].play();
+      playingBKG.push(self.audio.background[index]);
+      self.setState({
+        playingBKG,
+      });
     }
   }
 
