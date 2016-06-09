@@ -2,7 +2,10 @@
     "globals": {
         "pl": true,
         "play": true,
-        "$": true
+        "$": true,
+        "React": true,
+        "ReactDOM": true,
+        "moment": true
     },
     "parser": "babel-eslint",
     "plugins": [
