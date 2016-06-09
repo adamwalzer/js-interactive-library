@@ -9,7 +9,9 @@ import ListItem from 'components/list_item';
 import start from 'methods/start';
 import util from 'methods/util';
 
-window.play = {
+// Keeping window.play for now as to not break games.
+// Once the games are fixed, I will remove this.
+window.play = window.skoash = {
   Component,
   Screen,
   Game,

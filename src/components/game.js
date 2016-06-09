@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import classNames from 'classnames';
 
 import Component from 'components/component';
@@ -61,7 +62,7 @@ class Game extends Component {
   }
 
   getState() {
-    return new Object(this.state);
+    return this.state;
   }
 
   demo() {
@@ -366,37 +367,27 @@ class Game extends Component {
   }
 
   emit(data) {
-    var event;
+    return new Promise((resolve) => {
+      var event;
 
-    if (typeof data !== 'object') return;
+      if (typeof data !== 'object') return;
 
-    if (!data.game) {
-      data.game = this.config.id;
-    }
+      if (!data.game) {
+        data.game = this.config.id;
+      }
 
-    event = new Event('game-event', {bubbles: true, cancelable: false});
+      event = new Event('game-event', {bubbles: true, cancelable: false});
 
-    event.name = data.name;
-    event.gameData = data;
-    event.respond = gameData => {
-      var platformEvent;
-
-
-      platformEvent = new Event('platform-event');
-      platformEvent.name = gameData.name;
-      platformEvent.gameData = gameData || {};
-      platformEvent.gameData.callback = data.callback;
+      event.name = data.name;
+      event.gameData = data;
+      event.respond = gameData => {
+        resolve(gameData);
+      };
 
       if (window.frameElement) {
-        window.frameElement.dispatchEvent(platformEvent);
+        window.frameElement.dispatchEvent(event);
       }
-    };
-
-    if (window.frameElement) {
-      window.frameElement.dispatchEvent(event);
-    }
-
-    return event;
+    });
   }
 
   getData(opts) {
@@ -594,7 +585,7 @@ class Game extends Component {
   }
 
   renderMenuScreens() {
-    return Object.keys(this.menus).map((key, index) => {
+    return _.map(this.menus, (index, key) => {
       var Menu = this.menus[key];
       return (
         <Menu key={key} index={index} ref={'menu-' + key} />

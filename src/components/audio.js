@@ -14,16 +14,22 @@ class Audio extends Asset {
 
     if (!this.state.ready) {
       this.bootstrap();
-      this.play();
+      setTimeout(
+        this.play.bind(this),
+        50
+      );
     } else {
       play.trigger('audioPlay', {
         audio: this
       });
 
       if (state.paused) {
-        this.setState({
-          paused: true,
-        }, this.playAudio.bind(this));
+        this.setState(
+          {
+            paused: true,
+          },
+          this.playAudio.bind(this)
+        );
       } else {
         setTimeout(() => {
           self.playAudio();
@@ -99,19 +105,9 @@ class Audio extends Asset {
     }
   }
 
-  bootstrap() {
-    // this is to prevent the audio component from collecting it's own audio
-  }
-
-  shouldComponentUpdate() {
-    return false;
-  }
-
   render() {
       // <audio {...this.props} preload='none'></audio>
-    return (
-      null
-    );
+    return null;
   }
 }
 
