@@ -104,7 +104,7 @@ class Component extends React.Component {
       return false;
     });
 
-    if (self.requireForReady.length) {
+    if (!self.requireForReady.length) {
       self.ready();
     } else {
       self.state.ready = false;
