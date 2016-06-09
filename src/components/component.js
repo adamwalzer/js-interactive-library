@@ -132,7 +132,7 @@ class Component extends React.Component {
       return false;
     });
 
-    if (self.requireForComplete.length) {
+    if (!self.requireForComplete.length) {
       self.complete();
     } else if (self.state.started) {
       self.state.complete = false;

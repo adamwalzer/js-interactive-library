@@ -12,17 +12,17 @@ class Game extends Component {
 
     self = this;
 
-    this.config = config;
+    self.config = config;
 
-    this.screens = {
+    self.screens = {
       0: Screen
     };
 
-    this.menus = {
+    self.menus = {
       Screen
     };
 
-    this.state = {
+    self.state = {
       currentScreenIndex: 0,
       highestScreenIndex: 0,
       playingSFX: [],
@@ -35,7 +35,7 @@ class Game extends Component {
       data: {},
     };
 
-    play.trigger = this.trigger.bind(this);
+    play.trigger = self.trigger.bind(self);
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
@@ -54,10 +54,6 @@ class Game extends Component {
 
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
-    });
-
-    window.frameElement.addEventListener('platform-event', function (e) {
-      self.trigger(e.name, e.gameData);
     });
   }
 
@@ -94,17 +90,17 @@ class Game extends Component {
   bootstrap() {
     var self = this;
 
-    if (!this.state.iOS) {
-      this.state.currentScreenIndex = 1;
+    if (!self.state.iOS) {
+      self.state.currentScreenIndex = 1;
     }
 
-    this.requireForReady = Object.keys(this.refs);
-    this.requireForComplete = this.requireForReady.filter(key => {
+    self.requireForReady = Object.keys(self.refs);
+    self.requireForComplete = self.requireForReady.filter(key => {
       return !self.refs[key].state || !self.refs[key].state.complete;
     });
 
-    this.collectMedia();
-    this.loadScreens();
+    self.collectMedia();
+    self.loadScreens();
   }
 
   loadScreens() {
@@ -211,7 +207,6 @@ class Game extends Component {
 
   goto(opts) {
     var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex;
-
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
@@ -367,6 +362,8 @@ class Game extends Component {
   }
 
   emit(data) {
+    var self = this;
+
     return new Promise((resolve) => {
       var event;
 
@@ -387,12 +384,14 @@ class Game extends Component {
       if (window.frameElement) {
         window.frameElement.dispatchEvent(event);
       }
+    }).then(d => {
+      self.trigger(d.name, d);
     });
   }
 
   getData(opts) {
     opts.name = 'get-data';
-    this.emit(opts);
+    return this.emit(opts);
   }
 
   passData() {
