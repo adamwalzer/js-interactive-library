@@ -8,13 +8,9 @@ import ListItem from 'components/list_item';
 
 import start from 'methods/start';
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-window.React = React;
-window.ReactDOM = ReactDOM;
-
-window.play = {
+// Keeping window.play for now as to not break games.
+// Once the games are fixed, I will remove this.
+window.play = window.skoash = {
   Component,
   Screen,
   Game,

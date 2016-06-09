@@ -1,4 +1,4 @@
-import { Howl, Howler } from 'howler';
+import { Howl } from 'howler';
 import Asset from './asset.js';
 
 class Audio extends Asset {
@@ -8,8 +8,8 @@ class Audio extends Asset {
 
   play() {
     var self = this,
-        delay = this.props.delay || 0,
-        state = play.trigger('getState');
+      delay = this.props.delay || 0,
+      state = play.trigger('getState');
 
 
     if (!this.state.ready) {
@@ -94,7 +94,7 @@ class Audio extends Asset {
       onend: this.complete.bind(this),
       onload: this.ready.bind(this)
     });
-    if(this.props.complete) {
+    if (this.props.complete) {
       this.complete();
     }
   }

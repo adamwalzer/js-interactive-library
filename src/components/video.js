@@ -1,5 +1,4 @@
 import Asset from './asset.js';
-import Component from './component.js';
 
 class Video extends Asset {
   constructor() {
@@ -38,7 +37,7 @@ class Video extends Asset {
   render() {
     var self = this;
     return (
-      <video onCanPlay={() => {self.ready()}} onEnded={() => {self.complete()}} className={this.props.className} src={this.props.src} preload='auto' controls={true}></video>
+      <video onCanPlay={() => self.ready()} onEnded={() => self.complete()} className={this.props.className} src={this.props.src} preload="auto" controls={true}></video>
     );
   }
 }
