@@ -11,7 +11,6 @@ class Audio extends Asset {
       delay = this.props.delay || 0,
       state = play.trigger('getState');
 
-
     if (!self.state.ready) {
       self.bootstrap();
       setTimeout(
@@ -23,26 +22,17 @@ class Audio extends Asset {
         audio: self
       });
 
-      if (state.paused) {
-        self.setState(
-          {
-            paused: true,
-          },
-          self.playAudio.bind(self)
+      if (!state.paused) {
+        setTimeout(
+          self.playAudio.bind(self),
+          delay
         );
-      } else {
-        setTimeout(() => {
-          self.playAudio();
-        }, delay);
       }
     }
   }
 
   playAudio() {
     if (this.state.paused) {
-      this.setState({
-        playAfterResume: true,
-      });
       return;
     }
 
@@ -57,11 +47,12 @@ class Audio extends Asset {
   }
 
   resume() {
-    this.playAudio();
-    this.setState({
-      playAfterResume: false,
-      paused: false,
-    });
+    this.setState(
+      {
+        paused: false,
+      },
+      this.playAudio.bind(this)
+    );
   }
 
   stop() {

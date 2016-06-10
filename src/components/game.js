@@ -143,11 +143,11 @@ class Game extends Component {
     this.setPause(true);
   }
 
-  setPause(pause) {
-    var fn = pause ? 'pause' : 'resume';
+  setPause(paused) {
+    var fn = paused ? 'pause' : 'resume';
 
     this.setState({
-      paused: pause
+      paused
     });
 
     this.state.playingSFX.map(audio => {
@@ -314,15 +314,10 @@ class Game extends Component {
 
     if (playingBKG[0]) {
       playingBKG[0].stop();
-      playingBKG.shift();
     }
 
     if (self.audio.background[index]) {
       self.audio.background[index].play();
-      playingBKG.push(self.audio.background[index]);
-      self.setState({
-        playingBKG,
-      });
     }
   }
 
@@ -449,14 +444,16 @@ class Game extends Component {
 
     switch (opts.audio.props.type) {
     case 'sfx':
-      playingSFX.splice(opts.audio, 1);
+      playingSFX.splice(playingSFX.indexOf(opts.audio), 1);
       break;
     case 'voiceOver':
-      playingVO.splice(opts.audio, 1);
-      this.raiseBackground();
+      playingVO.splice(playingVO.indexOf(opts.audio), 1);
+      if (!playingVO.length) {
+        this.raiseBackground();
+      }
       break;
     case 'background':
-      playingBKG.splice(opts.audio, 1);
+      playingBKG.splice(playingBKG.indexOf(opts.audio), 1);
       break;
     }
 
