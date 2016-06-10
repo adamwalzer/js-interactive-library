@@ -76,9 +76,12 @@ class Audio extends Asset {
   }
 
   complete() {
-    play.trigger('audioStop', {
-      audio: this
-    });
+    if (!this.props.loop) {
+      play.trigger('audioStop', {
+        audio: this
+      });
+    }
+
     this.setState({
       complete: true,
     });
