@@ -20,6 +20,10 @@ class Game extends Component {
       0: Screen
     };
 
+    self.screenProps = {
+      0: {},
+    };
+
     self.menus = {
       Screen
     };
@@ -557,9 +561,11 @@ class Game extends Component {
     var screenKeys = Object.keys(this.screens);
     this.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
-      var Screen = this.screens[key]; // eslint-disable-line no-shadow
+      var Screen, props; // eslint-disable-line no-shadow
+      Screen = this.screens[key];
+      props = this.screenProps[key] || {};
       return (
-        <Screen key={key} index={index} ref={'screen-' + key} />
+        <Screen {...props} key={key} index={index} ref={'screen-' + key} />
       );
     });
   }

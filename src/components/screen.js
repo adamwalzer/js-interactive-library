@@ -70,6 +70,10 @@ class Screen extends Component {
     if (this.audio.start) {
       this.audio.start.play();
     }
+
+    if (this.props.playOnStart && this.refs[this.props.playOnStart]) {
+      this.refs[this.props.playOnStart].play();
+    }
   }
 
   complete() {
