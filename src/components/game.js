@@ -87,7 +87,6 @@ class Game extends Component {
   componentWillMount() {
     this.emit({
       name: 'init',
-      game: this.config.id,
     });
     this.detechDevice();
     this.scale();
@@ -360,32 +359,36 @@ class Game extends Component {
     }
   }
 
-  emit(data) {
-    var self = this;
+  emit(gameData) {
+    var p, self = this;
 
-    return new Promise((resolve) => {
+    p = new Promise((resolve) => {
       var event;
 
-      if (typeof data !== 'object') return;
+      if (typeof gameData !== 'object') return;
 
-      if (!data.game) {
-        data.game = this.config.id;
+      if (!gameData.game) {
+        gameData.game = self.config.id;
       }
 
       event = new Event('game-event', {bubbles: true, cancelable: false});
 
-      event.name = data.name;
-      event.gameData = data;
-      event.respond = gameData => {
-        resolve(gameData);
+      event.name = gameData.name;
+      event.gameData = gameData;
+      event.respond = data => {
+        resolve(data);
       };
 
       if (window.frameElement) {
         window.frameElement.dispatchEvent(event);
       }
-    }).then(d => {
+    });
+
+    p.then(d => {
       self.trigger(d.name, d);
     });
+
+    return p;
   }
 
   getData(opts) {
