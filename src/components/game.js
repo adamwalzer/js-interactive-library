@@ -351,6 +351,7 @@ class Game extends Component {
       getState: this.getState,
       emit: this.emit,
       quit: this.quit,
+      save: this.load,
     };
 
     fn = events[event];
@@ -398,6 +399,14 @@ class Game extends Component {
 
   passData() {
     // this should be implemented per game
+  }
+
+  load(opts) {
+    if (opts.game === this.config.id && opts.highestScreenIndex) {
+      this.setState({
+        currentScreenIndex: opts.highestScreenIndex
+      });
+    }
   }
 
   quit() {
