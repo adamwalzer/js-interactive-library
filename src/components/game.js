@@ -31,6 +31,7 @@ class Game extends Component {
     self.state = {
       currentScreenIndex: 0,
       highestScreenIndex: 0,
+      screenIndexArray: [],
       playingSFX: [],
       playingVO: [],
       playingBKG: [],
@@ -210,8 +211,17 @@ class Game extends Component {
     return check;
   }
 
+  goBack() {
+    var screenIndexArray, index;
+    screenIndexArray = this.state.screenIndexArray;
+    screenIndexArray.pop();
+    index = screenIndexArray.pop();
+
+    this.goto({index});
+  }
+
   goto(opts) {
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex;
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex, screenIndexArray;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
@@ -223,6 +233,7 @@ class Game extends Component {
       highestScreenIndex = this.state.highestScreenIndex;
     }
     newScreen = this.refs['screen-' + currentScreenIndex];
+    screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
       if (!this.state.demo && !oldScreen.state.complete) {
@@ -241,6 +252,7 @@ class Game extends Component {
       if (!newScreen.state.load || !newScreen.state.ready) {
         this.loadScreens();
       }
+      screenIndexArray.push(currentScreenIndex);
       newScreen.open(opts);
     }
 
@@ -267,6 +279,7 @@ class Game extends Component {
       game: this.config.id,
       highestScreenIndex,
       currentScreenIndex,
+      screenIndexArray,
     });
 
     if (!opts.silent && this.audio.button) {
@@ -335,6 +348,7 @@ class Game extends Component {
 
     events = {
       goto: this.goto,
+      goBack: this.goBack,
       audioPlay: this.audioPlay,
       audioStop: this.audioStop,
       videoPlay: this.videoPlay,

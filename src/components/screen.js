@@ -17,7 +17,11 @@ class Screen extends Component {
   }
 
   goto(index) {
-    play.trigger('goto', {index});
+    skoash.trigger('goto', {index});
+  }
+
+  back() {
+    skoash.trigger('goBack');
   }
 
   load() {
@@ -78,7 +82,7 @@ class Screen extends Component {
 
   complete() {
     Component.prototype.complete.call(this);
-    play.trigger('screenComplete');
+    skoash.trigger('screenComplete');
   }
 
   open(opts) {
