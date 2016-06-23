@@ -17,7 +17,11 @@ class Screen extends Component {
   }
 
   goto(index) {
-    skoash.trigger('goto', {index});
+    if (typeof index === 'string') {
+      skoash.trigger('goto', {index});
+    } else if (typeof index === 'object') {
+      skoash.trigger('goto', index);
+    }
   }
 
   back() {
