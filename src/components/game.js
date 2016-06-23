@@ -221,6 +221,10 @@ class Game extends Component {
   }
 
   goto(opts) {
+    /*
+     * highestScreenIndex is the index of the highest screen reached
+     * not the index of the highest screen that exists.
+     */
     var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex, screenIndexArray;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
