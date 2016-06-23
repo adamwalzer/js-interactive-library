@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 
-import util from 'methods/util';
+// import util from 'methods/util';
 
 import Component from 'components/component';
 import Screen from 'components/screen';
@@ -431,7 +431,7 @@ class Game extends Component {
   }
 
   updateData(opts) {
-    var data = util.mergeObjects(this.state.data, opts.data);
+    var data = _.merge(this.state.data, opts.data);
 
     this.setState({
       data,
