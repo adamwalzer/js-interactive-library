@@ -62,6 +62,10 @@ class Game extends Component {
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
     });
+
+    window.addEventListener('platform-event', function (e) {
+      self.trigger(e.name, e.gameData);
+    });
   }
 
   getState() {
@@ -429,7 +433,7 @@ class Game extends Component {
 
   quit() {
     this.emit({
-      name: 'quit',
+      name: 'exit',
       game: this.config.id,
     });
   }

@@ -17,7 +17,7 @@ class Screen extends Component {
   }
 
   goto(index) {
-    if (typeof index === 'string') {
+    if (typeof index === 'string' || typeof index === 'number') {
       skoash.trigger('goto', {index});
     } else if (typeof index === 'object') {
       skoash.trigger('goto', index);
