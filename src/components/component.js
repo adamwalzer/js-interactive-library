@@ -59,6 +59,10 @@ class Component extends React.Component {
 
     this.collectMedia();
     this.checkReady();
+
+    // this seems to duplicate a lot of data
+    // let's think more about this before adding this code
+    // this.setState(this.props);
   }
 
   collectMedia() {
@@ -128,7 +132,7 @@ class Component extends React.Component {
       return false;
     });
 
-    if (self.requireForComplete.length) {
+    if (!self.requireForComplete.length) {
       self.complete();
     } else if (self.state.started) {
       self.state.complete = false;

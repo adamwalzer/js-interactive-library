@@ -7,6 +7,7 @@ import Video from 'components/video';
 import ListItem from 'components/list_item';
 
 import start from 'methods/start';
+import util from 'methods/util';
 
 // Keeping window.play for now as to not break games.
 // Once the games are fixed, I will remove this.
@@ -19,6 +20,7 @@ window.play = window.skoash = {
   Video,
   ListItem,
   start,
+  util,
 };
 
 export default window.play;

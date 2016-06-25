@@ -34,8 +34,14 @@ class Screen extends Component {
 
   }
 
+  checkCompleteOnStart() {
+    return true;
+  }
+
   start() {
-    this.bootstrap();
+    var self = this;
+
+    self.bootstrap();
 
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
@@ -43,11 +49,15 @@ class Screen extends Component {
       }
     });
 
-    this.startMedia();
+    self.startMedia();
 
-    this.setState({
+    self.setState({
       started: true,
-    }, this.checkComplete.bind(this));
+    });
+
+    if (self.props.checkComplete !== false) {
+      self.checkComplete();
+    }
   }
 
   startMedia() {
@@ -67,13 +77,16 @@ class Screen extends Component {
     play.trigger('screenComplete');
   }
 
-  open() {
+  open(opts) {
     var self = this;
 
     self.setState({
+      load: true,
       open: true,
       leave: false,
       close: false,
+      return: this.state.complete,
+      opts,
     });
 
     setTimeout(() => {
@@ -103,6 +116,7 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
+      screen: true,
       READY: this.state.ready,
       LOAD: this.state.load,
       OPEN: this.state.open,
@@ -110,6 +124,7 @@ class Screen extends Component {
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
       COMPLETE: this.state.complete,
+      RETURN: this.state.return,
     });
   }
 
@@ -141,7 +156,7 @@ class Screen extends Component {
 
   render() {
     return (
-      <div id={this.state.id} className={'screen ' + this.getClassNames()}>
+      <div id={this.state.id} className={this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}

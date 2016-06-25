@@ -2,6 +2,7 @@
     "globals": {
         "pl": true,
         "play": true,
+        "skoash": true,
         "$": true,
         "React": true,
         "ReactDOM": true,

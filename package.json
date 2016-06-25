@@ -1,6 +1,6 @@
 {
   "name": "js-interactive-library",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "CMWN Games Library (PlayJS)",
   "repository": {
     "type": "git",
@@ -9,6 +9,7 @@
   "main": "build/build.js",
   "dependencies": {
     "Base64": "^0.3.0",
+    "babel-eslint": "^6.0.4",
     "babel-polyfill": "^6.0.16",
     "classnames": "^2.2.5",
     "howler": "git@github.com:goldfire/howler.js.git",
@@ -27,7 +28,6 @@
     "autoprefixer": "^6.3.3",
     "autoprefixer-loader": "^3.2.0",
     "babel-core": "^6.1.4",
-    "babel-eslint": "^4.1.5",
     "babel-loader": "^6.1.0",
     "babel-plugin-react-transform": "^2.0.0-beta1",
     "babel-preset-es2015": "^6.1.4",
