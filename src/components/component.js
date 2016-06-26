@@ -31,7 +31,9 @@ class Component extends React.Component {
       if (typeof ref.start === 'function') ref.start();
     });
 
-    this.checkComplete();
+    if (this.props.checkComplete !== false) {
+      this.checkComplete();
+    }
   }
 
   stop() {

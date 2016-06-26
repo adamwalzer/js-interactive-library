@@ -66,6 +66,12 @@ class Screen extends Component {
     if (self.props.checkComplete !== false) {
       self.checkComplete();
     }
+
+    if (typeof self.props.completeDelay === 'number') {
+      setTimeout(() => {
+        self.complete();
+      }, self.props.completeDelay);
+    }
   }
 
   startMedia() {
@@ -148,12 +154,6 @@ class Screen extends Component {
     return this.renderContent();
   }
 
-  renderContent() {
-    return (
-      <div>screen content</div>
-    );
-  }
-
   renderPrevButton() {
     return (
       <button className="prev-screen" onClick={this.goto.bind(this, this.props.index - 1)}></button>
@@ -168,7 +168,7 @@ class Screen extends Component {
 
   render() {
     return (
-      <div id={this.state.id} className={this.getClassNames()}>
+      <div id={this.props.id || this.state.id} className={this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
