@@ -8,23 +8,19 @@ import Screen from 'components/screen';
 
 class Game extends Component {
   constructor(config) {
-    var self;
-
     super();
 
-    self = this;
+    this.config = config;
 
-    self.config = config;
-
-    self.screens = {
+    this.screens = {
       0: <Screen />
     };
 
-    self.menus = {
+    this.menus = {
       Screen
     };
 
-    self.state = {
+    this.state = {
       currentScreenIndex: 0,
       highestScreenIndex: 0,
       screenIndexArray: [],
@@ -38,7 +34,13 @@ class Game extends Component {
       data: {},
     };
 
-    play.trigger = self.trigger.bind(self);
+    skoash.trigger = this.trigger.bind(this);
+
+    this.attachEvents();
+  }
+
+  attachEvents() {
+    var self = this;
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
@@ -229,6 +231,9 @@ class Game extends Component {
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
+      if (opts.index > this.screensLength - 1) {
+        return this.quit();
+      }
       currentScreenIndex = Math.min(this.screensLength - 1, Math.max(0, opts.index));
       nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
       highestScreenIndex = Math.max(this.state.highestScreenIndex, currentScreenIndex);
@@ -588,12 +593,14 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screenKeys = Object.keys(this.screens);
+    var screens, screenKeys;
+    screens = this.props.screens || this.screens;
+    screenKeys = Object.keys(screens);
     this.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
-      var ScreenComponent, props; // eslint-disable-line no-shadow
-      ScreenComponent = this.screens[key].type;
-      props = this.screens[key].props || {};
+      var ScreenComponent, props;
+      ScreenComponent = screens[key].type;
+      props = screens[key].props || {};
       return (
         <ScreenComponent {...props} key={key} index={index} ref={'screen-' + key} />
       );
@@ -601,12 +608,9 @@ class Game extends Component {
   }
 
   renderMenuScreens() {
-    return _.map(this.menus, (index, key) => {
-      var Menu = this.menus[key];
-      return (
-        <Menu key={key} index={index} ref={'menu-' + key} />
-      );
-    });
+    return _.map(this.menus, (Menu, key) =>
+      <Menu key={key} index={key} ref={'menu-' + key} />
+    );
   }
 
   render() {

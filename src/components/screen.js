@@ -28,6 +28,14 @@ class Screen extends Component {
     skoash.trigger('goBack');
   }
 
+  next() {
+    this.goto.bind(this, this.props.index + 1);
+  }
+
+  prev() {
+    this.goto.bind(this, this.props.index - 1);
+  }
+
   load() {
     var self = this;
 
@@ -93,6 +101,9 @@ class Screen extends Component {
   complete() {
     Component.prototype.complete.call(this);
     skoash.trigger('screenComplete');
+    if (this.props.emitOnComplete) {
+      skoash.trigger('emit', this.props.emitOnComplete);
+    }
   }
 
   open(opts) {
@@ -146,19 +157,6 @@ class Screen extends Component {
     });
   }
 
-  renderContentList() {
-    var children = this.props.children || [];
-    return children.map((component, key) => {
-      return (
-        <component.type
-          {...component.props}
-          ref={component.ref}
-          key={key}
-        />
-      );
-    });
-  }
-
   renderContent() {
     return (
       <div>
@@ -177,13 +175,13 @@ class Screen extends Component {
 
   renderPrevButton() {
     return (
-      <button className="prev-screen" onClick={this.goto.bind(this, this.props.index - 1)}></button>
+      <button className="prev-screen" onClick={this.prev.bind(this)}></button>
     );
   }
 
   renderNextButton() {
     return (
-      <button className="next-screen" onClick={this.goto.bind(this, this.props.index + 1)}></button>
+      <button className="next-screen" onClick={this.next.bind(this)}></button>
     );
   }
 

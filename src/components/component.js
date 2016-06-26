@@ -142,9 +142,22 @@ class Component extends React.Component {
     }
   }
 
+  renderContentList(listName) {
+    var children = [].concat(this.props[listName || 'children']);
+    return children.map((component, key) =>
+      <component.type
+        {...component.props}
+        ref={component.ref}
+        key={key}
+      />
+    );
+  }
+
   render() {
     return (
-      <div {...this.props} />
+      <div {...this.props}>
+        {this.renderContentList()}
+      </div>
     );
   }
 }
