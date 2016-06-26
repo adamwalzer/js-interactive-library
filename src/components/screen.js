@@ -147,7 +147,7 @@ class Screen extends Component {
   }
 
   renderContentList() {
-    var children = this.props.children || this.props.content || [];
+    var children = this.props.children || [];
     return children.map((component, key) => {
       return (
         <component.type
