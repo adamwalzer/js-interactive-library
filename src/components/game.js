@@ -422,6 +422,9 @@ class Game extends Component {
 
   passData() {
     // this should be implemented per game
+    if (typeof this.props.passData === 'function') {
+      this.props.passData.apply(this, arguments);
+    }
   }
 
   load(opts) {
