@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 
 class Component extends React.Component {
   constructor() {
@@ -45,6 +46,18 @@ class Component extends React.Component {
       if (ref && typeof ref.stop === 'function') {
         ref.stop();
       }
+    });
+  }
+
+  open() {
+    this.setState({
+      open: true
+    });
+  }
+
+  close() {
+    this.setState({
+      open: false
     });
   }
 
@@ -142,6 +155,15 @@ class Component extends React.Component {
     }
   }
 
+  getClassNames() {
+    return classNames({
+      READY: this.state.ready,
+      STARTED: this.state.started,
+      COMPLETE: this.state.complete,
+      OPEN: this.state.open,
+    }, this.props.className);
+  }
+
   renderContentList(listName) {
     var children = [].concat(this.props[listName || 'children']);
     return children.map((component, key) =>
@@ -155,7 +177,7 @@ class Component extends React.Component {
 
   render() {
     return (
-      <div {...this.props}>
+      <div {...this.props} className={this.getClassNames()}>
         {this.renderContentList()}
       </div>
     );
