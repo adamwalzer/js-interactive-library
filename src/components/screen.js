@@ -174,15 +174,19 @@ class Screen extends Component {
   }
 
   renderPrevButton() {
-    return (
-      <button className="prev-screen" onClick={this.prev.bind(this)}></button>
-    );
+    if (this.props.showPrev !== false) {
+      return (
+        <button className="prev-screen" onClick={this.prev.bind(this)}></button>
+      );
+    }
   }
 
   renderNextButton() {
-    return (
-      <button className="next-screen" onClick={this.next.bind(this)}></button>
-    );
+    if (this.props.showNext !== false) {
+      return (
+        <button className="next-screen" onClick={this.next.bind(this)}></button>
+      );
+    }
   }
 
   render() {
