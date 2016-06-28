@@ -149,23 +149,25 @@ class Game extends Component {
     this.setPause(true);
   }
 
+  // paused should be a boolean determining if whether to call
+  // audio.pause or audio.resume
   setPause(paused) {
-    var fn = paused ? 'pause' : 'resume';
+    var fnKey = paused ? 'pause' : 'resume';
 
     this.setState({
       paused
     });
 
     this.state.playingSFX.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
 
     this.state.playingVO.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
 
     this.state.playingBKG.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
   }
 
