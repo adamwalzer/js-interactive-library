@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 
-import util from 'methods/util';
+// import util from 'methods/util';
 
 import Component from 'components/component';
 import Screen from 'components/screen';
@@ -20,6 +20,10 @@ class Game extends Component {
       0: Screen
     };
 
+    self.screenProps = {
+      0: {},
+    };
+
     self.menus = {
       Screen
     };
@@ -27,6 +31,7 @@ class Game extends Component {
     self.state = {
       currentScreenIndex: 0,
       highestScreenIndex: 0,
+      screenIndexArray: [],
       playingSFX: [],
       playingVO: [],
       playingBKG: [],
@@ -57,6 +62,10 @@ class Game extends Component {
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
     });
+
+    window.addEventListener('platform-event', function (e) {
+      self.trigger(e.name, e.gameData);
+    });
   }
 
   getState() {
@@ -83,7 +92,6 @@ class Game extends Component {
   componentWillMount() {
     this.emit({
       name: 'init',
-      game: this.config.id,
     });
     this.detechDevice();
     this.scale();
@@ -143,11 +151,11 @@ class Game extends Component {
     this.setPause(true);
   }
 
-  setPause(pause) {
-    var fn = pause ? 'pause' : 'resume';
+  setPause(paused) {
+    var fn = paused ? 'pause' : 'resume';
 
     this.setState({
-      paused: pause
+      paused
     });
 
     this.state.playingSFX.map(audio => {
@@ -207,8 +215,21 @@ class Game extends Component {
     return check;
   }
 
+  goBack() {
+    var screenIndexArray, index;
+    screenIndexArray = this.state.screenIndexArray;
+    screenIndexArray.pop();
+    index = screenIndexArray.pop();
+
+    this.goto({index});
+  }
+
   goto(opts) {
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex;
+    /*
+     * highestScreenIndex is the index of the highest screen reached
+     * not the index of the highest screen that exists.
+     */
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex, screenIndexArray;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
@@ -220,6 +241,7 @@ class Game extends Component {
       highestScreenIndex = this.state.highestScreenIndex;
     }
     newScreen = this.refs['screen-' + currentScreenIndex];
+    screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
       if (!this.state.demo && !oldScreen.state.complete) {
@@ -238,6 +260,7 @@ class Game extends Component {
       if (!newScreen.state.load || !newScreen.state.ready) {
         this.loadScreens();
       }
+      screenIndexArray.push(currentScreenIndex);
       newScreen.open(opts);
     }
 
@@ -264,6 +287,7 @@ class Game extends Component {
       game: this.config.id,
       highestScreenIndex,
       currentScreenIndex,
+      screenIndexArray,
     });
 
     if (!opts.silent && this.audio.button) {
@@ -305,26 +329,19 @@ class Game extends Component {
   playBackground(currentScreenIndex) {
     var index, playingBKG, self = this;
 
-    index = this.getBackgroundIndex(currentScreenIndex);
-    playingBKG = this.state.playingBKG;
+    index = self.getBackgroundIndex(currentScreenIndex);
+    playingBKG = self.state.playingBKG;
 
-    if (playingBKG[0] === this.audio.background[index]) {
+    if (playingBKG[0] === self.audio.background[index]) {
       return;
     }
 
     if (playingBKG[0]) {
       playingBKG[0].stop();
-      playingBKG.shift();
     }
 
-    if (this.audio.background[index]) {
-      setTimeout(() => {
-        self.audio.background[index].play();
-        playingBKG.push(self.audio.background[index]);
-        self.setState({
-          playingBKG,
-        });
-      }, 500);
+    if (self.audio.background[index]) {
+      self.audio.background[index].play();
     }
   }
 
@@ -339,6 +356,7 @@ class Game extends Component {
 
     events = {
       goto: this.goto,
+      goBack: this.goBack,
       audioPlay: this.audioPlay,
       audioStop: this.audioStop,
       videoPlay: this.videoPlay,
@@ -355,6 +373,7 @@ class Game extends Component {
       getState: this.getState,
       emit: this.emit,
       quit: this.quit,
+      save: this.load,
     };
 
     fn = events[event];
@@ -363,32 +382,36 @@ class Game extends Component {
     }
   }
 
-  emit(data) {
-    var self = this;
+  emit(gameData) {
+    var p, self = this;
 
-    return new Promise((resolve) => {
+    p = new Promise((resolve) => {
       var event;
 
-      if (typeof data !== 'object') return;
+      if (typeof gameData !== 'object') return;
 
-      if (!data.game) {
-        data.game = this.config.id;
+      if (!gameData.game) {
+        gameData.game = self.config.id;
       }
 
       event = new Event('game-event', {bubbles: true, cancelable: false});
 
-      event.name = data.name;
-      event.gameData = data;
-      event.respond = gameData => {
-        resolve(gameData);
+      event.name = gameData.name;
+      event.gameData = gameData;
+      event.respond = data => {
+        resolve(data);
       };
 
       if (window.frameElement) {
         window.frameElement.dispatchEvent(event);
       }
-    }).then(d => {
+    });
+
+    p.then(d => {
       self.trigger(d.name, d);
     });
+
+    return p;
   }
 
   getData(opts) {
@@ -400,15 +423,23 @@ class Game extends Component {
     // this should be implemented per game
   }
 
+  load(opts) {
+    if (opts.game === this.config.id && opts.highestScreenIndex) {
+      this.setState({
+        currentScreenIndex: opts.highestScreenIndex
+      });
+    }
+  }
+
   quit() {
     this.emit({
-      name: 'quit',
+      name: 'exit',
       game: this.config.id,
     });
   }
 
   updateData(opts) {
-    var data = util.mergeObjects(this.state.data, opts.data);
+    var data = _.merge(this.state.data, opts.data);
 
     this.setState({
       data,
@@ -451,14 +482,16 @@ class Game extends Component {
 
     switch (opts.audio.props.type) {
     case 'sfx':
-      playingSFX.splice(opts.audio, 1);
+      playingSFX.splice(playingSFX.indexOf(opts.audio), 1);
       break;
     case 'voiceOver':
-      playingVO.splice(opts.audio, 1);
-      this.raiseBackground();
+      playingVO.splice(playingVO.indexOf(opts.audio), 1);
+      if (!playingVO.length) {
+        this.raiseBackground();
+      }
       break;
     case 'background':
-      playingBKG.splice(opts.audio, 1);
+      playingBKG.splice(playingBKG.indexOf(opts.audio), 1);
       break;
     }
 
@@ -562,9 +595,11 @@ class Game extends Component {
     var screenKeys = Object.keys(this.screens);
     this.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
-      var Screen = this.screens[key]; // eslint-disable-line no-shadow
+      var Screen, props; // eslint-disable-line no-shadow
+      Screen = this.screens[key];
+      props = this.screenProps[key] || {};
       return (
-        <Screen key={key} index={index} ref={'screen-' + key} />
+        <Screen {...props} key={key} index={index} ref={'screen-' + key} />
       );
     });
   }

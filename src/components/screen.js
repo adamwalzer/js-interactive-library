@@ -17,7 +17,15 @@ class Screen extends Component {
   }
 
   goto(index) {
-    play.trigger('goto', {index});
+    if (typeof index === 'string' || typeof index === 'number') {
+      skoash.trigger('goto', {index});
+    } else if (typeof index === 'object') {
+      skoash.trigger('goto', index);
+    }
+  }
+
+  back() {
+    skoash.trigger('goBack');
   }
 
   load() {
@@ -70,11 +78,15 @@ class Screen extends Component {
     if (this.audio.start) {
       this.audio.start.play();
     }
+
+    if (this.props.playOnStart && this.refs[this.props.playOnStart]) {
+      this.refs[this.props.playOnStart].play();
+    }
   }
 
   complete() {
     Component.prototype.complete.call(this);
-    play.trigger('screenComplete');
+    skoash.trigger('screenComplete');
   }
 
   open(opts) {

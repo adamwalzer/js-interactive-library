@@ -142,7 +142,7 @@ class Component extends React.Component {
 
   render() {
     return (
-      <div>woohoo!</div>
+      <div {...this.props} />
     );
   }
 }
