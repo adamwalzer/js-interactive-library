@@ -283,6 +283,7 @@ class Game extends Component {
       loading: false,
       currentScreenIndex,
       highestScreenIndex,
+      screenIndexArray,
     });
 
     this.emit({
@@ -290,7 +291,6 @@ class Game extends Component {
       game: this.config.id,
       highestScreenIndex,
       currentScreenIndex,
-      screenIndexArray,
     });
 
     if (!opts.silent && this.audio.button) {
