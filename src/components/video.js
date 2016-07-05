@@ -30,6 +30,19 @@ class Video extends Asset {
     });
   }
 
+  pause() {
+    this.el.pause();
+    this.setState({
+      paused: true,
+    });
+  }
+
+  resume() {
+    this.setState({
+      paused: false,
+    }, this.play);
+  }
+
   componentDidMount() {
     this.el = ReactDOM.findDOMNode(this);
   }

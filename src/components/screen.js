@@ -29,11 +29,11 @@ class Screen extends Component {
   }
 
   next() {
-    this.goto.bind(this, this.props.index + 1);
+    this.goto(this.props.index + 1);
   }
 
   prev() {
-    this.goto.bind(this, this.props.index - 1);
+    this.goto(this.props.index - 1);
   }
 
   load() {

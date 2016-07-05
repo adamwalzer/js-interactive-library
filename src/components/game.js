@@ -158,6 +158,11 @@ class Game extends Component {
       paused
     });
 
+    if (this.state.playingVideo) {
+      this.state.playingVideo[fnKey]();
+      return;
+    }
+
     this.state.playingSFX.map(audio => {
       audio[fnKey]();
     });
