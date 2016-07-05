@@ -403,6 +403,10 @@ class Game extends Component {
         gameData.game = self.config.id;
       }
 
+      if (!gameData.version) {
+        gameData.version = self.config.version;
+      }
+
       event = new Event('game-event', {bubbles: true, cancelable: false});
 
       event.name = gameData.name;
