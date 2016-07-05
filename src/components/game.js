@@ -424,7 +424,7 @@ class Game extends Component {
   }
 
   getData(opts) {
-    opts.name = 'get-data';
+    opts.name = 'getData';
     return this.emit(opts);
   }
 
