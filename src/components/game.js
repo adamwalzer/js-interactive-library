@@ -294,6 +294,7 @@ class Game extends Component {
     this.emit({
       name: 'save',
       game: this.config.id,
+      version: this.config.version,
       highestScreenIndex,
       currentScreenIndex,
     });
