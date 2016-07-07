@@ -378,6 +378,7 @@ class Game extends Component {
       'pass-data': this.passData,
       'update-data': this.updateData,
       screenComplete: this.screenComplete,
+      openMenu: this.openMenu,
       menuClose: this.menuClose,
       getState: this.getState,
       emit: this.emit,
