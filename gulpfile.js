@@ -99,7 +99,8 @@ var buildDevelopment = function () {
   });
   return gulp.src('./src/app.js')
         .pipe(wpStream)
-        .pipe(gulp.dest('./build'));
+        .pipe(gulp.dest('./build'))
+        .pipe(gulp.dest('../cmwn-games/library/framework'));
 };
 
 var buildProduction = function () {
@@ -133,7 +134,8 @@ var buildProduction = function () {
     // run webpack
   return gulp.src('./src/app.js')
         .pipe(wpStream)
-        .pipe(gulp.dest('./build'));
+        .pipe(gulp.dest('./build'))
+        .pipe(gulp.dest('../cmwn-games/library/framework'));
 };
 
 var selectBuildMode = function () {

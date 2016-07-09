@@ -9,6 +9,7 @@ class Screen extends Component {
     this.state = {
       ready: false,
       open: false,
+      leaving: false,
       leave: false,
       close: true,
       complete: false,
@@ -29,11 +30,17 @@ class Screen extends Component {
   }
 
   next() {
-    this.goto(this.props.index + 1);
+    this.setState({
+      leaving: true
+    });
+    setTimeout(
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1),
+      this.props.nextDelay || 0
+    );
   }
 
   prev() {
-    this.goto(this.props.index - 1);
+    this.goto(this.props.prevIndex || this.props.index - 1);
   }
 
   load() {
@@ -48,10 +55,6 @@ class Screen extends Component {
       });
     }
 
-  }
-
-  checkCompleteOnStart() {
-    return true;
   }
 
   start() {
@@ -112,6 +115,7 @@ class Screen extends Component {
     self.setState({
       load: true,
       open: true,
+      leaving: false,
       leave: false,
       close: false,
       return: this.state.complete,
