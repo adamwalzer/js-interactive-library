@@ -30,9 +30,12 @@ class Screen extends Component {
   }
 
   next() {
+    if (!this.state.complete || this.state.leaving) return;
+
     this.setState({
       leaving: true
     });
+
     setTimeout(
       this.goto.bind(this, this.props.nextIndex || this.props.index + 1),
       this.props.nextDelay || 0
@@ -126,7 +129,7 @@ class Screen extends Component {
       if (!self.state.started) {
         self.start();
       }
-    }, 250);
+    }, this.props.startDelay || 250);
   }
 
   leave() {
