@@ -9,8 +9,10 @@ var start = function (Game, id) {
     document.body.appendChild(el);
   }
 
+  Game = typeof Game === 'object' ? Game : <Game />;
+
   ReactDOM.render(
-    <Game />,
+    Game,
     el
   );
 };

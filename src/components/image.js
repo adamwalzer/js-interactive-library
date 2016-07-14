@@ -29,7 +29,7 @@ class Image extends Asset {
 
   render() {
     return (
-      <img onLoad={this.ready.bind(this)} onError={this.error.bind(this)} className={this.props.className} src={this.props.src} draggable={false} />
+      <img {...this.props} onLoad={this.ready.bind(this)} onError={this.error.bind(this)} draggable={false} />
     );
   }
 }

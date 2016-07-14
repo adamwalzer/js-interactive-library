@@ -8,27 +8,19 @@ import Screen from 'components/screen';
 
 class Game extends Component {
   constructor(config) {
-    var self;
-
     super();
 
-    self = this;
+    this.config = config;
 
-    self.config = config;
-
-    self.screens = {
-      0: Screen
+    this.screens = {
+      0: <Screen />
     };
 
-    self.screenProps = {
-      0: {},
-    };
-
-    self.menus = {
+    this.menus = {
       Screen
     };
 
-    self.state = {
+    this.state = {
       currentScreenIndex: 0,
       highestScreenIndex: 0,
       screenIndexArray: [],
@@ -42,7 +34,13 @@ class Game extends Component {
       data: {},
     };
 
-    play.trigger = self.trigger.bind(self);
+    skoash.trigger = this.trigger.bind(this);
+
+    this.attachEvents();
+  }
+
+  attachEvents() {
+    var self = this;
 
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
@@ -151,23 +149,30 @@ class Game extends Component {
     this.setPause(true);
   }
 
+  // paused should be a boolean determining if whether to call
+  // audio.pause or audio.resume
   setPause(paused) {
-    var fn = paused ? 'pause' : 'resume';
+    var fnKey = paused ? 'pause' : 'resume';
 
     this.setState({
       paused
     });
 
+    if (this.state.playingVideo) {
+      this.state.playingVideo[fnKey]();
+      return;
+    }
+
     this.state.playingSFX.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
 
     this.state.playingVO.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
 
     this.state.playingBKG.map(audio => {
-      audio[fn]();
+      audio[fnKey]();
     });
   }
 
@@ -233,6 +238,9 @@ class Game extends Component {
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
+      if (opts.index > this.screensLength - 1) {
+        return this.quit();
+      }
       currentScreenIndex = Math.min(this.screensLength - 1, Math.max(0, opts.index));
       nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
       highestScreenIndex = Math.max(this.state.highestScreenIndex, currentScreenIndex);
@@ -280,14 +288,15 @@ class Game extends Component {
       loading: false,
       currentScreenIndex,
       highestScreenIndex,
+      screenIndexArray,
     });
 
     this.emit({
       name: 'save',
       game: this.config.id,
+      version: this.config.version,
       highestScreenIndex,
       currentScreenIndex,
-      screenIndexArray,
     });
 
     if (!opts.silent && this.audio.button) {
@@ -369,6 +378,7 @@ class Game extends Component {
       'pass-data': this.passData,
       'update-data': this.updateData,
       screenComplete: this.screenComplete,
+      openMenu: this.openMenu,
       menuClose: this.menuClose,
       getState: this.getState,
       emit: this.emit,
@@ -394,6 +404,10 @@ class Game extends Component {
         gameData.game = self.config.id;
       }
 
+      if (!gameData.version) {
+        gameData.version = self.config.version;
+      }
+
       event = new Event('game-event', {bubbles: true, cancelable: false});
 
       event.name = gameData.name;
@@ -415,12 +429,15 @@ class Game extends Component {
   }
 
   getData(opts) {
-    opts.name = 'get-data';
+    opts.name = 'getData';
     return this.emit(opts);
   }
 
   passData() {
     // this should be implemented per game
+    if (typeof this.props.passData === 'function') {
+      this.props.passData.apply(this, arguments);
+    }
   }
 
   load(opts) {
@@ -592,25 +609,24 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screenKeys = Object.keys(this.screens);
+    var screens, screenKeys;
+    screens = this.props.screens || this.screens;
+    screenKeys = Object.keys(screens);
     this.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
-      var Screen, props; // eslint-disable-line no-shadow
-      Screen = this.screens[key];
-      props = this.screenProps[key] || {};
+      var ScreenComponent, props;
+      ScreenComponent = screens[key].type;
+      props = screens[key].props || {};
       return (
-        <Screen {...props} key={key} index={index} ref={'screen-' + key} />
+        <ScreenComponent {...props} key={key} index={index} ref={'screen-' + key} />
       );
     });
   }
 
   renderMenuScreens() {
-    return _.map(this.menus, (index, key) => {
-      var Menu = this.menus[key];
-      return (
-        <Menu key={key} index={index} ref={'menu-' + key} />
-      );
-    });
+    return _.map(this.menus, (Menu, key) =>
+      <Menu key={key} index={key} ref={'menu-' + key} />
+    );
   }
 
   render() {

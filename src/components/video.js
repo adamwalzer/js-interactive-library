@@ -30,13 +30,26 @@ class Video extends Asset {
     });
   }
 
+  pause() {
+    this.el.pause();
+    this.setState({
+      paused: true,
+    });
+  }
+
+  resume() {
+    this.setState({
+      paused: false,
+    }, this.play);
+  }
+
   componentDidMount() {
     this.el = ReactDOM.findDOMNode(this);
   }
 
   render() {
     return (
-      <video onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} className={this.props.className} src={this.props.src} preload="auto" controls={true}></video>
+      <video {...this.props} onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} preload="auto" controls={true}></video>
     );
   }
 }

@@ -9,6 +9,7 @@ class Screen extends Component {
     this.state = {
       ready: false,
       open: false,
+      leaving: false,
       leave: false,
       close: true,
       complete: false,
@@ -28,6 +29,23 @@ class Screen extends Component {
     skoash.trigger('goBack');
   }
 
+  next() {
+    if (!this.state.complete || this.state.leaving) return;
+
+    this.setState({
+      leaving: true
+    });
+
+    setTimeout(
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1),
+      this.props.nextDelay || 0
+    );
+  }
+
+  prev() {
+    this.goto(this.props.prevIndex || this.props.index - 1);
+  }
+
   load() {
     var self = this;
 
@@ -40,10 +58,6 @@ class Screen extends Component {
       });
     }
 
-  }
-
-  checkCompleteOnStart() {
-    return true;
   }
 
   start() {
@@ -66,6 +80,12 @@ class Screen extends Component {
     if (self.props.checkComplete !== false) {
       self.checkComplete();
     }
+
+    if (typeof self.props.completeDelay === 'number') {
+      setTimeout(() => {
+        self.complete();
+      }, self.props.completeDelay);
+    }
   }
 
   startMedia() {
@@ -87,6 +107,9 @@ class Screen extends Component {
   complete() {
     Component.prototype.complete.call(this);
     skoash.trigger('screenComplete');
+    if (this.props.emitOnComplete) {
+      skoash.trigger('emit', this.props.emitOnComplete);
+    }
   }
 
   open(opts) {
@@ -95,6 +118,7 @@ class Screen extends Component {
     self.setState({
       load: true,
       open: true,
+      leaving: false,
       leave: false,
       close: false,
       return: this.state.complete,
@@ -105,7 +129,7 @@ class Screen extends Component {
       if (!self.state.started) {
         self.start();
       }
-    }, 250);
+    }, this.props.startDelay || 250);
   }
 
   leave() {
@@ -140,6 +164,14 @@ class Screen extends Component {
     });
   }
 
+  renderContent() {
+    return (
+      <div>
+        {this.renderContentList()}
+      </div>
+    );
+  }
+
   renderScreen() {
     if (!this.state.load) {
       return null;
@@ -148,27 +180,25 @@ class Screen extends Component {
     return this.renderContent();
   }
 
-  renderContent() {
-    return (
-      <div>screen content</div>
-    );
-  }
-
   renderPrevButton() {
-    return (
-      <button className="prev-screen" onClick={this.goto.bind(this, this.props.index - 1)}></button>
-    );
+    if (!this.props.hidePrev) {
+      return (
+        <button className="prev-screen" onClick={this.prev.bind(this)}></button>
+      );
+    }
   }
 
   renderNextButton() {
-    return (
-      <button className="next-screen" onClick={this.goto.bind(this, this.props.index + 1)}></button>
-    );
+    if (!this.props.hideNext) {
+      return (
+        <button className="next-screen" onClick={this.next.bind(this)}></button>
+      );
+    }
   }
 
   render() {
     return (
-      <div id={this.state.id} className={this.getClassNames()}>
+      <div id={this.props.id} className={this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
