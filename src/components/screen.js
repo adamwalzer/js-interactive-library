@@ -198,7 +198,7 @@ class Screen extends Component {
 
   render() {
     return (
-      <div id={this.props.id || this.state.id} className={this.getClassNames()}>
+      <div id={this.props.id} className={this.getClassNames()}>
         {this.renderScreen()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
