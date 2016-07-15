@@ -574,6 +574,7 @@ class Game extends Component {
       PAUSED: this.state.paused,
       LOADING: this.state.loading,
       MENU: this.state.openMenus.length,
+      ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
       DEMO: this.state.demo,
       ['SCREEN-' + this.state.currentScreenIndex]: true,
     });
