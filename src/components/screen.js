@@ -152,7 +152,6 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
-      screen: true,
       READY: this.state.ready,
       LOAD: this.state.load,
       OPEN: this.state.open,
@@ -161,7 +160,7 @@ class Screen extends Component {
       CLOSE: this.state.close,
       COMPLETE: this.state.complete,
       RETURN: this.state.return,
-    });
+    }, 'screen');
   }
 
   renderContent() {
