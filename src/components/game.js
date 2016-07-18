@@ -566,18 +566,22 @@ class Game extends Component {
   }
 
   getClassNames() {
-    return classNames({
-      iOS: this.state.iOS,
-      MOBILE: this.state.mobile,
-      SFX: this.state.playingSFX.length,
-      'VOICE-OVER': this.state.playingVO.length,
-      PAUSED: this.state.paused,
-      LOADING: this.state.loading,
-      MENU: this.state.openMenus.length,
-      ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
-      DEMO: this.state.demo,
-      ['SCREEN-' + this.state.currentScreenIndex]: true,
-    });
+    return classNames(
+      'pl-game',
+      'skoash-game',
+      {
+        iOS: this.state.iOS,
+        MOBILE: this.state.mobile,
+        SFX: this.state.playingSFX.length,
+        'VOICE-OVER': this.state.playingVO.length,
+        PAUSED: this.state.paused,
+        LOADING: this.state.loading,
+        MENU: this.state.openMenus.length,
+        ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
+        DEMO: this.state.demo,
+        ['SCREEN-' + this.state.currentScreenIndex]: true,
+      }
+    );
   }
 
   getStyles() {
@@ -632,7 +636,7 @@ class Game extends Component {
 
   render() {
     return (
-      <div className={'pl-game ' + this.getClassNames()} style={this.getStyles()}>
+      <div className={this.getClassNames()} style={this.getStyles()}>
         {this.renderLoader()}
         {this.renderAssets()}
         {this.renderMenu()}

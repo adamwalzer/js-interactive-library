@@ -82,9 +82,7 @@ class Audio extends Asset {
       });
     }
 
-    this.setState({
-      complete: true,
-    });
+    Asset.prototype.complete.call(this);
   }
 
   componentDidMount() {

@@ -15,6 +15,10 @@ class Component extends React.Component {
     this.setState({
       complete: true,
     });
+
+    if (typeof this.props.onComplete === 'function') {
+      this.props.onComplete(this);
+    }
   }
 
   ready() {
