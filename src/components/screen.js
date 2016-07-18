@@ -77,9 +77,7 @@ class Screen extends Component {
       started: true,
     });
 
-    if (self.props.checkComplete !== false) {
-      self.checkComplete();
-    }
+    self.checkComplete();
 
     if (typeof self.props.completeDelay === 'number') {
       setTimeout(() => {

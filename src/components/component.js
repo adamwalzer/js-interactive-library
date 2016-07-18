@@ -21,6 +21,12 @@ class Component extends React.Component {
     }
   }
 
+  incomplete() {
+    this.setState({
+      complete: false,
+    });
+  }
+
   ready() {
     this.setState({
       ready: true,
@@ -36,9 +42,7 @@ class Component extends React.Component {
       if (typeof ref.start === 'function') ref.start();
     });
 
-    if (this.props.checkComplete !== false) {
-      this.checkComplete();
-    }
+    this.checkComplete();
   }
 
   stop() {
@@ -138,6 +142,8 @@ class Component extends React.Component {
   checkComplete() {
     var self = this;
 
+    if (this.props.checkComplete === false) return;
+
     self.requireForComplete = self.requireForComplete.filter(key => {
       if (self.refs[key] instanceof Node) {
         return false;
@@ -170,13 +176,16 @@ class Component extends React.Component {
 
   renderContentList(listName) {
     var children = [].concat(this.props[listName || 'children']);
-    return children.map((component, key) =>
-      <component.type
-        {...component.props}
-        ref={component.ref}
-        key={key}
-      />
-    );
+    return children.map((component, key) => {
+      if (!component) return;
+      return (
+          <component.type
+          {...component.props}
+          ref={component.ref}
+          key={key}
+        />
+      );
+    });
   }
 
   render() {
