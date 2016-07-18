@@ -384,6 +384,8 @@ class Game extends Component {
       emit: this.emit,
       quit: this.quit,
       save: this.load,
+      complete: this.checkComplete,
+      incomplete: this.checkComplete,
     };
 
     fn = events[event];
@@ -556,6 +558,14 @@ class Game extends Component {
       this.state.playingBKG.map((bkg) => {
         bkg.setVolume(value);
       });
+    }
+  }
+
+  checkComplete() {
+    var openScreen = this.refs['screen-' + this.state.currentScreenIndex];
+
+    if (openScreen && typeof openScreen.checkComplete === 'function') {
+      openScreen.checkComplete();
     }
   }
 

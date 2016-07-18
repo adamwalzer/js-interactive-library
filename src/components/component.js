@@ -14,6 +14,8 @@ class Component extends React.Component {
   complete() {
     this.setState({
       complete: true,
+    }, () => {
+      skoash.trigger('complete');
     });
 
     if (typeof this.props.onComplete === 'function') {
@@ -24,6 +26,8 @@ class Component extends React.Component {
   incomplete() {
     this.setState({
       complete: false,
+    }, () => {
+      skoash.trigger('incomplete');
     });
   }
 
@@ -77,7 +81,7 @@ class Component extends React.Component {
     var self = this;
     this.requireForReady = Object.keys(self.refs);
     this.requireForComplete = this.requireForReady.filter(key => {
-      return !self.refs[key].state || !self.refs[key].state.complete;
+      return self.refs[key].checkComplete;
     });
 
     this.collectMedia();
@@ -140,30 +144,30 @@ class Component extends React.Component {
   }
 
   checkComplete() {
-    var self = this;
+    var self = this, complete;
 
     if (this.props.checkComplete === false) return;
 
-    self.requireForComplete = self.requireForComplete.filter(key => {
+    complete = self.requireForComplete.every(key => {
       if (self.refs[key] instanceof Node) {
-        return false;
+        return true;
       }
       if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
         if (typeof self.refs[key].checkComplete === 'function') {
           self.refs[key].checkComplete();
         }
-        return true;
+        return false;
       }
-      return false;
+      return true;
     });
 
-    if (!self.requireForComplete.length) {
+    if (complete && !self.state.complete) {
       self.complete();
-    } else if (self.state.started) {
-      self.state.complete = false;
-      setTimeout(self.checkComplete.bind(self), 100);
+    } else if (self.state.started && !complete && self.state.complete) {
+      self.incomplete();
     }
   }
+
 
   getClassNames() {
     return classNames({
