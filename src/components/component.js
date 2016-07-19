@@ -40,13 +40,13 @@ class Component extends React.Component {
   start() {
     this.setState({
       started: true
+    }, () => {
+      this.checkComplete();
     });
 
     _.each(this.refs, ref => {
       if (typeof ref.start === 'function') ref.start();
     });
-
-    this.checkComplete();
   }
 
   stop() {
@@ -58,6 +58,26 @@ class Component extends React.Component {
       if (ref && typeof ref.stop === 'function') {
         ref.stop();
       }
+    });
+  }
+
+  pause() {
+    if (typeof this.props.onPause === 'function') {
+      this.props.onPause(this);
+    }
+
+    _.each(this.refs, ref => {
+      if (typeof ref.pause === 'function') ref.pause();
+    });
+  }
+
+  resume() {
+    if (typeof this.props.onResume === 'function') {
+      this.props.onResume(this);
+    }
+
+    _.each(this.refs, ref => {
+      if (typeof ref.resume === 'function') ref.resume();
     });
   }
 
@@ -167,7 +187,6 @@ class Component extends React.Component {
       self.incomplete();
     }
   }
-
 
   getClassNames() {
     return classNames({

@@ -152,7 +152,7 @@ class Game extends Component {
   // paused should be a boolean determining if whether to call
   // audio.pause or audio.resume
   setPause(paused) {
-    var fnKey = paused ? 'pause' : 'resume';
+    var openScreen, fnKey = paused ? 'pause' : 'resume';
 
     this.setState({
       paused
@@ -174,6 +174,11 @@ class Game extends Component {
     this.state.playingBKG.map(audio => {
       audio[fnKey]();
     });
+
+    openScreen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (openScreen && typeof openScreen[fnKey] === 'function') {
+      openScreen[fnKey]();
+    }
   }
 
   /**
