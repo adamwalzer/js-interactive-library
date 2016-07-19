@@ -40,7 +40,21 @@ class Video extends Asset {
   resume() {
     this.setState({
       paused: false,
-    }, this.play);
+    }, this.play.bind(this));
+  }
+
+  complete() {
+    if (!this.props.loop) {
+      play.trigger('videoStop', {
+        video: this
+      });
+    }
+
+    this.setState({
+      playing: false
+    });
+
+    Asset.prototype.complete.call(this);
   }
 
   componentDidMount() {
@@ -49,7 +63,7 @@ class Video extends Asset {
 
   render() {
     return (
-      <video {...this.props} onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} preload="auto" controls={true}></video>
+      <video {...this.props} onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} preload="auto" controls={true} />
     );
   }
 }

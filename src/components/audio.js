@@ -36,10 +36,15 @@ class Audio extends Asset {
       return;
     }
 
+    this.setState({
+      playing: true
+    });
+
     this.audio.play();
   }
 
   pause() {
+    if (!this.state.playing) return;
     this.audio.pause();
     this.setState({
       paused: true,
@@ -47,6 +52,7 @@ class Audio extends Asset {
   }
 
   resume() {
+    if (!this.state.paused) return;
     this.setState(
       {
         paused: false,
@@ -59,6 +65,9 @@ class Audio extends Asset {
     if (!this.audio) return;
     play.trigger('audioStop', {
       audio: this
+    });
+    this.setState({
+      playing: false
     });
     this.audio.stop();
   }
@@ -81,6 +90,10 @@ class Audio extends Asset {
         audio: this
       });
     }
+
+    this.setState({
+      playing: false
+    });
 
     Asset.prototype.complete.call(this);
   }

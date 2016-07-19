@@ -560,7 +560,7 @@ class Game extends Component {
   raiseBackground(value) {
     if (typeof value === 'undefined') value = 1;
     if (this.state.playingVO.length === 0) {
-      this.state.playingBKG.map((bkg) => {
+      this.state.playingBKG.map(bkg => {
         bkg.setVolume(value);
       });
     }
