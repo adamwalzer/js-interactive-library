@@ -304,8 +304,12 @@ class Game extends Component {
       currentScreenIndex,
     });
 
-    if (!opts.silent && this.audio.button) {
-      this.audio.button.play();
+    if (!opts.silent) {
+      if (opts.buttonSound) {
+        opts.buttonSound.play();
+      } else if (this.audio.button) {
+        this.audio.button.play();
+      }
     }
 
     this.playBackground(currentScreenIndex);

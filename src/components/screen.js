@@ -17,10 +17,14 @@ class Screen extends Component {
     };
   }
 
-  goto(index) {
+  goto(index, buttonSound) {
     if (typeof index === 'string' || typeof index === 'number') {
-      skoash.trigger('goto', {index});
+      skoash.trigger('goto', {
+        index,
+        buttonSound
+      });
     } else if (typeof index === 'object') {
+      index.buttonSound = index.buttonSound || buttonSound;
       skoash.trigger('goto', index);
     }
   }
@@ -37,7 +41,7 @@ class Screen extends Component {
     });
 
     setTimeout(
-      this.goto.bind(this, this.props.nextIndex || this.props.index + 1),
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.audio.button),
       this.props.nextDelay || 0
     );
   }
@@ -128,6 +132,10 @@ class Screen extends Component {
         self.start();
       }
     }, this.props.startDelay || 250);
+
+    if (typeof this.props.onOpen === 'function') {
+      this.props.onOpen(this);
+    }
   }
 
   leave() {

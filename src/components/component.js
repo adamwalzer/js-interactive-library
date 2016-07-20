@@ -168,14 +168,17 @@ class Component extends React.Component {
 
     if (this.props.checkComplete === false) return;
 
+    self.requireForComplete.forEach(key => {
+      if (typeof self.refs[key].checkComplete === 'function') {
+        self.refs[key].checkComplete();
+      }
+    });
+
     complete = self.requireForComplete.every(key => {
       if (self.refs[key] instanceof Node) {
         return true;
       }
       if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
-        if (typeof self.refs[key].checkComplete === 'function') {
-          self.refs[key].checkComplete();
-        }
         return false;
       }
       return true;
@@ -213,11 +216,13 @@ class Component extends React.Component {
 
   render() {
     return (
-      <div {...this.props} className={this.getClassNames()}>
+      <this.props.type {...this.props} className={this.getClassNames()}>
         {this.renderContentList()}
-      </div>
+      </this.props.type>
     );
   }
 }
+
+Component.defaultProps = {type: 'div'};
 
 export default Component;
