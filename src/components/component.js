@@ -145,20 +145,25 @@ class Component extends React.Component {
   }
 
   checkReady() {
-    var self = this;
+    var ready, self = this;
 
-    self.requireForReady = this.requireForReady.filter((key) => {
-      if (self.refs[key].state && !self.refs[key].state.ready) {
+    self.requireForReady.forEach(key => {
+      if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
         self.refs[key].bootstrap();
-        return true;
       }
-      return false;
     });
 
-    if (!self.requireForReady.length) {
+    ready = self.requireForReady.every(key => {
+      return self.refs[key] && (
+          !self.refs[key].state || (
+            self.refs[key].state && self.refs[key].state.ready
+          )
+        );
+    });
+
+    if (ready) {
       self.ready();
     } else {
-      self.state.ready = false;
       setTimeout(self.checkReady.bind(self), 100);
     }
   }
