@@ -305,7 +305,7 @@ class Game extends Component {
     });
 
     if (!opts.silent) {
-      if (opts.buttonSound) {
+      if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
         opts.buttonSound.play();
       } else if (this.audio.button) {
         this.audio.button.play();
@@ -345,22 +345,27 @@ class Game extends Component {
   }
 
   playBackground(currentScreenIndex) {
-    var index, playingBKG, self = this;
+    var index, playingBKG;
 
-    index = self.getBackgroundIndex(currentScreenIndex);
-    playingBKG = self.state.playingBKG;
+    index = this.getBackgroundIndex(currentScreenIndex);
+    playingBKG = this.state.playingBKG;
 
-    if (playingBKG[0] === self.audio.background[index]) {
+    if (playingBKG.indexOf(this.audio.background[index]) !== -1) {
       return;
     }
 
-    if (playingBKG[0]) {
-      playingBKG[0].stop();
-    }
+    playingBKG = playingBKG.filter(bkg => {
+      bkg.stop();
+      return false;
+    });
 
-    if (self.audio.background[index]) {
-      self.audio.background[index].play();
-    }
+    this.setState({
+      playingBKG
+    }, () => {
+      if (this.audio.background[index]) {
+        this.audio.background[index].play();
+      }
+    });
   }
 
   scale() {
@@ -502,7 +507,7 @@ class Game extends Component {
   }
 
   audioStop(opts) {
-    var playingSFX, playingVO, playingBKG;
+    var playingSFX, playingVO, playingBKG, index;
 
     playingSFX = this.state.playingSFX || [];
     playingVO = this.state.playingVO || [];
@@ -510,16 +515,19 @@ class Game extends Component {
 
     switch (opts.audio.props.type) {
     case 'sfx':
-      playingSFX.splice(playingSFX.indexOf(opts.audio), 1);
+      index = playingSFX.indexOf(opts.audio);
+      index !== -1 && playingSFX.splice(index, 1);
       break;
     case 'voiceOver':
-      playingVO.splice(playingVO.indexOf(opts.audio), 1);
+      index = playingVO.indexOf(opts.audio);
+      index !== -1 && playingVO.splice(index, 1);
       if (!playingVO.length) {
         this.raiseBackground();
       }
       break;
     case 'background':
-      playingBKG.splice(playingBKG.indexOf(opts.audio), 1);
+      index = playingBKG.indexOf(opts.audio);
+      index !== -1 && playingBKG.splice(index, 1);
       break;
     }
 
@@ -556,7 +564,7 @@ class Game extends Component {
 
   fadeBackground(value) {
     if (typeof value === 'undefined') value = .25;
-    this.state.playingBKG.map((bkg) => {
+    this.state.playingBKG.map(bkg => {
       bkg.setVolume(value);
     });
   }

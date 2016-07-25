@@ -174,7 +174,7 @@ class Component extends React.Component {
     if (this.props.checkComplete === false) return;
 
     self.requireForComplete.forEach(key => {
-      if (typeof self.refs[key].checkComplete === 'function') {
+      if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
         self.refs[key].checkComplete();
       }
     });
@@ -183,7 +183,7 @@ class Component extends React.Component {
       if (self.refs[key] instanceof Node) {
         return true;
       }
-      if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
+      if (!self.refs[key] || !self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
         return false;
       }
       return true;
