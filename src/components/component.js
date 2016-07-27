@@ -233,7 +233,7 @@ class Component extends React.Component {
       if (!component) return;
       var ref = component.ref || component.props['data-ref'];
       return (
-          <component.type
+        <component.type
           {...component.props}
           ref={ref}
           key={key}
