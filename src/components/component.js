@@ -115,37 +115,59 @@ class Component extends React.Component {
   collectMedia() {
     var self = this;
 
-    self.video = [];
-    self.audio = {
-      background: [],
-      sfx: [],
-      voiceOver: [],
+    self.media = {
+      video: [],
+      audio: {
+        background: [],
+        sfx: [],
+        voiceOver: [],
+      },
+      sequence: [],
     };
 
     _.each(self.refs, (ref, key) => {
-      if (play.Video && ref instanceof play.Video) {
+      if (skoash.Video && ref instanceof skoash.Video) {
         self.collectVideo(key);
       }
 
-      if (play.Audio && ref instanceof play.Audio) {
+      if (skoash.Audio && ref instanceof skoash.Audio) {
         self.collectAudio(key);
       }
+
+      if (skoash.MediaSequence && ref instanceof skoash.MediaSequence) {
+        self.collectMediaSequence(key);
+      }
     });
+
+    // TODO: remove this after making sure components reference
+    // this.media.audio and this.media.video instead of
+    // this.audio and this.video directly
+    self.audio = self.media.audio;
+    self.video = self.media.video;
   }
 
   collectVideo(key) {
-    this.video.push(this.refs[key]);
+    if (!this.media[key]) this.media[key] = this.refs[key];
+    this.media.video.push(this.refs[key]);
   }
 
   collectAudio(key) {
-    this.audio[key] = this.refs[key];
+    if (!this.media[key]) this.media[key] = this.refs[key];
+    if (!this.media.audio[key]) this.media.audio[key] = this.refs[key];
     if (this.refs[key].props.type) {
-      this.audio[this.refs[key].props.type].push(this.refs[key]);
+      this.media.audio[this.refs[key].props.type].push(this.refs[key]);
     }
+  }
+
+  collectMediaSequence(key) {
+    if (!this.media[key]) this.media[key] = this.refs[key];
+    this.media.sequence.push(this.refs[key]);
   }
 
   checkReady() {
     var ready, self = this;
+
+    if (!this.props.checkReady) return;
 
     self.requireForReady.forEach(key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
@@ -171,7 +193,7 @@ class Component extends React.Component {
   checkComplete() {
     var self = this, complete;
 
-    if (this.props.checkComplete === false) return;
+    if (!self.props.checkComplete || !self.requireForComplete) return;
 
     self.requireForComplete.forEach(key => {
       if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
@@ -221,6 +243,8 @@ class Component extends React.Component {
   }
 
   render() {
+    if (!this.props.shouldRender) return null;
+
     return (
       <this.props.type {...this.props} className={this.getClassNames()}>
         {this.renderContentList()}
@@ -229,6 +253,11 @@ class Component extends React.Component {
   }
 }
 
-Component.defaultProps = {type: 'div'};
+Component.defaultProps = {
+  type: 'div',
+  shouldRender: true,
+  checkComplete: true,
+  checkReady: true,
+};
 
 export default Component;

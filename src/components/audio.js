@@ -1,7 +1,7 @@
 import { Howl } from 'howler';
-import Asset from './asset.js';
+import Media from './media.js';
 
-class Audio extends Asset {
+class Audio extends Media {
   constructor() {
     super();
   }
@@ -95,7 +95,7 @@ class Audio extends Asset {
       playing: false
     });
 
-    Asset.prototype.complete.call(this);
+    super.complete();
   }
 
   componentDidMount() {
@@ -108,11 +108,6 @@ class Audio extends Asset {
     if (this.props.complete) {
       this.complete();
     }
-  }
-
-  render() {
-      // <audio {...this.props} preload='none'></audio>
-    return null;
   }
 }
 

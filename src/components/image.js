@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import Asset from './asset.js';
 
 class Image extends Asset {
@@ -33,5 +35,11 @@ class Image extends Asset {
     );
   }
 }
+
+Image.defaultProps = _.assign(Asset.defaultProps, {
+  shouldRender: true,
+  bootstrap: true,
+  checkReady: true,
+});
 
 export default Image;

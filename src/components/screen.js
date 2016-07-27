@@ -107,7 +107,7 @@ class Screen extends Component {
   }
 
   complete() {
-    Component.prototype.complete.call(this);
+    super.complete();
     skoash.trigger('screenComplete');
     if (this.props.emitOnComplete) {
       skoash.trigger('emit', this.props.emitOnComplete);
