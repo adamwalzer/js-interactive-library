@@ -113,7 +113,7 @@ class Component extends React.Component {
   }
 
   collectData() {
-    if (this.props.collectData === 'function') {
+    if (typeof this.props.collectData === 'function') {
       return this.props.collectData.call(this);
     }
   }
