@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import shortid from 'shortid';
 import classNames from 'classnames';
 
 class Component extends React.Component {
@@ -243,7 +242,7 @@ class Component extends React.Component {
         <component.type
           {...component.props}
           ref={ref}
-          key={shortid(key)}
+          key={key}
         />
       );
     });
