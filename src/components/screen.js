@@ -160,15 +160,12 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
-      READY: this.state.ready,
       LOAD: this.state.load,
-      OPEN: this.state.open,
       LEAVING: this.state.leaving,
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
-      COMPLETE: this.state.complete,
       RETURN: this.state.return,
-    }, 'screen');
+    }, super.getClassNames(), 'screen');
   }
 
   renderContent() {
