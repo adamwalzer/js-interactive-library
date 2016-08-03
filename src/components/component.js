@@ -233,11 +233,11 @@ class Component extends React.Component {
     }, this.props.className);
   }
 
-  renderContentList(listName) {
-    var children = [].concat(this.props[listName || 'children']);
+  renderContentList(listName = 'children') {
+    var children = [].concat(this.props[listName]);
     return children.map((component, key) => {
       if (!component) return;
-      var ref = component.ref || component.props['data-ref'] || key;
+      var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
       return (
         <component.type
           {...component.props}
