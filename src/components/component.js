@@ -173,7 +173,7 @@ class Component extends React.Component {
   checkReady() {
     var ready, self = this;
 
-    if (!this.props.checkReady) return;
+    if (!this.props.checkReady || this.state.ready) return;
 
     self.requireForReady.forEach(key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
