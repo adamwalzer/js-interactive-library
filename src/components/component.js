@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import shortid from 'shortid';
 import classNames from 'classnames';
 
 class Component extends React.Component {
@@ -231,12 +232,12 @@ class Component extends React.Component {
     var children = [].concat(this.props[listName || 'children']);
     return children.map((component, key) => {
       if (!component) return;
-      var ref = component.ref || component.props['data-ref'];
+      var ref = component.ref || component.props['data-ref'] || key;
       return (
         <component.type
           {...component.props}
           ref={ref}
-          key={key}
+          key={shortid(key)}
         />
       );
     });

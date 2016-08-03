@@ -296,13 +296,7 @@ class Game extends Component {
       screenIndexArray,
     });
 
-    this.emit({
-      name: 'save',
-      game: this.config.id,
-      version: this.config.version,
-      highestScreenIndex,
-      currentScreenIndex,
-    });
+    this.emitSave(highestScreenIndex, currentScreenIndex);
 
     if (!opts.silent) {
       if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
@@ -313,6 +307,16 @@ class Game extends Component {
     }
 
     this.playBackground(currentScreenIndex);
+  }
+
+  emitSave(highestScreenIndex, currentScreenIndex) {
+    this.emit({
+      name: 'save',
+      game: this.config.id,
+      version: this.config.version,
+      highestScreenIndex,
+      currentScreenIndex,
+    });
   }
 
   openMenu(opts) {
@@ -586,6 +590,7 @@ class Game extends Component {
     }
   }
 
+  // this method takes in an opts method with screenID
   screenComplete() {
     if (this.audio['screen-complete']) {
       this.audio['screen-complete'].play();
