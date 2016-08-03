@@ -113,6 +113,12 @@ class Component extends React.Component {
     // this.setState(this.props);
   }
 
+  collectData() {
+    if (this.props.collectData === 'function') {
+      this.props.collectData.call(this);
+    }
+  }
+
   collectMedia() {
     var self = this;
 
