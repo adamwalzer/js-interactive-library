@@ -1,6 +1,6 @@
-import Media from './media.js';
+import Component from './component.js';
 
-class MediaSequence extends Media {
+class MediaSequence extends Component {
   constructor() {
     super();
 
