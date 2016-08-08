@@ -32,13 +32,16 @@ class MediaSequence extends Media {
   }
 
   renderContentList() {
-    var children = [].concat(this.props.children);
+    var self = this, children = [].concat(this.props.children);
     return children.map((component, key) =>
       <component.type
         {...component.props}
         ref={key}
         key={key}
-        onComplete={this.playNext}
+        onComplete={function() {
+          self.playNext();
+          if (typeof component.props.onComplete === 'function') component.props.onComplete.call(this, this);
+        }}
       />
     );
   }
