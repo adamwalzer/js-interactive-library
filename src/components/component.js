@@ -179,7 +179,7 @@ class Component extends React.Component {
   checkReady() {
     var ready, self = this;
 
-    if (!this.props.checkReady) return;
+    if (!this.props.checkReady || this.state.ready) return;
 
     self.requireForReady.forEach(key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
@@ -239,11 +239,11 @@ class Component extends React.Component {
     }, this.props.className);
   }
 
-  renderContentList(listName) {
-    var children = [].concat(this.props[listName || 'children']);
+  renderContentList(listName = 'children') {
+    var children = [].concat(this.props[listName]);
     return children.map((component, key) => {
       if (!component) return;
-      var ref = component.ref || component.props['data-ref'] || key;
+      var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
       return (
         <component.type
           {...component.props}

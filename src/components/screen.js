@@ -109,8 +109,14 @@ class Screen extends Component {
   complete() {
     super.complete();
     skoash.trigger('screenComplete', {
-      screenID: this.props.id
+      screenID: this.props.id,
+      silent: this.props.silentComplete
     });
+
+    if (this.audio['screen-complete']) {
+      this.audio['screen-complete'].play();
+    }
+
     if (this.props.emitOnComplete) {
       skoash.trigger('emit', this.props.emitOnComplete);
     }
@@ -210,15 +216,12 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
-      READY: this.state.ready,
       LOAD: this.state.load,
-      OPEN: this.state.open,
       LEAVING: this.state.leaving,
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
-      COMPLETE: this.state.complete,
       RETURN: this.state.return,
-    }, 'screen');
+    }, super.getClassNames(), 'screen');
   }
 
   renderContent() {
