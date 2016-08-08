@@ -118,6 +118,12 @@ class Component extends React.Component {
     }
   }
 
+  loadData() {
+    if (this.metaData && typeof this.props.loadData === 'function') {
+      this.props.loadData.call(this, this.metaData);
+    }
+  }
+
   collectMedia() {
     var self = this;
 
