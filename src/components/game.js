@@ -32,7 +32,7 @@ class Game extends Component {
       loading: true,
       demo: false,
       data: {},
-      classes: []
+      classes: [],
     };
 
     skoash.trigger = this.trigger.bind(this);
@@ -67,7 +67,7 @@ class Game extends Component {
     });
   }
 
-  getState() {
+  getState(opts) {
     return this.state;
   }
 
@@ -657,17 +657,17 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screens, screenKeys;
-    screens = this.props.screens || this.screens;
+    var screens, screenKeys, self = this;
+    screens = self.props.screens || self.screens;
     screenKeys = Object.keys(screens);
-    this.screensLength = screenKeys.length;
+    self.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
       var ScreenComponent, props;
-      ScreenComponent = screens[key].type;
       props = screens[key].props || {};
-      return (
-        <ScreenComponent {...props} key={key} index={index} ref={'screen-' + key} />
-      );
+      props.data = self.state.data.screens[key];
+      props.index = index;
+      ScreenComponent = screens[key];
+      return ScreenComponent(props, 'screen-' + key, key);
     });
   }
 
