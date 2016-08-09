@@ -19,7 +19,7 @@ class Component extends React.Component {
     });
 
     if (typeof this.props.onComplete === 'function') {
-      this.props.onComplete(this);
+      this.props.onComplete.call(this, this);
     }
   }
 
