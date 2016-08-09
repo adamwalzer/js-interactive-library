@@ -397,6 +397,7 @@ class Game extends Component {
       passData: this.passData,
       'pass-data': this.passData,
       'update-data': this.updateData,
+      updateState: this.updateState,
       screenComplete: this.screenComplete,
       openMenu: this.openMenu,
       menuClose: this.menuClose,
@@ -475,6 +476,22 @@ class Game extends Component {
       name: 'exit',
       game: this.config.id,
     });
+  }
+
+  updateState(opts) {
+    if (typeof opts.path === 'string') {
+      opts.data = {
+        screens: {
+          [this.state.currentScreenIndex]: {
+            [opts.path]: opts.data
+          }
+        }
+      };
+      this.updateData(opts);
+    } else if (_.isArray(opts.path)) {
+      opts.data = _.setWith({}, opts.path, opts.data, Object);
+      this.updateData(opts);
+    }
   }
 
   updateData(opts) {
