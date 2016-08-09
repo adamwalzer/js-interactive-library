@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import classNames from 'classnames';
 
 import Component from 'components/component';
@@ -172,7 +173,7 @@ class Screen extends Component {
     if (this.refs['selectable-reveal']) {
       data = [];
       if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
-        _.forIn(this.refs['selectable-reveal'].refs.selectable.refs , (ref, key) => {
+        _.forIn(this.refs['selectable-reveal'].refs.selectable.refs, (ref) => {
           if (_.includes(ref.props.className, 'SELECTED') || _.includes(ref.props.className, 'HIGHLIGHTED')) data.push(ref.props['data-ref']);
         });
       }
@@ -182,14 +183,14 @@ class Screen extends Component {
           if (key.indexOf('dropzone-') === -1 || !ref.state.content) return;
           if (this.props.multipleAnswers) {
             data[key] = [];
-            _.forIn(ref.state.content, (ref2, key2) => {
+            _.forIn(ref.state.content, (ref2) => {
               data[key].push(ref2.props.message);
             });
           } else {
             data[key] = {
               ref: ref.state.content.props.message,
               state: ref.state.content.state
-            }
+            };
           }
         });
       }
