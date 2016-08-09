@@ -235,6 +235,10 @@ class Component extends React.Component {
     }
   }
 
+  updateGameState(opts) {
+    skoash.trigger('updateState', opts);
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
