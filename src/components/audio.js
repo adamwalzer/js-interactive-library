@@ -4,6 +4,9 @@ import Media from './media.js';
 class Audio extends Media {
   constructor() {
     super();
+
+    this.complete = this.complete.bind(this);
+    this.ready = this.ready.bind(this);
   }
 
   play() {
@@ -100,10 +103,10 @@ class Audio extends Media {
 
   componentDidMount() {
     this.audio = new Howl({
-      urls: [this.props.src],
+      src: this.props.src,
       loop: this.props.loop || false,
-      onend: this.complete.bind(this),
-      onload: this.ready.bind(this)
+      onend: this.complete,
+      onload: this.ready
     });
     if (this.props.complete) {
       this.complete();

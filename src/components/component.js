@@ -12,15 +12,17 @@ class Component extends React.Component {
   }
 
   complete() {
-    this.setState({
-      complete: true,
-    }, () => {
-      skoash.trigger('complete');
-    });
+    setTimeout(() => {
+      this.setState({
+        complete: true,
+      }, () => {
+        skoash.trigger('complete');
+      });
 
-    if (typeof this.props.onComplete === 'function') {
-      this.props.onComplete(this);
-    }
+      if (typeof this.props.onComplete === 'function') {
+        this.props.onComplete.call(this, this);
+      }
+    }, this.props.completeDelay);
   }
 
   incomplete() {
@@ -99,6 +101,11 @@ class Component extends React.Component {
 
   bootstrap() {
     var self = this;
+
+    if (this.props.complete) {
+      this.complete();
+    }
+
     this.requireForReady = Object.keys(self.refs);
     this.requireForComplete = this.requireForReady.filter(key => {
       return self.refs[key].checkComplete;
@@ -115,6 +122,12 @@ class Component extends React.Component {
   collectData() {
     if (typeof this.props.collectData === 'function') {
       return this.props.collectData.call(this);
+    }
+  }
+
+  loadData() {
+    if (this.metaData && typeof this.props.loadData === 'function') {
+      this.props.loadData.call(this, this.metaData);
     }
   }
 
@@ -268,6 +281,7 @@ Component.defaultProps = {
   shouldRender: true,
   checkComplete: true,
   checkReady: true,
+  completeDelay: 0,
 };
 
 export default Component;

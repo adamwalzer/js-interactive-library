@@ -67,7 +67,7 @@ class Game extends Component {
     });
   }
 
-  getState(opts) {
+  getState() {
     return this.state;
   }
 
