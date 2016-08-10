@@ -66,9 +66,7 @@ class Screen extends Component {
   }
 
   start() {
-    var self = this;
-
-    self.bootstrap();
+    this.bootstrap();
 
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
@@ -76,18 +74,16 @@ class Screen extends Component {
       }
     });
 
-    self.startMedia();
+    this.startMedia();
 
-    self.setState({
+    this.setState({
       started: true,
     });
 
-    self.checkComplete();
+    this.checkComplete();
 
-    if (typeof self.props.completeDelay === 'number') {
-      setTimeout(() => {
-        self.complete();
-      }, self.props.completeDelay);
+    if (this.props.completeOnStart) {
+      this.complete();
     }
   }
 
@@ -269,7 +265,7 @@ class Screen extends Component {
 }
 
 Screen.defaultProps = _.merge(Component.defaultProps, {
-  resetOnClose: true
+  resetOnClose: true,
 });
 
 export default Screen;
