@@ -38,7 +38,7 @@ class MediaSequence extends Component {
         {...component.props}
         ref={key}
         key={key}
-        onComplete={function() {
+        onComplete={function () {
           self.playNext();
           if (typeof component.props.onComplete === 'function') component.props.onComplete.call(this, this);
         }}
