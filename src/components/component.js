@@ -49,6 +49,10 @@ class Component extends React.Component {
     _.each(this.refs, ref => {
       if (typeof ref.start === 'function') ref.start();
     });
+
+    if (this.props.completeOnStart) {
+      this.complete();
+    }
   }
 
   stop() {
@@ -282,6 +286,7 @@ Component.defaultProps = {
   checkComplete: true,
   checkReady: true,
   completeDelay: 0,
+  completeOnStart: false,
 };
 
 export default Component;
