@@ -240,7 +240,8 @@ class Game extends Component {
      * highestScreenIndex is the index of the highest screen reached
      * not the index of the highest screen that exists.
      */
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex, screenIndexArray;
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
+      highestScreenIndex, screenIndexArray, data;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
@@ -283,6 +284,14 @@ class Game extends Component {
         oldScreen.close();
       } else {
         oldScreen.leave();
+      }
+
+      if (oldScreen.props.resetOnClose) {
+        data = _.cloneDeep(this.state.data);
+        data.screens[oldIndex] = {};
+        this.setState({
+          data
+        });
       }
     }
 

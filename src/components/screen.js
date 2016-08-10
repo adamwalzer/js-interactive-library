@@ -217,4 +217,8 @@ class Screen extends Component {
   }
 }
 
+Screen.defaultProps = _.merge(Component.defaultProps, {
+  resetOnClose: true
+});
+
 export default Screen;
