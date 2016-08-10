@@ -12,15 +12,17 @@ class Component extends React.Component {
   }
 
   complete() {
-    this.setState({
-      complete: true,
-    }, () => {
-      skoash.trigger('complete');
-    });
+    setTimeout(() => {
+      this.setState({
+        complete: true,
+      }, () => {
+        skoash.trigger('complete');
+      });
 
-    if (typeof this.props.onComplete === 'function') {
-      this.props.onComplete.call(this, this);
-    }
+      if (typeof this.props.onComplete === 'function') {
+        this.props.onComplete.call(this, this);
+      }
+    }, this.props.completeDelay);
   }
 
   incomplete() {
@@ -279,6 +281,7 @@ Component.defaultProps = {
   shouldRender: true,
   checkComplete: true,
   checkReady: true,
+  completeDelay: 0,
 };
 
 export default Component;
