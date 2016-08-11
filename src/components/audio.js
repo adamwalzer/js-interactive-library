@@ -103,7 +103,7 @@ class Audio extends Media {
 
   componentDidMount() {
     this.audio = new Howl({
-      src: this.props.src,
+      src: [this.props.src],
       loop: this.props.loop || false,
       onend: this.complete,
       onload: this.ready
