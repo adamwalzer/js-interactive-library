@@ -10,7 +10,27 @@ class Media extends Asset {
   }
 
   play() {
-    // this should be implemented per media
+    if (this.props.playTarget) {
+      this.updateGameState({
+        path: this.props.playTarget,
+        data: {
+          playing: true
+        }
+      });
+    }
+  }
+
+  complete() {
+    if (this.props.completeTarget) {
+      this.updateGameState({
+        path: this.props.completeTarget,
+        data: {
+          playing: false,
+          complete: true
+        }
+      });
+    }
+    super.complete();
   }
 }
 
