@@ -17,11 +17,11 @@ class Component extends React.Component {
         complete: true,
       }, () => {
         skoash.trigger('complete');
-      });
 
-      if (typeof this.props.onComplete === 'function') {
-        this.props.onComplete.call(this, this);
-      }
+        if (typeof this.props.onComplete === 'function') {
+          this.props.onComplete.call(this, this);
+        }
+      });
     }, this.props.completeDelay);
   }
 
