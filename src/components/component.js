@@ -216,7 +216,7 @@ class Component extends React.Component {
   checkComplete() {
     var self = this, complete;
 
-    if (!self.props.checkComplete || !self.requireForComplete) return;
+    if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
 
     self.requireForComplete.forEach(key => {
       if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {

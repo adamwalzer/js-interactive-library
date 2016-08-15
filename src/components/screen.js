@@ -130,7 +130,7 @@ class Screen extends Component {
       leaving: false,
       leave: false,
       close: false,
-      return: this.state.complete,
+      replay: this.state.complete,
       opts,
     });
 
@@ -219,7 +219,7 @@ class Screen extends Component {
       LEAVING: this.state.leaving,
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
-      RETURN: this.state.return,
+      REPLAY: this.state.replay,
     }, super.getClassNames(), 'screen');
   }
 

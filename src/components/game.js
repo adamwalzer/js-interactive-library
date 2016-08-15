@@ -242,6 +242,9 @@ class Game extends Component {
      */
     var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
       highestScreenIndex, screenIndexArray, data;
+
+    data = this.state.data;
+
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (typeof opts.index === 'number') {
@@ -289,9 +292,6 @@ class Game extends Component {
       if (oldScreen.props.resetOnClose) {
         data = _.cloneDeep(this.state.data);
         data.screens[oldIndex] = {};
-        this.setState({
-          data
-        });
       }
     }
 
@@ -305,6 +305,7 @@ class Game extends Component {
       highestScreenIndex,
       screenIndexArray,
       classes: [],
+      data,
     });
 
     this.emitSave(highestScreenIndex, currentScreenIndex);
