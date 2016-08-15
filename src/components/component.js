@@ -11,6 +11,12 @@ class Component extends React.Component {
     };
   }
 
+  callProp(action, opts) {
+    if (typeof this.props[action] === 'function') {
+      this.props[action].call(this, opts);
+    }
+  }
+
   complete() {
     setTimeout(() => {
       this.setState({
