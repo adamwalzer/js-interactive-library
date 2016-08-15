@@ -262,7 +262,7 @@ class Game extends Component {
     screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
-      if (!this.state.demo && !oldScreen.state.complete) {
+      if (!this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
