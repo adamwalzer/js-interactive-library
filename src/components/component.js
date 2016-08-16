@@ -32,10 +32,22 @@ class Component extends React.Component {
   }
 
   incomplete() {
+    if (!this.state.complete || this.props.complete) return;
+
     this.setState({
       complete: false,
     }, () => {
       skoash.trigger('incomplete');
+    });
+  }
+
+  incompleteRefs() {
+    this.incomplete();
+
+    _.forEach(this.refs, ref => {
+      if (typeof ref.incompleteRefs === 'function') {
+        ref.incompleteRefs();
+      }
     });
   }
 
