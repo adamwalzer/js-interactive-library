@@ -41,6 +41,16 @@ class Component extends React.Component {
     });
   }
 
+  completeRefs() {
+    this.complete();
+
+    _.forEach(this.refs, ref => {
+      if (typeof ref.completeRefs === 'function') {
+        ref.completeRefs();
+      }
+    });
+  }
+
   incompleteRefs() {
     this.incomplete();
 
