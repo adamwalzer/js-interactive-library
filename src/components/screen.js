@@ -127,18 +127,22 @@ class Screen extends Component {
     self.setState({
       load: true,
       open: true,
+      opening: true,
       leaving: false,
       leave: false,
       close: false,
-      replay: this.state.complete,
+      replay: this.state.complete || this.state.replay,
       opts,
     });
 
     setTimeout(() => {
       if (!self.state.started) {
         self.start();
+        self.setState({
+          opening: false
+        });
       }
-    }, this.props.startDelay || 250);
+    }, this.props.startDelay);
 
     if (typeof this.props.onOpen === 'function') {
       this.props.onOpen(this);
@@ -266,8 +270,9 @@ class Screen extends Component {
   }
 }
 
-Screen.defaultProps = _.merge(Component.defaultProps, {
+Screen.defaultProps = _.defaults({
   resetOnClose: true,
-});
+  startDelay: 250,
+}, Component.defaultProps);
 
 export default Screen;
