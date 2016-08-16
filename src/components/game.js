@@ -248,9 +248,7 @@ class Game extends Component {
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
 
-    console.log(_.clone(oldScreen));
     if (oldScreen && oldScreen.state && oldScreen.state.opening) {
-      console.log('opening');
       return;
     }
 

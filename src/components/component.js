@@ -299,12 +299,13 @@ class Component extends React.Component {
 }
 
 Component.defaultProps = {
-  type: 'div',
-  shouldRender: true,
+  bootstrap: true,
   checkComplete: true,
   checkReady: true,
   completeDelay: 0,
   completeOnStart: false,
+  shouldRender: true,
+  type: 'div',
 };
 
 export default Component;

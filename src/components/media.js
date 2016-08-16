@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import Asset from './asset.js';
 
 /*
@@ -14,13 +16,14 @@ class Media extends Asset {
   }
 }
 
-Media.defaultProps = {
-  type: 'div',
-  shouldRender: false,
+Media.defaultProps = _.defaults({
   bootstrap: false,
-  checkReady: false,
   checkComplete: false,
-  silentOnStart: true
-};
+  checkReady: false,
+  shouldRender: false,
+  completeDelay: 0,
+  completeOnStart: false,
+  silentOnStart: true,
+}, Asset.defaultProps);
 
 export default Media;
