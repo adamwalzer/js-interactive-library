@@ -202,7 +202,7 @@ class Screen extends Component {
 
   loadData() {
     var loadData = {};
-    if (!this.refs) return;
+    if (!this.refs || !this.metaData) return;
     if (this.refs['selectable-reveal']) {
       if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
         _.forEach(this.metaData, (ref) => {
@@ -210,11 +210,15 @@ class Screen extends Component {
           this.refs['selectable-reveal'].refs.selectable.loadData = loadData;
         });
       }
-    } else if (this.refs['dropzone-reveal']) {
+    }
+
+    if (this.refs['dropzone-reveal']) {
       if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
         this.refs['dropzone-reveal'].refs.dropzone.loadData = this.metaData;
       }
     }
+
+    this.completeRefs();
   }
 
   getClassNames() {
