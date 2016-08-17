@@ -510,7 +510,7 @@ class Game extends Component {
   }
 
   updateData(opts) {
-    var data = _.merge(opts.data, this.state.data);
+    var data = _.merge(this.state.data, opts.data);
 
     this.setState({
       data,
