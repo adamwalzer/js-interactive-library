@@ -57,6 +57,11 @@ class Game extends Component {
     window.addEventListener('orientationchange', () => {
       window.onresize();
     });
+    if (window.parent) {
+      window.parent.addEventListener('orientationchange', () => {
+        window.onresize();
+      });
+    }
 
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
