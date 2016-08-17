@@ -44,6 +44,7 @@ class Audio extends Media {
     });
 
     this.audio.play();
+    super.play()
   }
 
   pause() {
