@@ -163,6 +163,10 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
+      this.state.playingBKG.map(audio => {
+        audio[fnKey]();
+      });
+
       openScreen = this.refs['screen-' + this.state.currentScreenIndex];
       if (openScreen && typeof openScreen[fnKey] === 'function') {
         openScreen[fnKey]();
