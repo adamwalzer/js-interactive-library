@@ -163,29 +163,11 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      if (this.state.playingVideo) {
-        this.state.playingVideo[fnKey]();
-        return;
-      }
-
-      this.state.playingSFX.map(audio => {
-        audio[fnKey]();
-      });
-
-      this.state.playingVO.map(audio => {
-        audio[fnKey]();
-      });
-
-      this.state.playingBKG.map(audio => {
-        audio[fnKey]();
-      });
-
       openScreen = this.refs['screen-' + this.state.currentScreenIndex];
       if (openScreen && typeof openScreen[fnKey] === 'function') {
         openScreen[fnKey]();
       }
     });
-
   }
 
   /**
