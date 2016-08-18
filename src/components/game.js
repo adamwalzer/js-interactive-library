@@ -329,7 +329,7 @@ class Game extends Component {
   }
 
   openMenu(opts) {
-    var menu, openMenus;
+    var menu, openMenus, screen;
 
     menu = this.refs['menu-' + opts.id];
 
@@ -337,20 +337,28 @@ class Game extends Component {
       menu.open();
       openMenus = this.state.openMenus || [];
       openMenus.push(opts.id);
+      if (this.media.button) this.media.button.play();
       this.setState({
         openMenus,
       });
     }
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (screen) screen.pause();
   }
 
   menuClose(opts) {
-    var openMenus;
+    var openMenus, screen;
 
     openMenus = this.state.openMenus || [];
     openMenus.splice(opts.id, 1);
+    if (this.media.button) this.media.button.play();
     this.setState({
       openMenus,
     });
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (screen && !openMenus.length) screen.resume();
   }
 
   getBackgroundIndex() {
