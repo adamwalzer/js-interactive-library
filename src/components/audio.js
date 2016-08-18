@@ -44,7 +44,7 @@ class Audio extends Media {
     });
 
     this.audio.play();
-    super.play()
+    super.play();
   }
 
   pause() {
@@ -57,12 +57,9 @@ class Audio extends Media {
 
   resume() {
     if (!this.state.paused) return;
-    this.setState(
-      {
-        paused: false,
-      },
-      this.playAudio.bind(this)
-    );
+    this.setState({
+      paused: false,
+    }, this.playAudio.bind(this));
   }
 
   stop() {
