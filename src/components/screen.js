@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import classNames from 'classnames';
 
 import Component from 'components/component';
@@ -107,8 +108,16 @@ class Screen extends Component {
   }
 
   complete() {
-    Component.prototype.complete.call(this);
-    skoash.trigger('screenComplete');
+    super.complete();
+    skoash.trigger('screenComplete', {
+      screenID: this.props.id,
+      silent: this.props.silentComplete
+    });
+
+    if (this.audio['screen-complete']) {
+      this.audio['screen-complete'].play();
+    }
+
     if (this.props.emitOnComplete) {
       skoash.trigger('emit', this.props.emitOnComplete);
     }
@@ -136,6 +145,8 @@ class Screen extends Component {
     if (typeof this.props.onOpen === 'function') {
       this.props.onOpen(this);
     }
+
+    this.loadData();
   }
 
   leave() {
@@ -156,17 +167,62 @@ class Screen extends Component {
     this.stop();
   }
 
+  collectData() {
+    var data = {};
+    if (!this.refs) return data;
+    if (this.refs['selectable-reveal']) {
+      data = [];
+      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
+        _.forIn(this.refs['selectable-reveal'].refs.selectable.refs, (ref) => {
+          if (_.includes(ref.props.className, 'SELECTED') || _.includes(ref.props.className, 'HIGHLIGHTED')) data.push(ref.props['data-ref']);
+        });
+      }
+    } else if (this.refs['dropzone-reveal']) {
+      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
+        _.forIn(this.refs['dropzone-reveal'].refs.dropzone.refs, (ref, key) => {
+          if (key.indexOf('dropzone-') === -1 || !ref.state.content) return;
+          if (this.props.multipleAnswers) {
+            data[key] = [];
+            _.forIn(ref.state.content, (ref2) => {
+              data[key].push(ref2.props.message);
+            });
+          } else {
+            data[key] = {
+              ref: ref.state.content.props.message,
+              state: ref.state.content.state
+            };
+          }
+        });
+      }
+    }
+    return data;
+  }
+
+  loadData() {
+    var loadData = {};
+    if (!this.refs) return;
+    if (this.refs['selectable-reveal']) {
+      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
+        _.forEach(this.metaData, (ref) => {
+          loadData[ref] = this.refs['selectable-reveal'].props.selectableSelectClass || this.refs['selectable-reveal'].refs.selectable.state.selectClass;
+          this.refs['selectable-reveal'].refs.selectable.loadData = loadData;
+        });
+      }
+    } else if (this.refs['dropzone-reveal']) {
+      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
+        this.refs['dropzone-reveal'].refs.dropzone.loadData = this.metaData;
+      }
+    }
+  }
+
   getClassNames() {
     return classNames({
-      READY: this.state.ready,
       LOAD: this.state.load,
-      OPEN: this.state.open,
       LEAVING: this.state.leaving,
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
-      COMPLETE: this.state.complete,
       RETURN: this.state.return,
-    }, 'screen');
+    }, super.getClassNames(), 'screen');
   }
 
   renderContent() {

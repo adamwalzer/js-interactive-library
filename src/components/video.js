@@ -1,6 +1,6 @@
-import Asset from './asset.js';
+import Media from './media.js';
 
-class Video extends Asset {
+class Video extends Media {
   constructor() {
     super();
   }
@@ -54,7 +54,7 @@ class Video extends Asset {
       playing: false
     });
 
-    Asset.prototype.complete.call(this);
+    super.complete();
   }
 
   componentDidMount() {

@@ -1,9 +1,12 @@
 import { Howl } from 'howler';
-import Asset from './asset.js';
+import Media from './media.js';
 
-class Audio extends Asset {
+class Audio extends Media {
   constructor() {
     super();
+
+    this.complete = this.complete.bind(this);
+    this.ready = this.ready.bind(this);
   }
 
   play() {
@@ -95,24 +98,19 @@ class Audio extends Asset {
       playing: false
     });
 
-    Asset.prototype.complete.call(this);
+    super.complete();
   }
 
   componentDidMount() {
     this.audio = new Howl({
-      urls: [this.props.src],
+      src: this.props.src,
       loop: this.props.loop || false,
-      onend: this.complete.bind(this),
-      onload: this.ready.bind(this)
+      onend: this.complete,
+      onload: this.ready
     });
     if (this.props.complete) {
       this.complete();
     }
-  }
-
-  render() {
-      // <audio {...this.props} preload='none'></audio>
-    return null;
   }
 }
 

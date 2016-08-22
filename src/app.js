@@ -4,6 +4,7 @@ import Game from 'components/game';
 import Image from 'components/image';
 import Audio from 'components/audio';
 import Video from 'components/video';
+import MediaSequence from 'components/media_sequence';
 import ListItem from 'components/list_item';
 
 import start from 'methods/start';
@@ -18,6 +19,7 @@ window.play = window.skoash = {
   Game,
   Image,
   Audio,
+  MediaSequence,
   Video,
   ListItem,
   start,

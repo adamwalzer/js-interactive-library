@@ -32,6 +32,7 @@ class Game extends Component {
       loading: true,
       demo: false,
       data: {},
+      classes: []
     };
 
     skoash.trigger = this.trigger.bind(this);
@@ -294,15 +295,10 @@ class Game extends Component {
       currentScreenIndex,
       highestScreenIndex,
       screenIndexArray,
+      classes: [],
     });
 
-    this.emit({
-      name: 'save',
-      game: this.config.id,
-      version: this.config.version,
-      highestScreenIndex,
-      currentScreenIndex,
-    });
+    this.emitSave(highestScreenIndex, currentScreenIndex);
 
     if (!opts.silent) {
       if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
@@ -313,6 +309,16 @@ class Game extends Component {
     }
 
     this.playBackground(currentScreenIndex);
+  }
+
+  emitSave(highestScreenIndex, currentScreenIndex) {
+    this.emit({
+      name: 'save',
+      game: this.config.id,
+      version: this.config.version,
+      highestScreenIndex,
+      currentScreenIndex,
+    });
   }
 
   openMenu(opts) {
@@ -480,11 +486,16 @@ class Game extends Component {
   }
 
   audioPlay(opts) {
-    var playingSFX, playingVO, playingBKG;
+    var playingSFX, playingVO, playingBKG, classes;
 
     playingSFX = this.state.playingSFX || [];
     playingVO = this.state.playingVO || [];
     playingBKG = this.state.playingBKG || [];
+    classes = this.state.classes || [];
+
+    if (opts.audio.props.gameClass) {
+      classes.push(opts.audio.props.gameClass);
+    }
 
     switch (opts.audio.props.type) {
     case 'sfx':
@@ -503,6 +514,7 @@ class Game extends Component {
       playingSFX,
       playingVO,
       playingBKG,
+      classes
     });
   }
 
@@ -586,7 +598,9 @@ class Game extends Component {
     }
   }
 
-  screenComplete() {
+  // this method takes in an opts method with screenID
+  screenComplete(opts) {
+    if (opts.silent) return;
     if (this.audio['screen-complete']) {
       this.audio['screen-complete'].play();
     }
@@ -607,7 +621,9 @@ class Game extends Component {
         ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
         DEMO: this.state.demo,
         ['SCREEN-' + this.state.currentScreenIndex]: true,
-      }
+      },
+      ...this.state.classes,
+      super.getClassNames()
     );
   }
 
