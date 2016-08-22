@@ -17,10 +17,14 @@ class Screen extends Component {
     };
   }
 
-  goto(index) {
+  goto(index, buttonSound) {
     if (typeof index === 'string' || typeof index === 'number') {
-      skoash.trigger('goto', {index});
+      skoash.trigger('goto', {
+        index,
+        buttonSound
+      });
     } else if (typeof index === 'object') {
+      index.buttonSound = index.buttonSound || buttonSound;
       skoash.trigger('goto', index);
     }
   }
@@ -30,14 +34,14 @@ class Screen extends Component {
   }
 
   next() {
-    if (!this.state.complete || this.state.leaving) return;
+    if (this.state.leaving) return;
 
     this.setState({
       leaving: true
     });
 
     setTimeout(
-      this.goto.bind(this, this.props.nextIndex || this.props.index + 1),
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.audio.button),
       this.props.nextDelay || 0
     );
   }
@@ -77,9 +81,7 @@ class Screen extends Component {
       started: true,
     });
 
-    if (self.props.checkComplete !== false) {
-      self.checkComplete();
-    }
+    self.checkComplete();
 
     if (typeof self.props.completeDelay === 'number') {
       setTimeout(() => {
@@ -130,6 +132,10 @@ class Screen extends Component {
         self.start();
       }
     }, this.props.startDelay || 250);
+
+    if (typeof this.props.onOpen === 'function') {
+      this.props.onOpen(this);
+    }
   }
 
   leave() {
@@ -152,7 +158,6 @@ class Screen extends Component {
 
   getClassNames() {
     return classNames({
-      screen: true,
       READY: this.state.ready,
       LOAD: this.state.load,
       OPEN: this.state.open,
@@ -161,7 +166,7 @@ class Screen extends Component {
       CLOSE: this.state.close,
       COMPLETE: this.state.complete,
       RETURN: this.state.return,
-    });
+    }, 'screen');
   }
 
   renderContent() {

@@ -152,7 +152,7 @@ class Game extends Component {
   // paused should be a boolean determining if whether to call
   // audio.pause or audio.resume
   setPause(paused) {
-    var fnKey = paused ? 'pause' : 'resume';
+    var openScreen, fnKey = paused ? 'pause' : 'resume';
 
     this.setState({
       paused
@@ -174,6 +174,11 @@ class Game extends Component {
     this.state.playingBKG.map(audio => {
       audio[fnKey]();
     });
+
+    openScreen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (openScreen && typeof openScreen[fnKey] === 'function') {
+      openScreen[fnKey]();
+    }
   }
 
   /**
@@ -299,8 +304,12 @@ class Game extends Component {
       currentScreenIndex,
     });
 
-    if (!opts.silent && this.audio.button) {
-      this.audio.button.play();
+    if (!opts.silent) {
+      if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
+        opts.buttonSound.play();
+      } else if (this.audio.button) {
+        this.audio.button.play();
+      }
     }
 
     this.playBackground(currentScreenIndex);
@@ -336,22 +345,27 @@ class Game extends Component {
   }
 
   playBackground(currentScreenIndex) {
-    var index, playingBKG, self = this;
+    var index, playingBKG;
 
-    index = self.getBackgroundIndex(currentScreenIndex);
-    playingBKG = self.state.playingBKG;
+    index = this.getBackgroundIndex(currentScreenIndex);
+    playingBKG = this.state.playingBKG;
 
-    if (playingBKG[0] === self.audio.background[index]) {
+    if (playingBKG.indexOf(this.audio.background[index]) !== -1) {
       return;
     }
 
-    if (playingBKG[0]) {
-      playingBKG[0].stop();
-    }
+    playingBKG = playingBKG.filter(bkg => {
+      bkg.stop();
+      return false;
+    });
 
-    if (self.audio.background[index]) {
-      self.audio.background[index].play();
-    }
+    this.setState({
+      playingBKG
+    }, () => {
+      if (this.audio.background[index]) {
+        this.audio.background[index].play();
+      }
+    });
   }
 
   scale() {
@@ -384,6 +398,8 @@ class Game extends Component {
       emit: this.emit,
       quit: this.quit,
       save: this.load,
+      complete: this.checkComplete,
+      incomplete: this.checkComplete,
     };
 
     fn = events[event];
@@ -491,7 +507,7 @@ class Game extends Component {
   }
 
   audioStop(opts) {
-    var playingSFX, playingVO, playingBKG;
+    var playingSFX, playingVO, playingBKG, index;
 
     playingSFX = this.state.playingSFX || [];
     playingVO = this.state.playingVO || [];
@@ -499,16 +515,19 @@ class Game extends Component {
 
     switch (opts.audio.props.type) {
     case 'sfx':
-      playingSFX.splice(playingSFX.indexOf(opts.audio), 1);
+      index = playingSFX.indexOf(opts.audio);
+      index !== -1 && playingSFX.splice(index, 1);
       break;
     case 'voiceOver':
-      playingVO.splice(playingVO.indexOf(opts.audio), 1);
+      index = playingVO.indexOf(opts.audio);
+      index !== -1 && playingVO.splice(index, 1);
       if (!playingVO.length) {
         this.raiseBackground();
       }
       break;
     case 'background':
-      playingBKG.splice(playingBKG.indexOf(opts.audio), 1);
+      index = playingBKG.indexOf(opts.audio);
+      index !== -1 && playingBKG.splice(index, 1);
       break;
     }
 
@@ -545,7 +564,7 @@ class Game extends Component {
 
   fadeBackground(value) {
     if (typeof value === 'undefined') value = .25;
-    this.state.playingBKG.map((bkg) => {
+    this.state.playingBKG.map(bkg => {
       bkg.setVolume(value);
     });
   }
@@ -553,9 +572,17 @@ class Game extends Component {
   raiseBackground(value) {
     if (typeof value === 'undefined') value = 1;
     if (this.state.playingVO.length === 0) {
-      this.state.playingBKG.map((bkg) => {
+      this.state.playingBKG.map(bkg => {
         bkg.setVolume(value);
       });
+    }
+  }
+
+  checkComplete() {
+    var openScreen = this.refs['screen-' + this.state.currentScreenIndex];
+
+    if (openScreen && typeof openScreen.checkComplete === 'function') {
+      openScreen.checkComplete();
     }
   }
 
@@ -566,17 +593,22 @@ class Game extends Component {
   }
 
   getClassNames() {
-    return classNames({
-      iOS: this.state.iOS,
-      MOBILE: this.state.mobile,
-      SFX: this.state.playingSFX.length,
-      'VOICE-OVER': this.state.playingVO.length,
-      PAUSED: this.state.paused,
-      LOADING: this.state.loading,
-      MENU: this.state.openMenus.length,
-      DEMO: this.state.demo,
-      ['SCREEN-' + this.state.currentScreenIndex]: true,
-    });
+    return classNames(
+      'pl-game',
+      'skoash-game',
+      {
+        iOS: this.state.iOS,
+        MOBILE: this.state.mobile,
+        SFX: this.state.playingSFX.length,
+        'VOICE-OVER': this.state.playingVO.length,
+        PAUSED: this.state.paused,
+        LOADING: this.state.loading,
+        MENU: this.state.openMenus.length,
+        ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
+        DEMO: this.state.demo,
+        ['SCREEN-' + this.state.currentScreenIndex]: true,
+      }
+    );
   }
 
   getStyles() {
@@ -625,13 +657,13 @@ class Game extends Component {
 
   renderMenuScreens() {
     return _.map(this.menus, (Menu, key) =>
-      <Menu key={key} index={key} ref={'menu-' + key} />
+      <Menu.type {...Menu.props} key={key} index={key} ref={'menu-' + key} />
     );
   }
 
   render() {
     return (
-      <div className={'pl-game ' + this.getClassNames()} style={this.getStyles()}>
+      <div className={this.getClassNames()} style={this.getStyles()}>
         {this.renderLoader()}
         {this.renderAssets()}
         {this.renderMenu()}

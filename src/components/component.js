@@ -14,6 +14,20 @@ class Component extends React.Component {
   complete() {
     this.setState({
       complete: true,
+    }, () => {
+      skoash.trigger('complete');
+    });
+
+    if (typeof this.props.onComplete === 'function') {
+      this.props.onComplete(this);
+    }
+  }
+
+  incomplete() {
+    this.setState({
+      complete: false,
+    }, () => {
+      skoash.trigger('incomplete');
     });
   }
 
@@ -26,15 +40,13 @@ class Component extends React.Component {
   start() {
     this.setState({
       started: true
+    }, () => {
+      this.checkComplete();
     });
 
     _.each(this.refs, ref => {
       if (typeof ref.start === 'function') ref.start();
     });
-
-    if (this.props.checkComplete !== false) {
-      this.checkComplete();
-    }
   }
 
   stop() {
@@ -46,6 +58,26 @@ class Component extends React.Component {
       if (ref && typeof ref.stop === 'function') {
         ref.stop();
       }
+    });
+  }
+
+  pause() {
+    if (typeof this.props.onPause === 'function') {
+      this.props.onPause(this);
+    }
+
+    _.each(this.refs, ref => {
+      if (typeof ref.pause === 'function') ref.pause();
+    });
+  }
+
+  resume() {
+    if (typeof this.props.onResume === 'function') {
+      this.props.onResume(this);
+    }
+
+    _.each(this.refs, ref => {
+      if (typeof ref.resume === 'function') ref.resume();
     });
   }
 
@@ -69,7 +101,7 @@ class Component extends React.Component {
     var self = this;
     this.requireForReady = Object.keys(self.refs);
     this.requireForComplete = this.requireForReady.filter(key => {
-      return !self.refs[key].state || !self.refs[key].state.complete;
+      return self.refs[key].checkComplete;
     });
 
     this.collectMedia();
@@ -113,45 +145,54 @@ class Component extends React.Component {
   }
 
   checkReady() {
-    var self = this;
+    var ready, self = this;
 
-    self.requireForReady = this.requireForReady.filter((key) => {
-      if (self.refs[key].state && !self.refs[key].state.ready) {
+    self.requireForReady.forEach(key => {
+      if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
         self.refs[key].bootstrap();
-        return true;
       }
-      return false;
     });
 
-    if (!self.requireForReady.length) {
+    ready = self.requireForReady.every(key => {
+      return self.refs[key] && (
+          !self.refs[key].state || (
+            self.refs[key].state && self.refs[key].state.ready
+          )
+        );
+    });
+
+    if (ready) {
       self.ready();
     } else {
-      self.state.ready = false;
       setTimeout(self.checkReady.bind(self), 100);
     }
   }
 
   checkComplete() {
-    var self = this;
+    var self = this, complete;
 
-    self.requireForComplete = self.requireForComplete.filter(key => {
-      if (self.refs[key] instanceof Node) {
-        return false;
+    if (this.props.checkComplete === false) return;
+
+    self.requireForComplete.forEach(key => {
+      if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
+        self.refs[key].checkComplete();
       }
-      if (!self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
-        if (typeof self.refs[key].checkComplete === 'function') {
-          self.refs[key].checkComplete();
-        }
-        return true;
-      }
-      return false;
     });
 
-    if (!self.requireForComplete.length) {
+    complete = self.requireForComplete.every(key => {
+      if (self.refs[key] instanceof Node) {
+        return true;
+      }
+      if (!self.refs[key] || !self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (complete && !self.state.complete) {
       self.complete();
-    } else if (self.state.started) {
-      self.state.complete = false;
-      setTimeout(self.checkComplete.bind(self), 100);
+    } else if (self.state.started && !complete && self.state.complete) {
+      self.incomplete();
     }
   }
 
@@ -166,22 +207,28 @@ class Component extends React.Component {
 
   renderContentList(listName) {
     var children = [].concat(this.props[listName || 'children']);
-    return children.map((component, key) =>
-      <component.type
-        {...component.props}
-        ref={component.ref}
-        key={key}
-      />
-    );
+    return children.map((component, key) => {
+      if (!component) return;
+      var ref = component.ref || component.props['data-ref'];
+      return (
+          <component.type
+          {...component.props}
+          ref={ref}
+          key={key}
+        />
+      );
+    });
   }
 
   render() {
     return (
-      <div {...this.props} className={this.getClassNames()}>
+      <this.props.type {...this.props} className={this.getClassNames()}>
         {this.renderContentList()}
-      </div>
+      </this.props.type>
     );
   }
 }
+
+Component.defaultProps = {type: 'div'};
 
 export default Component;
