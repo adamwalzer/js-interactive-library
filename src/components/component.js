@@ -13,7 +13,7 @@ class Component extends React.Component {
 
   callProp(action, opts) {
     if (typeof this.props[action] === 'function') {
-      this.props[action].call(this, opts);
+      return this.props[action].call(this, opts);
     }
   }
 

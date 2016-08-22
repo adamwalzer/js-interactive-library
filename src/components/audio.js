@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { Howl } from 'howler';
 import Media from './media.js';
 
@@ -10,56 +12,56 @@ class Audio extends Media {
   }
 
   play() {
-    var self = this,
-      delay = this.props.delay || 0,
-      state = skoash.trigger('getState');
+    var state = skoash.trigger('getState');
 
-    if (!self.state.ready) {
-      self.bootstrap();
-      setTimeout(
-        self.skoash.bind(self),
-        50
-      );
+    if (!this.state.ready) {
+      this.bootstrap();
     } else {
       skoash.trigger('audioPlay', {
-        audio: self
+        audio: this
       });
+      this.delayed = true;
 
       if (!state.paused) {
-        setTimeout(
-          self.playAudio.bind(self),
-          delay
+        this.timeout = setTimeout(
+          this.playAudio.bind(this),
+          this.props.delay
         );
       }
     }
   }
 
   playAudio() {
-    if (this.state.paused) {
-      return;
-    }
+    if (this.paused) return;
 
-    this.setState({
-      playing: true
-    });
+    this.delayed = false;
+    this.playing = true;
 
     this.audio.play();
     super.play();
   }
 
   pause() {
-    if (!this.state.playing) return;
+    if (this.delayed) {
+      clearTimeout(this.timeout);
+    }
+
+    if (!this.playing) return;
     this.audio.pause();
-    this.setState({
-      paused: true,
-    });
+    this.paused = true;
   }
 
   resume() {
-    if (!this.state.paused) return;
-    this.setState({
-      paused: false,
-    }, this.playAudio.bind(this));
+    if (this.delayed) {
+      this.timeout = setTimeout(
+        this.playAudio.bind(this),
+        this.props.delay
+      );
+    }
+
+    if (!this.paused) return;
+    this.paused = false;
+    this.playAudio();
   }
 
   stop() {
@@ -67,9 +69,7 @@ class Audio extends Media {
     skoash.trigger('audioStop', {
       audio: this
     });
-    this.setState({
-      playing: false
-    });
+    this.playing = false;
     this.audio.stop();
   }
 
@@ -92,17 +92,14 @@ class Audio extends Media {
       });
     }
 
-    this.setState({
-      playing: false
-    });
-
+    this.playing = false;
     super.complete();
   }
 
-  componentDidMount() {
+  bootstrap() {
     this.audio = new Howl({
-      src: [this.props.src],
-      loop: this.props.loop || false,
+      src: [].concat(this.props.src),
+      loop: this.props.loop,
       onend: this.complete,
       onload: this.ready
     });
@@ -111,5 +108,10 @@ class Audio extends Media {
     }
   }
 }
+
+Audio.defaultProps = _.defaults({
+  delay: 0,
+  loop: false,
+}, Media.defaultProps);
 
 export default Audio;

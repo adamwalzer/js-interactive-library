@@ -514,7 +514,11 @@ class Game extends Component {
 
     this.setState({
       data,
-    }, opts.callback);
+    }, () => {
+      if (typeof opts.callback === 'function') {
+        opts.callback.call(this);
+      }
+    });
   }
 
   audioPlay(opts) {
