@@ -65,6 +65,10 @@ class Audio extends Media {
   }
 
   stop() {
+    if (this.delayed) {
+      clearTimeout(this.timeout);
+    }
+
     if (!this.audio) return;
     skoash.trigger('audioStop', {
       audio: this
@@ -96,7 +100,12 @@ class Audio extends Media {
     super.complete();
   }
 
+  shouldComponentUpdate() {
+    return false;
+  }
+
   bootstrap() {
+    if (this.audio) return;
     this.audio = new Howl({
       urls: [].concat(this.props.src),
       loop: this.props.loop,

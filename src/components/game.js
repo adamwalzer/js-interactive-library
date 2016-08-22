@@ -38,6 +38,8 @@ class Game extends Component {
     skoash.trigger = this.trigger.bind(this);
 
     this.attachEvents();
+
+    window.g = this;
   }
 
   attachEvents() {
@@ -259,7 +261,7 @@ class Game extends Component {
     screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
-      if (!this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
+      if (!opts.ignoreComplete && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
@@ -480,8 +482,9 @@ class Game extends Component {
 
   load(opts) {
     if (opts.game === this.config.id && opts.highestScreenIndex) {
-      this.setState({
-        currentScreenIndex: opts.highestScreenIndex
+      this.goto({
+        index: opts.highestScreenIndex,
+        ignoreComplete: true,
       });
     }
   }
