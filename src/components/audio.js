@@ -98,7 +98,7 @@ class Audio extends Media {
 
   bootstrap() {
     this.audio = new Howl({
-      src: [].concat(this.props.src),
+      urls: [].concat(this.props.src),
       loop: this.props.loop,
       onend: this.complete,
       onload: this.ready
