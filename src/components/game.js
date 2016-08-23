@@ -261,7 +261,7 @@ class Game extends Component {
     screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
-      if (!opts.ignoreComplete && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
+      if (!this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
@@ -480,13 +480,22 @@ class Game extends Component {
     }
   }
 
-  load(opts) {
-    if (opts.game === this.config.id && opts.highestScreenIndex) {
-      this.goto({
-        index: opts.highestScreenIndex,
-        ignoreComplete: true,
-      });
-    }
+  load(opts) { // eslint-disable-line no-unused-vars
+    // AW 20160823
+    // I'm removing this for now since it doesn't work properly.
+    // I will fix it when it is priority.
+    // if (opts.game === this.config.id && opts.highestScreenIndex) {
+    //   this.setState({
+    //     currentScreenIndex: opts.highestScreenIndex
+    //   }, () => {
+    //     this.loadScreens();
+    //     for (var i = 0; i < opts.highestScreenIndex; i++) {
+    //       if (this.refs['screen-' + i]) {
+    //         this.refs['screen-' + i].completeRefs();
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   quit() {
