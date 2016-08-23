@@ -273,6 +273,12 @@ class Component extends React.Component {
     skoash.trigger('updateState', opts);
   }
 
+  componentWillReceiveProps(props) {
+    if (props.complete === true && props.complete !== this.props.complete) {
+      this.complete();
+    }
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
