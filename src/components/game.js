@@ -185,9 +185,9 @@ class Game extends Component {
       mobile: this.mobileOrTablet(),
     });
   }
-   /**
-    * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
-    */
+  /**
+   * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+   */
   iOS() {
     var iDevices = [
       'iPad Simulator',
@@ -676,15 +676,20 @@ class Game extends Component {
   }
 
   getStyles() {
-    var transformOrigin = '50% 0px 0px';
+    var transform, transformOrigin;
+
+    transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
+    transformOrigin = '50% 0px 0px';
 
     if (this.state.scale < 1) {
       transformOrigin = '0px 0px 0px';
     }
 
     return {
-      transform: 'scale3d(' + this.state.scale + ',' + this.state.scale + ',1)',
+      transform,
+      WebkitTransform: transform,
       transformOrigin,
+      WebkitTransformOrigin: transformOrigin,
     };
   }
 
