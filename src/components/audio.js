@@ -7,6 +7,9 @@ class Audio extends Media {
   constructor() {
     super();
 
+    this.startCount = 0;
+    this.completeCount = 0;
+
     this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
   }
@@ -38,6 +41,7 @@ class Audio extends Media {
     this.playing = true;
 
     this.audio.play();
+    this.startCount++;
     super.play();
   }
 
@@ -96,7 +100,10 @@ class Audio extends Media {
       });
     }
 
+    this.completeCount++;
+
     if (!this.props.complete && (!this.playing || this.paused)) return;
+    if (this.startCount > this.completeCount) return;
 
     this.playing = false;
     super.complete();
