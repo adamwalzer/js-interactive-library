@@ -96,6 +96,8 @@ class Audio extends Media {
       });
     }
 
+    if (!this.props.complete && (!this.playing || this.paused)) return;
+
     this.playing = false;
     super.complete();
   }
