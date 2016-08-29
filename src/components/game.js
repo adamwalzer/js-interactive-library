@@ -366,12 +366,17 @@ class Game extends Component {
   }
 
   playBackground(currentScreenIndex) {
-    var index, playingBKG;
+    var index, playingBKG, currentScreen;
+
+    if (!_.isFinite(currentScreenIndex)) return;
 
     index = this.getBackgroundIndex(currentScreenIndex);
     playingBKG = this.state.playingBKG;
 
-    if (playingBKG.indexOf(this.audio.background[index]) !== -1) {
+    currentScreen = this.refs['screen-' + currentScreenIndex];
+
+    if (!currentScreen.props.restartBackground &&
+      playingBKG.indexOf(this.audio.background[index]) !== -1) {
       return;
     }
 
