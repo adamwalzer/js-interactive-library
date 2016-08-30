@@ -35,7 +35,7 @@ class Screen extends Component {
   }
 
   next() {
-    if (this.state.leaving) return;
+    if (this.state.leaving || !this.state.complete) return;
 
     this.setState({
       leaving: true
