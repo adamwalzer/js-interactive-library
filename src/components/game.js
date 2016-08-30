@@ -163,7 +163,7 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      this.state.playingBKG.map(audio => {
+      this.state.playingBKG.forEach(audio => {
         audio[fnKey]();
       });
 
@@ -380,18 +380,13 @@ class Game extends Component {
       return;
     }
 
-    playingBKG = playingBKG.filter(bkg => {
+    _.each(playingBKG, bkg => {
       bkg.stop();
-      return false;
     });
 
-    this.setState({
-      playingBKG
-    }, () => {
-      if (this.audio.background[index]) {
-        this.audio.background[index].play();
-      }
-    });
+    if (this.audio.background[index]) {
+      this.audio.background[index].play();
+    }
   }
 
   scale() {
@@ -626,15 +621,17 @@ class Game extends Component {
   }
 
   fadeBackground(value) {
-    this.state.playingBKG.map(bkg => {
-      bkg.decreaseVolume(value);
+    if (typeof value !== 'number') value = .25;
+    this.state.playingBKG.forEach(bkg => {
+      bkg.setVolume(value);
     });
   }
 
   raiseBackground(value) {
+    if (typeof value !== 'number') value = 1;
     if (this.state.playingVO.length === 0) {
-      this.state.playingBKG.map(bkg => {
-        bkg.increaseVolume(value);
+      this.state.playingBKG.forEach(bkg => {
+        bkg.setVolume(value);
       });
     }
   }

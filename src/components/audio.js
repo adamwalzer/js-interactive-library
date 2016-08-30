@@ -35,14 +35,12 @@ class Audio extends Media {
   }
 
   playAudio() {
-    var play = this.props.sprite ? 'sprite' : undefined;
-
     if (this.paused) return;
 
     this.delayed = false;
     this.playing = true;
 
-    this.audio.play(play);
+    this.audio.play(this.sprite);
     this.startCount++;
     super.play();
   }
@@ -58,6 +56,10 @@ class Audio extends Media {
   }
 
   resume() {
+    var state = skoash.trigger('getState');
+
+    if (state.paused) return;
+
     if (this.delayed) {
       this.timeout = setTimeout(
         this.playAudio.bind(this),
@@ -80,19 +82,23 @@ class Audio extends Media {
       audio: this
     });
     this.playing = false;
-    this.audio.stop();
+    this.paused = false;
+    this.audio.stop(this.sprite);
   }
 
   setVolume(volume) {
+    volume = Math.min(this.props.maxVolume, Math.max(this.props.minVolume, volume));
     this.audio.volume(volume);
   }
 
   increaseVolume(volume) {
+    if (!this.playing) return;
     volume = Math.min(volume || this.props.volume, this.props.maxVolume);
     this.audio.fadeIn(volume);
   }
 
   decreaseVolume(volume) {
+    if (!this.playing) return;
     volume = Math.max(volume, this.props.minVolume);
     this.audio.fadeOut(volume);
   }
@@ -119,6 +125,8 @@ class Audio extends Media {
 
   bootstrap() {
     var sprite;
+
+    this.sprite = this.props.sprite ? 'sprite' : undefined;
 
     if (this.audio) return;
 
