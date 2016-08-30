@@ -81,16 +81,18 @@ class Audio extends Media {
     this.audio.stop();
   }
 
-  setVolume(value) {
-    this.audio.volume(value);
+  setVolume(volume) {
+    this.audio.volume(volume);
   }
 
-  increaseVolume(value) {
-    this.audio.fadeIn(value);
+  increaseVolume(volume) {
+    volume = Math.min(volume || this.props.volume, this.props.maxVolume);
+    this.audio.fadeIn(volume);
   }
 
-  decreaseVolume(value) {
-    this.audio.fadeOut(value);
+  decreaseVolume(volume) {
+    volume = Math.max(volume, this.props.minVolume);
+    this.audio.fadeOut(volume);
   }
 
   complete() {
@@ -118,6 +120,7 @@ class Audio extends Media {
     this.audio = new Howl({
       urls: [].concat(this.props.src),
       loop: this.props.loop,
+      volume: this.props.volume,
       onend: this.complete,
       onload: this.ready
     });
@@ -130,6 +133,9 @@ class Audio extends Media {
 Audio.defaultProps = _.defaults({
   delay: 0,
   loop: false,
+  volume: 1,
+  maxVolume: 1,
+  minVolume: 0,
 }, Media.defaultProps);
 
 export default Audio;

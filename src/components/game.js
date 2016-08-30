@@ -626,17 +626,15 @@ class Game extends Component {
   }
 
   fadeBackground(value) {
-    if (typeof value === 'undefined') value = .25;
     this.state.playingBKG.map(bkg => {
-      bkg.setVolume(value);
+      bkg.decreaseVolume(value);
     });
   }
 
   raiseBackground(value) {
-    if (typeof value === 'undefined') value = 1;
     if (this.state.playingVO.length === 0) {
       this.state.playingBKG.map(bkg => {
-        bkg.setVolume(value);
+        bkg.increaseVolume(value);
       });
     }
   }
