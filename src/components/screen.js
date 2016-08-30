@@ -35,7 +35,9 @@ class Screen extends Component {
   }
 
   next() {
-    if (this.state.leaving || !this.state.complete) return;
+    var state = skoash.trigger('getState');
+
+    if (this.state.leaving || (!state.demo && !this.state.complete)) return;
 
     this.setState({
       leaving: true

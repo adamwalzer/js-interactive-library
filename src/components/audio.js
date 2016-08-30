@@ -35,12 +35,14 @@ class Audio extends Media {
   }
 
   playAudio() {
+    var play = this.props.sprite ? 'sprite' : undefined;
+
     if (this.paused) return;
 
     this.delayed = false;
     this.playing = true;
 
-    this.audio.play();
+    this.audio.play(play);
     this.startCount++;
     super.play();
   }
@@ -116,13 +118,23 @@ class Audio extends Media {
   }
 
   bootstrap() {
+    var sprite;
+
     if (this.audio) return;
+
+    if (this.props.sprite) {
+      sprite = {
+        sprite: this.props.sprite
+      };
+    }
+
     this.audio = new Howl({
       urls: [].concat(this.props.src),
       loop: this.props.loop,
       volume: this.props.volume,
       onend: this.complete,
-      onload: this.ready
+      onload: this.ready,
+      sprite,
     });
     if (this.props.complete) {
       this.complete();
@@ -136,6 +148,7 @@ Audio.defaultProps = _.defaults({
   volume: 1,
   maxVolume: 1,
   minVolume: 0,
+  sprite: undefined,
 }, Media.defaultProps);
 
 export default Audio;
