@@ -422,6 +422,7 @@ class Game extends Component {
       save: this.load,
       complete: this.checkComplete,
       incomplete: this.checkComplete,
+      resize: this.scale,
     };
 
     fn = events[event];
