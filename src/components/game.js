@@ -55,11 +55,11 @@ class Game extends Component {
       self.scale();
     });
     window.addEventListener('orientationchange', () => {
-      window.onresize();
+      window.dispatchEvent(new Event('resize'));
     });
     if (window.parent) {
       window.parent.addEventListener('orientationchange', () => {
-        window.onresize();
+        window.dispatchEvent(new Event('orientationchange'));
       });
     }
 
