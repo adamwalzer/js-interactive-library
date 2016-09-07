@@ -118,7 +118,7 @@ class Game extends Component {
   }
 
   loadScreens() {
-    var firstScreen, secondScreen, self = this;
+    var firstScreen, secondScreen;
 
     firstScreen = this.refs['screen-' + this.state.currentScreenIndex];
     secondScreen = this.refs['screen-' + this.state.currentScreenIndex + 1];
@@ -127,7 +127,7 @@ class Game extends Component {
     if (secondScreen) secondScreen.load();
 
     setTimeout(() => {
-      self.checkReady();
+      this.checkReady();
     }, 0);
   }
 
@@ -483,18 +483,18 @@ class Game extends Component {
     // AW 20160823
     // I'm removing this for now since it doesn't work properly.
     // I will fix it when it is priority.
-    // if (opts.game === this.config.id && opts.highestScreenIndex) {
-    //   this.setState({
-    //     currentScreenIndex: opts.highestScreenIndex
-    //   }, () => {
-    //     this.loadScreens();
-    //     for (var i = 0; i < opts.highestScreenIndex; i++) {
-    //       if (this.refs['screen-' + i]) {
-    //         this.refs['screen-' + i].completeRefs();
-    //       }
-    //     }
-    //   });
-    // }
+    if (opts.game === this.config.id && opts.highestScreenIndex) {
+      this.setState({
+        currentScreenIndex: opts.highestScreenIndex
+      }, () => {
+        this.loadScreens();
+        // for (var i = 0; i < opts.highestScreenIndex; i++) {
+        //   if (this.refs['screen-' + i]) {
+        //     this.refs['screen-' + i].completeRefs();
+        //   }
+        // }
+      });
+    }
   }
 
   quit() {
