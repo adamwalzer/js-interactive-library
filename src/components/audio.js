@@ -12,16 +12,16 @@ class Audio extends Media {
   play() {
     var self = this,
       delay = this.props.delay || 0,
-      state = play.trigger('getState');
+      state = skoash.trigger('getState');
 
     if (!self.state.ready) {
       self.bootstrap();
       setTimeout(
-        self.play.bind(self),
+        self.skoash.bind(self),
         50
       );
     } else {
-      play.trigger('audioPlay', {
+      skoash.trigger('audioPlay', {
         audio: self
       });
 
@@ -44,6 +44,7 @@ class Audio extends Media {
     });
 
     this.audio.play();
+    super.play();
   }
 
   pause() {
@@ -56,17 +57,14 @@ class Audio extends Media {
 
   resume() {
     if (!this.state.paused) return;
-    this.setState(
-      {
-        paused: false,
-      },
-      this.playAudio.bind(this)
-    );
+    this.setState({
+      paused: false,
+    }, this.playAudio.bind(this));
   }
 
   stop() {
     if (!this.audio) return;
-    play.trigger('audioStop', {
+    skoash.trigger('audioStop', {
       audio: this
     });
     this.setState({
@@ -89,7 +87,7 @@ class Audio extends Media {
 
   complete() {
     if (!this.props.loop) {
-      play.trigger('audioStop', {
+      skoash.trigger('audioStop', {
         audio: this
       });
     }
@@ -103,7 +101,7 @@ class Audio extends Media {
 
   componentDidMount() {
     this.audio = new Howl({
-      src: this.props.src,
+      src: [this.props.src],
       loop: this.props.loop || false,
       onend: this.complete,
       onload: this.ready

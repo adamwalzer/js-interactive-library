@@ -8,6 +8,7 @@ class Video extends Media {
   play() {
     if (this.state.playing) return;
     this.el.play();
+    super.play();
     play.trigger('videoPlay', {
       video: this
     });

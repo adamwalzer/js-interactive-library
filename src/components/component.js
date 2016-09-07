@@ -11,25 +11,53 @@ class Component extends React.Component {
     };
   }
 
+  callProp(action, opts) {
+    if (typeof this.props[action] === 'function') {
+      this.props[action].call(this, opts);
+    }
+  }
+
   complete() {
     setTimeout(() => {
       this.setState({
         complete: true,
       }, () => {
         skoash.trigger('complete');
-      });
 
-      if (typeof this.props.onComplete === 'function') {
-        this.props.onComplete.call(this, this);
-      }
+        if (typeof this.props.onComplete === 'function') {
+          this.props.onComplete.call(this, this);
+        }
+      });
     }, this.props.completeDelay);
   }
 
   incomplete() {
+    if (!this.state.complete || this.props.complete) return;
+
     this.setState({
       complete: false,
     }, () => {
       skoash.trigger('incomplete');
+    });
+  }
+
+  completeRefs() {
+    this.complete({silent: true});
+
+    _.forEach(this.refs, ref => {
+      if (typeof ref.completeRefs === 'function') {
+        ref.completeRefs();
+      }
+    });
+  }
+
+  incompleteRefs() {
+    this.incomplete();
+
+    _.forEach(this.refs, ref => {
+      if (typeof ref.incompleteRefs === 'function') {
+        ref.incompleteRefs();
+      }
     });
   }
 
@@ -49,6 +77,10 @@ class Component extends React.Component {
     _.each(this.refs, ref => {
       if (typeof ref.start === 'function') ref.start();
     });
+
+    if (this.props.completeOnStart) {
+      this.complete();
+    }
   }
 
   stop() {
@@ -212,7 +244,7 @@ class Component extends React.Component {
   checkComplete() {
     var self = this, complete;
 
-    if (!self.props.checkComplete || !self.requireForComplete) return;
+    if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
 
     self.requireForComplete.forEach(key => {
       if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
@@ -277,11 +309,13 @@ class Component extends React.Component {
 }
 
 Component.defaultProps = {
-  type: 'div',
-  shouldRender: true,
+  bootstrap: true,
   checkComplete: true,
   checkReady: true,
   completeDelay: 0,
+  completeOnStart: false,
+  shouldRender: true,
+  type: 'div',
 };
 
 export default Component;

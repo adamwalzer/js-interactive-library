@@ -57,6 +57,11 @@ class Game extends Component {
     window.addEventListener('orientationchange', () => {
       window.onresize();
     });
+    if (window.parent) {
+      window.parent.addEventListener('orientationchange', () => {
+        window.onresize();
+      });
+    }
 
     window.addEventListener('keydown', function (e) {
       self.onKeyUp(e);
@@ -157,29 +162,16 @@ class Game extends Component {
 
     this.setState({
       paused
+    }, () => {
+      this.state.playingBKG.map(audio => {
+        audio[fnKey]();
+      });
+
+      openScreen = this.refs['screen-' + this.state.currentScreenIndex];
+      if (openScreen && typeof openScreen[fnKey] === 'function') {
+        openScreen[fnKey]();
+      }
     });
-
-    if (this.state.playingVideo) {
-      this.state.playingVideo[fnKey]();
-      return;
-    }
-
-    this.state.playingSFX.map(audio => {
-      audio[fnKey]();
-    });
-
-    this.state.playingVO.map(audio => {
-      audio[fnKey]();
-    });
-
-    this.state.playingBKG.map(audio => {
-      audio[fnKey]();
-    });
-
-    openScreen = this.refs['screen-' + this.state.currentScreenIndex];
-    if (openScreen && typeof openScreen[fnKey] === 'function') {
-      openScreen[fnKey]();
-    }
   }
 
   /**
@@ -240,9 +232,18 @@ class Game extends Component {
      * highestScreenIndex is the index of the highest screen reached
      * not the index of the highest screen that exists.
      */
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen, highestScreenIndex, screenIndexArray;
+    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
+      highestScreenIndex, screenIndexArray, data;
+
+    data = this.state.data;
+
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
+
+    if (oldScreen && oldScreen.state && oldScreen.state.opening) {
+      return;
+    }
+
     if (typeof opts.index === 'number') {
       if (opts.index > this.screensLength - 1) {
         return this.quit();
@@ -258,7 +259,7 @@ class Game extends Component {
     screenIndexArray = this.state.screenIndexArray;
 
     if (oldScreen.props.index < newScreen.props.index) {
-      if (!this.state.demo && !oldScreen.state.complete) {
+      if (!this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
@@ -284,6 +285,11 @@ class Game extends Component {
       } else {
         oldScreen.leave();
       }
+
+      if (oldScreen.props.resetOnClose) {
+        data = _.cloneDeep(this.state.data);
+        data.screens[oldIndex] = {};
+      }
     }
 
     if (nextScreen) {
@@ -296,6 +302,7 @@ class Game extends Component {
       highestScreenIndex,
       screenIndexArray,
       classes: [],
+      data,
     });
 
     this.emitSave(highestScreenIndex, currentScreenIndex);
@@ -322,7 +329,7 @@ class Game extends Component {
   }
 
   openMenu(opts) {
-    var menu, openMenus;
+    var menu, openMenus, screen;
 
     menu = this.refs['menu-' + opts.id];
 
@@ -330,20 +337,28 @@ class Game extends Component {
       menu.open();
       openMenus = this.state.openMenus || [];
       openMenus.push(opts.id);
+      if (this.media.button) this.media.button.play();
       this.setState({
         openMenus,
       });
     }
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (screen) screen.pause();
   }
 
   menuClose(opts) {
-    var openMenus;
+    var openMenus, screen;
 
     openMenus = this.state.openMenus || [];
     openMenus.splice(opts.id, 1);
+    if (this.media.button) this.media.button.play();
     this.setState({
       openMenus,
     });
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    if (screen && !openMenus.length) screen.resume();
   }
 
   getBackgroundIndex() {
