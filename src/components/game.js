@@ -38,6 +38,8 @@ class Game extends Component {
     skoash.trigger = this.trigger.bind(this);
 
     this.attachEvents();
+
+    window.g = this;
   }
 
   attachEvents() {
@@ -117,17 +119,27 @@ class Game extends Component {
     self.loadScreens();
   }
 
-  loadScreens() {
+  loadScreens(currentScreenIndex) {
     var firstScreen, secondScreen;
 
-    firstScreen = this.refs['screen-' + this.state.currentScreenIndex];
-    secondScreen = this.refs['screen-' + this.state.currentScreenIndex + 1];
+    if (!_.isFinite(currentScreenIndex)) currentScreenIndex = this.state.currentScreenIndex;
+
+    firstScreen = this.refs['screen-' + currentScreenIndex];
+    secondScreen = this.refs['screen-' + currentScreenIndex + 1];
 
     if (firstScreen) firstScreen.load();
     if (secondScreen) secondScreen.load();
 
     setTimeout(() => {
-      this.checkReady();
+      if (!this.state.ready) {
+        this.checkReady();
+      }
+
+      this.goto({
+        index: currentScreenIndex,
+        load: true,
+        silent: true,
+      });
     }, 0);
   }
 
@@ -236,14 +248,14 @@ class Game extends Component {
       highestScreenIndex, screenIndexArray, data;
 
     data = this.state.data;
-
+    console.log(249);
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
-
-    if (oldScreen && oldScreen.state && oldScreen.state.opening) {
+    if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
       return;
     }
 
+    console.log(256);
     if (typeof opts.index === 'number') {
       if (opts.index > this.screensLength - 1) {
         return this.quit();
@@ -258,27 +270,31 @@ class Game extends Component {
     newScreen = this.refs['screen-' + currentScreenIndex];
     screenIndexArray = this.state.screenIndexArray;
 
+    console.log(271);
     if (oldScreen.props.index < newScreen.props.index) {
-      if (!this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
+      if (!opts.load && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
 
+    console.log(278);
     if (oldScreen.props.index > newScreen.props.index) {
       if (newScreen.props.index === 0) {
         return;
       }
     }
 
+    console.log(285);
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
-        this.loadScreens();
+        this.loadScreens(currentScreenIndex);
       }
       screenIndexArray.push(currentScreenIndex);
       newScreen.open(opts);
     }
 
+    console.log(295);
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
         oldScreen.close();
@@ -296,6 +312,7 @@ class Game extends Component {
       nextScreen.load();
     }
 
+    console.log(313);
     this.setState({
       loading: false,
       currentScreenIndex,
@@ -305,7 +322,9 @@ class Game extends Component {
       data,
     });
 
-    this.emitSave(highestScreenIndex, currentScreenIndex);
+    if (!opts.load) {
+      this.emitSave(highestScreenIndex, currentScreenIndex);
+    }
 
     if (!opts.silent) {
       if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
@@ -319,6 +338,7 @@ class Game extends Component {
   }
 
   emitSave(highestScreenIndex, currentScreenIndex) {
+    if (highestScreenIndex < 2) return;
     this.emit({
       name: 'save',
       game: this.config.id,
@@ -433,7 +453,7 @@ class Game extends Component {
 
   emit(gameData) {
     var p, self = this;
-
+    console.log('emit', gameData);
     p = new Promise((resolve) => {
       var event;
 
@@ -483,17 +503,20 @@ class Game extends Component {
     // AW 20160823
     // I'm removing this for now since it doesn't work properly.
     // I will fix it when it is priority.
-    if (opts.game === this.config.id && opts.highestScreenIndex) {
-      this.setState({
-        currentScreenIndex: opts.highestScreenIndex
-      }, () => {
-        this.loadScreens();
-        // for (var i = 0; i < opts.highestScreenIndex; i++) {
-        //   if (this.refs['screen-' + i]) {
-        //     this.refs['screen-' + i].completeRefs();
-        //   }
-        // }
-      });
+    if (opts.game === this.config.id &&
+      opts.version === this.config.version &&
+      opts.highestScreenIndex) {
+      // this.setState({
+      //   currentScreenIndex: opts.highestScreenIndex
+      // }, () => {
+        console.log('load', opts);
+        this.loadScreens(opts.highestScreenIndex);
+        for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
+          if (this.refs['screen-' + i]) {
+            this.refs['screen-' + i].completeRefs();
+          }
+        }
+      // });
     }
   }
 

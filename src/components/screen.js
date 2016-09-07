@@ -140,10 +140,10 @@ class Screen extends Component {
     setTimeout(() => {
       if (!self.state.started) {
         self.start();
-        self.setState({
-          opening: false
-        });
       }
+      self.setState({
+        opening: false
+      });
     }, this.props.startDelay);
 
     if (typeof this.props.onOpen === 'function') {
