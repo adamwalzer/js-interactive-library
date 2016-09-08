@@ -244,18 +244,16 @@ class Game extends Component {
      * highestScreenIndex is the index of the highest screen reached
      * not the index of the highest screen that exists.
      */
-    var oldScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
+    var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
       highestScreenIndex, screenIndexArray, data;
 
     data = this.state.data;
-    console.log(249);
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
     if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
       return;
     }
 
-    console.log(256);
     if (typeof opts.index === 'number') {
       if (opts.index > this.screensLength - 1) {
         return this.quit();
@@ -268,23 +266,21 @@ class Game extends Component {
       highestScreenIndex = this.state.highestScreenIndex;
     }
     newScreen = this.refs['screen-' + currentScreenIndex];
+    prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
     screenIndexArray = this.state.screenIndexArray;
 
-    console.log(271);
     if (oldScreen.props.index < newScreen.props.index) {
       if (!opts.load && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
         return;
       }
     }
 
-    console.log(278);
     if (oldScreen.props.index > newScreen.props.index) {
       if (newScreen.props.index === 0) {
         return;
       }
     }
 
-    console.log(285);
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
@@ -294,7 +290,8 @@ class Game extends Component {
       newScreen.open(opts);
     }
 
-    console.log(295);
+    if(prevScreen) prevScreen.replay();
+
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
         oldScreen.close();
@@ -312,7 +309,6 @@ class Game extends Component {
       nextScreen.load();
     }
 
-    console.log(313);
     this.setState({
       loading: false,
       currentScreenIndex,
@@ -453,7 +449,6 @@ class Game extends Component {
 
   emit(gameData) {
     var p, self = this;
-    console.log('emit', gameData);
     p = new Promise((resolve) => {
       var event;
 
@@ -499,24 +494,16 @@ class Game extends Component {
     }
   }
 
-  load(opts) { // eslint-disable-line no-unused-vars
-    // AW 20160823
-    // I'm removing this for now since it doesn't work properly.
-    // I will fix it when it is priority.
+  load(opts) {
     if (opts.game === this.config.id &&
       opts.version === this.config.version &&
       opts.highestScreenIndex) {
-      // this.setState({
-      //   currentScreenIndex: opts.highestScreenIndex
-      // }, () => {
-        console.log('load', opts);
-        this.loadScreens(opts.highestScreenIndex);
-        for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
-          if (this.refs['screen-' + i]) {
-            this.refs['screen-' + i].completeRefs();
-          }
+      this.loadScreens(opts.highestScreenIndex);
+      for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
+        if (this.refs['screen-' + i]) {
+          this.refs['screen-' + i].completeRefs();
         }
-      // });
+      }
     }
   }
 
