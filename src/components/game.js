@@ -498,6 +498,7 @@ class Game extends Component {
     if (opts.game === this.config.id &&
       opts.version === this.config.version &&
       opts.highestScreenIndex) {
+      if (opts.highestScreenIndex === this.screensLength - 1) return;
       this.loadScreens(opts.highestScreenIndex);
       for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
         if (this.refs['screen-' + i]) {
