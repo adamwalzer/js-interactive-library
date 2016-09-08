@@ -119,7 +119,7 @@ class Game extends Component {
     self.loadScreens();
   }
 
-  loadScreens(currentScreenIndex) {
+  loadScreens(currentScreenIndex, goto = true) {
     var firstScreen, secondScreen;
 
     if (!_.isFinite(currentScreenIndex)) currentScreenIndex = this.state.currentScreenIndex;
@@ -135,11 +135,13 @@ class Game extends Component {
         this.checkReady();
       }
 
-      this.goto({
-        index: currentScreenIndex,
-        load: true,
-        silent: true,
-      });
+      if (goto) {
+        this.goto({
+          index: currentScreenIndex,
+          load: true,
+          silent: true,
+        });
+      }
     }, 0);
   }
 
@@ -284,7 +286,7 @@ class Game extends Component {
     if (newScreen) {
       // this should never be dropped into
       if (!newScreen.state.load || !newScreen.state.ready) {
-        this.loadScreens(currentScreenIndex);
+        this.loadScreens(currentScreenIndex, false);
       }
       screenIndexArray.push(currentScreenIndex);
       newScreen.open(opts);
