@@ -290,7 +290,7 @@ class Game extends Component {
       newScreen.open(opts);
     }
 
-    if(prevScreen) prevScreen.replay();
+    if (prevScreen) prevScreen.replay();
 
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
