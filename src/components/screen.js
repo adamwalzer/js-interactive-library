@@ -66,6 +66,12 @@ class Screen extends Component {
     }
   }
 
+  bootstrap() {
+    super.bootstrap();
+
+    if (this.props.load) this.load();
+  }
+
   replay(replay = true) {
     this.setState({
       replay,
