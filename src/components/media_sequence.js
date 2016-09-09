@@ -28,7 +28,7 @@ class MediaSequence extends Component {
 
   playNext() {
     var next = this.refs[++this.playingIndex];
-    if (next) next.play();
+    if (next && this.state.started) next.play();
   }
 
   renderContentList() {

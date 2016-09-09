@@ -55,11 +55,11 @@ class Game extends Component {
       self.scale();
     });
     window.addEventListener('orientationchange', () => {
-      window.onresize();
+      window.dispatchEvent(new Event('resize'));
     });
     if (window.parent) {
       window.parent.addEventListener('orientationchange', () => {
-        window.onresize();
+        window.dispatchEvent(new Event('orientationchange'));
       });
     }
 
@@ -163,7 +163,7 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      this.state.playingBKG.map(audio => {
+      this.state.playingBKG.forEach(audio => {
         audio[fnKey]();
       });
 
@@ -183,9 +183,9 @@ class Game extends Component {
       mobile: this.mobileOrTablet(),
     });
   }
-   /**
-    * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
-    */
+  /**
+   * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+   */
   iOS() {
     var iDevices = [
       'iPad Simulator',
@@ -366,27 +366,27 @@ class Game extends Component {
   }
 
   playBackground(currentScreenIndex) {
-    var index, playingBKG;
+    var index, playingBKG, currentScreen;
+
+    if (!_.isFinite(currentScreenIndex)) return;
 
     index = this.getBackgroundIndex(currentScreenIndex);
     playingBKG = this.state.playingBKG;
 
-    if (playingBKG.indexOf(this.audio.background[index]) !== -1) {
+    currentScreen = this.refs['screen-' + currentScreenIndex];
+
+    if (!currentScreen.props.restartBackground &&
+      playingBKG.indexOf(this.audio.background[index]) !== -1) {
       return;
     }
 
-    playingBKG = playingBKG.filter(bkg => {
+    _.each(playingBKG, bkg => {
       bkg.stop();
-      return false;
     });
 
-    this.setState({
-      playingBKG
-    }, () => {
-      if (this.audio.background[index]) {
-        this.audio.background[index].play();
-      }
-    });
+    if (this.audio.background[index]) {
+      this.audio.background[index].play();
+    }
   }
 
   scale() {
@@ -422,6 +422,7 @@ class Game extends Component {
       save: this.load,
       complete: this.checkComplete,
       incomplete: this.checkComplete,
+      resize: this.scale,
     };
 
     fn = events[event];
@@ -478,12 +479,22 @@ class Game extends Component {
     }
   }
 
-  load(opts) {
-    if (opts.game === this.config.id && opts.highestScreenIndex) {
-      this.setState({
-        currentScreenIndex: opts.highestScreenIndex
-      });
-    }
+  load(opts) { // eslint-disable-line no-unused-vars
+    // AW 20160823
+    // I'm removing this for now since it doesn't work properly.
+    // I will fix it when it is priority.
+    // if (opts.game === this.config.id && opts.highestScreenIndex) {
+    //   this.setState({
+    //     currentScreenIndex: opts.highestScreenIndex
+    //   }, () => {
+    //     this.loadScreens();
+    //     for (var i = 0; i < opts.highestScreenIndex; i++) {
+    //       if (this.refs['screen-' + i]) {
+    //         this.refs['screen-' + i].completeRefs();
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   quit() {
@@ -514,7 +525,11 @@ class Game extends Component {
 
     this.setState({
       data,
-    }, opts.callback);
+    }, () => {
+      if (typeof opts.callback === 'function') {
+        opts.callback.call(this);
+      }
+    });
   }
 
   audioPlay(opts) {
@@ -607,16 +622,16 @@ class Game extends Component {
   }
 
   fadeBackground(value) {
-    if (typeof value === 'undefined') value = .25;
-    this.state.playingBKG.map(bkg => {
+    if (typeof value !== 'number') value = .25;
+    this.state.playingBKG.forEach(bkg => {
       bkg.setVolume(value);
     });
   }
 
   raiseBackground(value) {
-    if (typeof value === 'undefined') value = 1;
+    if (typeof value !== 'number') value = 1;
     if (this.state.playingVO.length === 0) {
-      this.state.playingBKG.map(bkg => {
+      this.state.playingBKG.forEach(bkg => {
         bkg.setVolume(value);
       });
     }
@@ -660,15 +675,20 @@ class Game extends Component {
   }
 
   getStyles() {
-    var transformOrigin = '50% 0px 0px';
+    var transform, transformOrigin;
+
+    transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
+    transformOrigin = '50% 0px 0px';
 
     if (this.state.scale < 1) {
       transformOrigin = '0px 0px 0px';
     }
 
     return {
-      transform: 'scale3d(' + this.state.scale + ',' + this.state.scale + ',1)',
+      transform,
+      WebkitTransform: transform,
       transformOrigin,
+      WebkitTransformOrigin: transformOrigin,
     };
   }
 

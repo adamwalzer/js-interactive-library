@@ -12,6 +12,9 @@ class Media extends Asset {
   }
 
   play() {
+    // this should be implemented per media
+    // and the class that extends media should
+    // call super.play() inside if its play method
     if (this.props.playTarget) {
       this.updateGameState({
         path: this.props.playTarget,

@@ -35,7 +35,9 @@ class Screen extends Component {
   }
 
   next() {
-    if (this.state.leaving) return;
+    var state = skoash.trigger('getState');
+
+    if (this.state.leaving || (!state.demo && !this.state.complete)) return;
 
     this.setState({
       leaving: true
@@ -170,55 +172,11 @@ class Screen extends Component {
   }
 
   collectData() {
-    var data = {};
-    if (!this.refs) return data;
-    if (this.refs['selectable-reveal']) {
-      data = [];
-      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
-        _.forIn(this.refs['selectable-reveal'].refs.selectable.refs, (ref) => {
-          if (_.includes(ref.props.className, 'SELECTED') || _.includes(ref.props.className, 'HIGHLIGHTED')) data.push(ref.props['data-ref']);
-        });
-      }
-    } else if (this.refs['dropzone-reveal']) {
-      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
-        _.forIn(this.refs['dropzone-reveal'].refs.dropzone.refs, (ref, key) => {
-          if (key.indexOf('dropzone-') === -1 || !ref.state.content) return;
-          if (this.props.multipleAnswers) {
-            data[key] = [];
-            _.forIn(ref.state.content, (ref2) => {
-              data[key].push(ref2.props.message);
-            });
-          } else {
-            data[key] = {
-              ref: ref.state.content.props.message,
-              state: ref.state.content.state
-            };
-          }
-        });
-      }
-    }
-    return data;
+    return this.callProp('collectData');
   }
 
   loadData() {
-    var loadData = {};
-    if (!this.refs || !this.metaData) return;
-    if (this.refs['selectable-reveal']) {
-      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
-        _.forEach(this.metaData, (ref) => {
-          loadData[ref] = this.refs['selectable-reveal'].props.selectableSelectClass || this.refs['selectable-reveal'].refs.selectable.state.selectClass;
-          this.refs['selectable-reveal'].refs.selectable.loadData = loadData;
-        });
-      }
-    }
-
-    if (this.refs['dropzone-reveal']) {
-      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
-        this.refs['dropzone-reveal'].refs.dropzone.loadData = this.metaData;
-      }
-    }
-
-    this.completeRefs();
+    return this.callProp('loadData');
   }
 
   getClassNames() {
