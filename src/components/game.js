@@ -738,7 +738,13 @@ class Game extends Component {
 
   renderMenuScreens() {
     return _.map(this.menus, (Menu, key) =>
-      <Menu.type {...Menu.props} key={key} index={key} ref={'menu-' + key} />
+      <Menu.type
+        {...Menu.props}
+        gameState={this.state}
+        key={key}
+        index={key}
+        ref={'menu-' + key}
+      />
     );
   }
 
