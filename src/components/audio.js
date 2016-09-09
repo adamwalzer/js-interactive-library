@@ -73,7 +73,7 @@ class Audio extends Media {
   }
 
   stop() {
-    if (this.delayed) {
+    if (this.delayed && this.timeout) {
       clearTimeout(this.timeout);
     }
 
