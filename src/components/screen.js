@@ -35,7 +35,7 @@ class Screen extends Component {
   }
 
   next() {
-    var state = skoash.trigger('getState');
+    var state = this.props.gameState;
 
     if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 

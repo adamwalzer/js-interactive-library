@@ -35,8 +35,6 @@ class Game extends Component {
       classes: [],
     };
 
-    skoash.trigger = this.trigger.bind(this);
-
     this.attachEvents();
   }
 
@@ -69,6 +67,10 @@ class Game extends Component {
 
     window.addEventListener('platform-event', function (e) {
       self.trigger(e.name, e.gameData);
+    });
+
+    window.addEventListener('trigger', function (e) {
+      self.trigger(e.name, e.opts);
     });
   }
 

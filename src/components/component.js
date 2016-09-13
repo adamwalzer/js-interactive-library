@@ -295,6 +295,7 @@ class Component extends React.Component {
       var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
       return (
         <component.type
+          gameState={this.props.gameState}
           {...component.props}
           ref={ref}
           key={key}

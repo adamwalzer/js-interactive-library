@@ -15,23 +15,23 @@ class Audio extends Media {
   }
 
   play() {
-    var state = skoash.trigger('getState');
+    skoash.trigger('getState').then(state => {
+      if (!this.state.ready) {
+        this.bootstrap();
+      } else {
+        skoash.trigger('audioPlay', {
+          audio: this
+        });
+        this.delayed = true;
 
-    if (!this.state.ready) {
-      this.bootstrap();
-    } else {
-      skoash.trigger('audioPlay', {
-        audio: this
-      });
-      this.delayed = true;
-
-      if (!state.paused) {
-        this.timeout = setTimeout(
-          this.playAudio.bind(this),
-          this.props.delay
-        );
+        if (!state.paused) {
+          this.timeout = setTimeout(
+            this.playAudio.bind(this),
+            this.props.delay
+          );
+        }
       }
-    }
+    });
   }
 
   playAudio() {
@@ -56,20 +56,20 @@ class Audio extends Media {
   }
 
   resume() {
-    var state = skoash.trigger('getState');
+    skoash.trigger('getState').then(state => {
+      if (state.paused) return;
 
-    if (state.paused) return;
+      if (this.delayed) {
+        this.timeout = setTimeout(
+          this.playAudio.bind(this),
+          this.props.delay
+        );
+      }
 
-    if (this.delayed) {
-      this.timeout = setTimeout(
-        this.playAudio.bind(this),
-        this.props.delay
-      );
-    }
-
-    if (!this.paused) return;
-    this.paused = false;
-    this.playAudio();
+      if (!this.paused) return;
+      this.paused = false;
+      this.playAudio();
+    });
   }
 
   stop() {

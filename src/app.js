@@ -8,6 +8,7 @@ import MediaSequence from 'components/media_sequence';
 import ListItem from 'components/list_item';
 
 import start from 'methods/start';
+import trigger from 'methods/trigger';
 import util from 'methods/util';
 
 // Keeping window.play for now as to not break games.
@@ -23,6 +24,7 @@ window.play = window.skoash = {
   Video,
   ListItem,
   start,
+  trigger,
   util,
 };
 
