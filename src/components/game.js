@@ -249,7 +249,7 @@ class Game extends Component {
      * not the index of the highest screen that exists.
      */
     var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
-      highestScreenIndex, screenIndexArray, data;
+      highestScreenIndex, screenIndexArray, data, back = false, buttonSound;
 
     data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
@@ -298,6 +298,7 @@ class Game extends Component {
 
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
+        back = true;
         oldScreen.close();
       } else {
         oldScreen.leave();
@@ -328,10 +329,12 @@ class Game extends Component {
 
     if (!opts.silent) {
       if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
-        opts.buttonSound.play();
+        buttonSound = opts.buttonSound;
       } else if (this.audio.button) {
-        this.audio.button.play();
+        buttonSound = this.audio.next || this.audio.button;
+        if (back) buttonSound = this.audio.back || this.audio.button;
       }
+      if (buttonSound) buttonSound.play();
     }
 
     this.playBackground(currentScreenIndex);
