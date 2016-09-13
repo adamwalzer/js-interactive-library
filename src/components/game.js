@@ -7,10 +7,10 @@ import Component from 'components/component';
 import Screen from 'components/screen';
 
 class Game extends Component {
-  constructor(config) {
+  constructor(props = {}) {
     super();
 
-    this.config = config;
+    this.config = props.config ? props.config : props;
 
     this.screens = {
       0: <Screen />
