@@ -12,11 +12,11 @@ class Game extends Component {
 
     this.config = props.config ? props.config : props;
 
-    this.screens = {
+    this.screens = props.screens || {
       0: <Screen />
     };
 
-    this.menus = {
+    this.menus = props.menus || {
       Screen
     };
 
@@ -722,17 +722,16 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screens, screenKeys, self = this;
-    screens = self.props.screens || self.screens;
-    screenKeys = Object.keys(screens);
+    var screenKeys, self = this;
+    screenKeys = Object.keys(self.screens);
     self.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
       var ScreenComponent, props;
-      props = screens[key].props || {};
+      props = self.screens[key].props || {};
       props.data = self.state.data.screens[key];
       props.gameState = self.state;
       props.index = index;
-      ScreenComponent = screens[key];
+      ScreenComponent = self.screens[key];
       return ScreenComponent(props, 'screen-' + key, key);
     });
   }
@@ -765,6 +764,20 @@ class Game extends Component {
 Game.defaultProps = _.defaults({
   getBackgroundIndex: () => 0,
   passData: _.identity,
+  screens: {
+    0: function (props, ref, key) {
+      return (
+        <Screen
+          {...props}
+          ref={ref}
+          key={key}
+        />
+      );
+    }
+  },
+  menus: {
+    Screen
+  }
 }, Component.defaultProps);
 
 export default Game;
