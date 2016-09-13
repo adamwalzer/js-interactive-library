@@ -35,6 +35,8 @@ class Game extends Component {
       classes: [],
     };
 
+    this.state.data.screens = _.map(this.screens, () => ({}));
+
     this.attachEvents();
   }
 
