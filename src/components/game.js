@@ -379,8 +379,8 @@ class Game extends Component {
     if (screen && !openMenus.length) screen.resume();
   }
 
-  getBackgroundIndex() {
-    return 0;
+  getBackgroundIndex(index) {
+    return this.props.getBackgroundIndex.call(this, index);
   }
 
   playBackground(currentScreenIndex) {
@@ -491,9 +491,7 @@ class Game extends Component {
 
   passData() {
     // this should be implemented per game
-    if (typeof this.props.passData === 'function') {
-      this.props.passData.apply(this, arguments);
-    }
+    return this.props.passData.apply(this, arguments);
   }
 
   load(opts) {
@@ -706,11 +704,11 @@ class Game extends Component {
   }
 
   renderLoader() {
-    return null;
+    return this.renderContentList('loader');
   }
 
   renderAssets() {
-    return null;
+    return this.renderContentList('assets');
   }
 
   renderMenu() {
@@ -761,5 +759,10 @@ class Game extends Component {
     );
   }
 }
+
+Game.defaultProps = _.defaults({
+  getBackgroundIndex: () => 0,
+  passData: _.identity,
+}, Component.defaultProps);
 
 export default Game;
