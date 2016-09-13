@@ -12,6 +12,7 @@ class Audio extends Media {
 
     this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
+    this.playAudio = this.playAudio.bind(this);
   }
 
   play() {
@@ -26,7 +27,7 @@ class Audio extends Media {
 
         if (!state.paused) {
           this.timeout = setTimeout(
-            this.playAudio.bind(this),
+            this.playAudio,
             this.props.delay
           );
         }
@@ -61,7 +62,7 @@ class Audio extends Media {
 
       if (this.delayed) {
         this.timeout = setTimeout(
-          this.playAudio.bind(this),
+          this.playAudio,
           this.props.delay
         );
       }

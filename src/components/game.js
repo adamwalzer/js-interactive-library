@@ -38,6 +38,8 @@ class Game extends Component {
     this.state.data.screens = _.map(this.screens, () => ({}));
 
     this.attachEvents();
+
+    window.g = this;
   }
 
   attachEvents() {
@@ -76,8 +78,8 @@ class Game extends Component {
     });
   }
 
-  getState() {
-    return this.state;
+  getState(opts = {}) {
+    if (typeof opts.respond === 'function') opts.respond(this.state);
   }
 
   demo() {
@@ -118,7 +120,7 @@ class Game extends Component {
     });
 
     self.collectMedia();
-    self.loadScreens();
+    self.loadScreens(this.state.currentScreenIndex, false);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
@@ -149,16 +151,17 @@ class Game extends Component {
 
   ready() {
     if (!this.state.ready) {
-      this.emit({
-        name: 'ready',
-        game: this.config.id,
-      });
       this.setState({
         ready: true,
-      });
-      this.goto({
-        index: this.state.currentScreenIndex,
-        silent: true,
+      }, () => {
+        this.emit({
+          name: 'ready',
+          game: this.config.id,
+        });
+        this.goto({
+          index: this.state.currentScreenIndex,
+          silent: true,
+        });
       });
     }
   }

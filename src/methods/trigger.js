@@ -1,10 +1,10 @@
-var trigger = function (name, opts) {
+var trigger = function (name, opts = {}) {
   return (
     new Promise(resolve => {
       var e = new Event('trigger');
       e.name = name;
       e.opts = opts;
-      e.respond = data => {
+      e.opts.respond = data => {
         resolve(data);
       };
       window.dispatchEvent(e);
