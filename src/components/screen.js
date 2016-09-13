@@ -37,7 +37,7 @@ class Screen extends Component {
   next() {
     var state = skoash.trigger('getState');
 
-    if (this.state.leaving || (!state.demo && !this.state.complete)) return;
+    if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 
     this.setState({
       leaving: true
@@ -64,7 +64,18 @@ class Screen extends Component {
         self.bootstrap();
       });
     }
+  }
 
+  bootstrap() {
+    super.bootstrap();
+
+    if (this.props.load) this.load();
+  }
+
+  replay(replay = true) {
+    this.setState({
+      replay,
+    });
   }
 
   start() {
@@ -140,10 +151,10 @@ class Screen extends Component {
     setTimeout(() => {
       if (!self.state.started) {
         self.start();
-        self.setState({
-          opening: false
-        });
       }
+      self.setState({
+        opening: false
+      });
     }, this.props.startDelay);
 
     if (typeof this.props.onOpen === 'function') {
