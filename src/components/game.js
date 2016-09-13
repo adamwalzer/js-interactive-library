@@ -728,6 +728,7 @@ class Game extends Component {
       var ScreenComponent, props;
       props = screens[key].props || {};
       props.data = self.state.data.screens[key];
+      props.gameState = self.state;
       props.index = index;
       ScreenComponent = screens[key];
       return ScreenComponent(props, 'screen-' + key, key);
