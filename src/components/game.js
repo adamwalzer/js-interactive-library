@@ -38,8 +38,6 @@ class Game extends Component {
     skoash.trigger = this.trigger.bind(this);
 
     this.attachEvents();
-
-    window.g = this;
   }
 
   attachEvents() {
