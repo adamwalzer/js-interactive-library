@@ -54,7 +54,7 @@ class Screen extends Component {
   }
 
   load(cb) {
-    this.onReady = cb;
+    this.onReady = cb || this.onReady;
     if (!this.state.load) {
       this.setState({
         load: true,
