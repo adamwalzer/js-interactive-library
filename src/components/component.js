@@ -64,6 +64,8 @@ class Component extends React.Component {
   ready() {
     this.setState({
       ready: true,
+    }, () => {
+      if (typeof this.onReady === 'function') this.onReady.call(this);
     });
   }
 

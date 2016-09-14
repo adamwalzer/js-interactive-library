@@ -129,22 +129,18 @@ class Game extends Component {
     firstScreen = this.refs['screen-' + currentScreenIndex];
     secondScreen = this.refs['screen-' + currentScreenIndex + 1];
 
-    if (firstScreen) firstScreen.load();
+    if (firstScreen) {
+      firstScreen.load(() => {
+        if (goto) {
+          this.goto({
+            index: currentScreenIndex,
+            load: true,
+            silent: true,
+          });
+        }
+      });
+    }
     if (secondScreen) secondScreen.load();
-
-    setTimeout(() => {
-      if (!this.state.ready) {
-        this.checkReady();
-      }
-
-      if (goto) {
-        this.goto({
-          index: currentScreenIndex,
-          load: true,
-          silent: true,
-        });
-      }
-    }, 0);
   }
 
   ready() {

@@ -53,15 +53,14 @@ class Screen extends Component {
     this.goto(this.props.prevIndex || this.props.index - 1);
   }
 
-  load() {
-    var self = this;
-
-    if (!self.state.load) {
-      self.setState({
+  load(cb) {
+    this.onReady = cb;
+    if (!this.state.load) {
+      this.setState({
         load: true,
         ready: false,
       }, () => {
-        self.bootstrap();
+        this.bootstrap();
       });
     }
   }
