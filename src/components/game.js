@@ -459,7 +459,7 @@ class Game extends Component {
     }
   }
 
-  emit(gameData) {
+  emit(gameData = {}) {
     var p, self = this;
     p = new Promise((resolve) => {
       var event;
@@ -478,9 +478,9 @@ class Game extends Component {
 
       event.name = gameData.name;
       event.gameData = gameData;
-      event.respond = data => {
+      event.respond = gameData.respond || (data => {
         resolve(data);
-      };
+      });
 
       if (window.frameElement) {
         window.frameElement.dispatchEvent(event);
@@ -499,9 +499,13 @@ class Game extends Component {
     return this.emit(opts);
   }
 
-  passData() {
+  passData(opts) {
     // this should be implemented per game
-    return this.props.passData.apply(this, arguments);
+    if (typeof opts.respond === 'function') {
+      opts.respond(this.props.passData.apply(this, arguments));
+    } else {
+      return this.props.passData.apply(this, arguments);
+    }
   }
 
   load(opts) {
