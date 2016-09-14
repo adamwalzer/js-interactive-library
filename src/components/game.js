@@ -431,10 +431,6 @@ class Game extends Component {
       videoStop: this.videoStop,
       demo: this.demo,
       'toggle-demo-mode': this.demo,
-      // AW - 20160913
-      // getData and passData likely need an update with skoash 1.0.2
-      // all others seem fine since getState has already been updated
-      // use getState as example
       getData: this.getData,
       'get-data': this.getData,
       passData: this.passData,
@@ -500,7 +496,6 @@ class Game extends Component {
   }
 
   passData(opts) {
-    // this should be implemented per game
     if (typeof opts.respond === 'function') {
       opts.respond(this.props.passData.apply(this, arguments));
     } else {
