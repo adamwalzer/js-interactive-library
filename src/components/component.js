@@ -12,6 +12,9 @@ class Component extends React.Component {
   }
 
   callProp(action, opts) {
+    /* eslint-disable */
+    console.log('Let\'s avoid using callProp in preference of using defaultProps to ensure the prop type is a function.');
+    /* eslint-enable */
     if (typeof this.props[action] === 'function') {
       return this.props[action].call(this, opts);
     }
