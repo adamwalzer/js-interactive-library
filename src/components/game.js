@@ -41,18 +41,16 @@ class Game extends Component {
   }
 
   attachEvents() {
-    var self = this;
-
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
-      self.resume();
+      this.resume();
     });
     window.addEventListener('blur', () => {
-      self.pause();
+      this.pause();
     });
 
     window.addEventListener('resize', () => {
-      self.scale();
+      this.scale();
     });
     window.addEventListener('orientationchange', () => {
       window.dispatchEvent(new Event('resize'));
@@ -63,16 +61,16 @@ class Game extends Component {
       });
     }
 
-    window.addEventListener('keydown', function (e) {
-      self.onKeyUp(e);
+    window.addEventListener('keydown', e => {
+      this.onKeyUp(e);
     });
 
-    window.addEventListener('platform-event', function (e) {
-      self.trigger(e.name, e.gameData);
+    window.addEventListener('platform-event', e => {
+      this.trigger(e.name, e.gameData);
     });
 
-    window.addEventListener('trigger', function (e) {
-      self.trigger(e.name, e.opts);
+    window.addEventListener('trigger', e => {
+      this.trigger(e.name, e.opts);
     });
   }
 

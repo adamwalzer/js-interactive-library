@@ -16,6 +16,9 @@ class Screen extends Component {
       complete: false,
       load: false,
     };
+
+    this.next = this.next.bind(this);
+    this.prev = this.prev.bind(this);
   }
 
   goto(index, buttonSound) {
@@ -145,22 +148,22 @@ class Screen extends Component {
       close: false,
       replay: this.state.complete || this.state.replay,
       opts,
-    });
+    }, () => {
+      setTimeout(() => {
+        if (!self.state.started) {
+          self.start();
+        }
+        self.setState({
+          opening: false
+        });
+      }, this.props.startDelay);
 
-    setTimeout(() => {
-      if (!self.state.started) {
-        self.start();
+      if (typeof this.props.onOpen === 'function') {
+        this.props.onOpen(this);
       }
-      self.setState({
-        opening: false
-      });
-    }, this.props.startDelay);
 
-    if (typeof this.props.onOpen === 'function') {
-      this.props.onOpen(this);
-    }
-
-    this.loadData();
+      this.loadData();
+    });
   }
 
   leave() {
@@ -218,7 +221,7 @@ class Screen extends Component {
   renderPrevButton() {
     if (!this.props.hidePrev) {
       return (
-        <button className="prev-screen" onClick={this.prev.bind(this)}></button>
+        <button className="prev-screen" onClick={this.prev}></button>
       );
     }
   }
@@ -226,7 +229,7 @@ class Screen extends Component {
   renderNextButton() {
     if (!this.props.hideNext) {
       return (
-        <button className="next-screen" onClick={this.next.bind(this)}></button>
+        <button className="next-screen" onClick={this.next}></button>
       );
     }
   }
