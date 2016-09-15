@@ -60,7 +60,7 @@ class Screen extends Component {
         load: true,
         ready: false,
       }, () => {
-        this.bootstrap();
+        super.bootstrap();
       });
     }
   }

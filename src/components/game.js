@@ -444,6 +444,7 @@ class Game extends Component {
       save: this.load,
       complete: this.checkComplete,
       incomplete: this.checkComplete,
+      ready: this.checkReady,
       resize: this.scale,
     };
 
@@ -507,11 +508,6 @@ class Game extends Component {
       opts.highestScreenIndex) {
       if (opts.highestScreenIndex === this.screensLength - 1) return;
       this.loadScreens(opts.highestScreenIndex);
-      for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
-        if (this.refs['screen-' + i]) {
-          this.refs['screen-' + i].completeRefs();
-        }
-      }
     }
   }
 
@@ -782,7 +778,8 @@ Game.defaultProps = _.defaults({
   },
   menus: {
     Screen
-  }
+  },
+  ignoreReady: true
 }, Component.defaultProps);
 
 export default Game;

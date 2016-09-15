@@ -65,6 +65,7 @@ class Component extends React.Component {
     this.setState({
       ready: true,
     }, () => {
+      skoash.trigger('ready');
       if (typeof this.onReady === 'function') this.onReady.call(this);
     });
   }
@@ -220,7 +221,7 @@ class Component extends React.Component {
   checkReady() {
     var ready, self = this;
 
-    if (!this.props.checkReady || this.state.ready) return;
+    if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
 
     self.requireForReady.forEach(key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
@@ -238,8 +239,6 @@ class Component extends React.Component {
 
     if (ready) {
       self.ready();
-    } else {
-      setTimeout(self.checkReady.bind(self), 100);
     }
   }
 
@@ -324,6 +323,7 @@ Component.defaultProps = {
   completeDelay: 0,
   completeOnStart: false,
   getClassNames: _.identity,
+  ignoreReady: false,
   shouldRender: true,
   type: 'div',
 };
