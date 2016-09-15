@@ -131,6 +131,8 @@ class Game extends Component {
 
     if (firstScreen) {
       firstScreen.load(() => {
+        this.checkReady();
+
         if (goto) {
           this.goto({
             index: currentScreenIndex,
