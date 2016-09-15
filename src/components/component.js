@@ -282,7 +282,6 @@ class Component extends React.Component {
   }
 
   getClassNames() {
-    if (!this.props.getClassNames) console.log(this);
     return classNames({
       READY: this.state.ready,
       STARTED: this.state.started,
