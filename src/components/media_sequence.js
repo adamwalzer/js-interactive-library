@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import Component from './component.js';
 
 class MediaSequence extends Component {
@@ -47,13 +49,8 @@ class MediaSequence extends Component {
   }
 }
 
-MediaSequence.defaultProps = {
-  type: 'div',
-  shouldRender: true,
-  bootstrap: true,
-  checkReady: true,
-  checkComplete: true,
+MediaSequence.defaultProps = _.defaults({
   silentOnStart: false,
-};
+}, Component.defaultProps);
 
 export default MediaSequence;

@@ -282,12 +282,13 @@ class Component extends React.Component {
   }
 
   getClassNames() {
+    if (!this.props.getClassNames) console.log(this);
     return classNames({
       READY: this.state.ready,
       STARTED: this.state.started,
       COMPLETE: this.state.complete,
       OPEN: this.state.open,
-    }, this.props.className);
+    }, this.props.className, this.props.getClassNames.call(this));
   }
 
   renderContentList(listName = 'children') {
@@ -323,6 +324,7 @@ Component.defaultProps = {
   checkReady: true,
   completeDelay: 0,
   completeOnStart: false,
+  getClassNames: _.identity,
   shouldRender: true,
   type: 'div',
 };
