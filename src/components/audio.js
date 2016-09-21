@@ -78,7 +78,7 @@ class Audio extends Media {
       clearTimeout(this.timeout);
     }
 
-    if (!this.playing) return;
+    if (!this.playing && !this.delayed) return;
     if (!this.audio) return;
 
     skoash.trigger('audioStop', {
