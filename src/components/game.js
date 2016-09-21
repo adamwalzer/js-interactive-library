@@ -161,6 +161,9 @@ class Game extends Component {
   }
 
   resume() {
+    if (this.state.playingVO.length) {
+      this.fadeBackground();
+    }
     this.setPause(false);
   }
 
