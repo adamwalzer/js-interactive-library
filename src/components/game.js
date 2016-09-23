@@ -447,6 +447,7 @@ class Game extends Component {
       incomplete: this.checkComplete,
       ready: this.checkReady,
       resize: this.scale,
+      getGame: this.getGame,
     };
 
     fn = events[event];
@@ -488,6 +489,12 @@ class Game extends Component {
     });
 
     return p;
+  }
+
+  getGame(opts) {
+    if (this.config.id === opts.id) {
+      opts.respond(this);
+    }
   }
 
   getData(opts) {
