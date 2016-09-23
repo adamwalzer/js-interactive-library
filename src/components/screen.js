@@ -81,25 +81,9 @@ class Screen extends Component {
   }
 
   start() {
+    super.start();
     this.bootstrap();
-
-    Object.keys(this.refs).map(key => {
-      if (typeof this.refs[key].start === 'function') {
-        this.refs[key].start();
-      }
-    });
-
     this.startMedia();
-
-    this.setState({
-      started: true,
-    });
-
-    this.checkComplete();
-
-    if (this.props.completeOnStart) {
-      this.complete();
-    }
   }
 
   startMedia() {
