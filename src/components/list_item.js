@@ -2,16 +2,11 @@ import _ from 'lodash';
 
 import Component from './component.js';
 
-class ListItem extends Component {
-  componentWillMount() {
-    if (!this.props.correct) {
-      this.complete();
-    }
-  }
-}
+class ListItem extends Component {}
 
 ListItem.defaultProps = _.defaults({
   checkComplete: false,
+  completeIncorrect: true,
   type: 'li',
 }, Component.defaultProps);
 

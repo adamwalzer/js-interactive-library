@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 
-// import util from 'methods/util';
-
 import Component from 'components/component';
 import Screen from 'components/screen';
 

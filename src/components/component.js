@@ -137,6 +137,12 @@ class Component extends React.Component {
     });
   }
 
+  componentWillMount() {
+    if (this.props.completeIncorrect && (!this.props.correct || this.props.incorrect)) {
+      this.complete();
+    }
+  }
+
   componentDidMount() {
     this.bootstrap();
   }
@@ -317,6 +323,7 @@ Component.defaultProps = {
   checkReady: true,
   collectData: _.identity,
   completeDelay: 0,
+  completeIncorrect: false,
   completeOnStart: false,
   getClassNames: _.identity,
   ignoreReady: false,
