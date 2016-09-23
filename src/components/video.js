@@ -41,7 +41,7 @@ class Video extends Media {
   resume() {
     this.setState({
       paused: false,
-    }, this.skoash.bind(this));
+    }, this.play.bind(this));
   }
 
   complete() {
