@@ -9,7 +9,7 @@ class Video extends Media {
     if (this.state.playing) return;
     this.el.play();
     super.play();
-    play.trigger('videoPlay', {
+    skoash.trigger('videoPlay', {
       video: this
     });
     this.setState({
@@ -23,7 +23,7 @@ class Video extends Media {
 
   stop() {
     this.el.pause();
-    play.trigger('videoStop', {
+    skoash.trigger('videoStop', {
       video: this
     });
     this.setState({
@@ -41,12 +41,12 @@ class Video extends Media {
   resume() {
     this.setState({
       paused: false,
-    }, this.play.bind(this));
+    }, this.skoash.bind(this));
   }
 
   complete() {
     if (!this.props.loop) {
-      play.trigger('videoStop', {
+      skoash.trigger('videoStop', {
         video: this
       });
     }
