@@ -7,6 +7,10 @@ class Video extends Media {
 
   play() {
     if (this.state.playing) return;
+    /*
+     * In order for videos to play on mobile devices,
+     * the screen must have prop.startDelay=0
+     */
     this.el.play();
     super.play();
     skoash.trigger('videoPlay', {

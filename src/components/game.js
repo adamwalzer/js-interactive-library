@@ -641,16 +641,14 @@ class Game extends Component {
     });
   }
 
-  fadeBackground(value) {
-    if (typeof value !== 'number') value = .25;
+  fadeBackground(value = .25) {
     this.state.playingBKG.forEach(bkg => {
       bkg.setVolume(value);
     });
   }
 
-  raiseBackground(value) {
-    if (typeof value !== 'number') value = 1;
-    if (this.state.playingVO.length === 0) {
+  raiseBackground(value = 1) {
+    if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
       this.state.playingBKG.forEach(bkg => {
         bkg.setVolume(value);
       });

@@ -133,14 +133,23 @@ class Screen extends Component {
       replay: this.state.complete || this.state.replay,
       opts,
     }, () => {
-      setTimeout(() => {
+      if (this.props.startDelay) {
+        setTimeout(() => {
+          if (!self.state.started) {
+            self.start();
+          }
+          self.setState({
+            opening: false
+          });
+        }, this.props.startDelay);
+      } else {
         if (!self.state.started) {
           self.start();
         }
         self.setState({
           opening: false
         });
-      }, this.props.startDelay);
+      }
 
       if (typeof this.props.onOpen === 'function') {
         this.props.onOpen(this);
