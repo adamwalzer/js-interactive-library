@@ -17,7 +17,7 @@ class Component extends React.Component {
     // TODO AW - 20160915
     // Let's get rid of the function and remove instances of its use in games.
     /* eslint-disable */
-    console.log('Let\'s avoid using callProp in preference of using defaultProps to ensure the prop type is a function.');
+    console.error('Let\'s avoid using callProp in preference of using defaultProps to ensure the prop type is a function.');
     /* eslint-enable */
     if (typeof this.props[action] === 'function') {
       return this.props[action].call(this, opts);
