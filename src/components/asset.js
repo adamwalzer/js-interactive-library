@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Component from './component.js';
 
 /*
@@ -11,12 +12,11 @@ class Asset extends Component {
   }
 }
 
-Asset.defaultProps = {
-  type: 'div',
-  shouldRender: false,
+Asset.defaultProps = _.defaults({
   bootstrap: false,
+  checkComplete: false,
   checkReady: false,
-  checkComplete: false
-};
+  shouldRender: false,
+}, Component.defaultProps);
 
 export default Asset;

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { Howl } from 'howler';
 import Media from './media.js';
 
@@ -5,113 +7,156 @@ class Audio extends Media {
   constructor() {
     super();
 
+    this.startCount = 0;
+    this.completeCount = 0;
+
     this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
   }
 
   play() {
-    var self = this,
-      delay = this.props.delay || 0,
-      state = play.trigger('getState');
+    var state = skoash.trigger('getState');
 
-    if (!self.state.ready) {
-      self.bootstrap();
-      setTimeout(
-        self.play.bind(self),
-        50
-      );
+    if (!this.state.ready) {
+      this.bootstrap();
     } else {
-      play.trigger('audioPlay', {
-        audio: self
+      skoash.trigger('audioPlay', {
+        audio: this
       });
+      this.delayed = true;
 
       if (!state.paused) {
-        setTimeout(
-          self.playAudio.bind(self),
-          delay
+        this.timeout = setTimeout(
+          this.playAudio.bind(this),
+          this.props.delay
         );
       }
     }
   }
 
   playAudio() {
-    if (this.state.paused) {
-      return;
-    }
+    if (this.paused) return;
 
-    this.setState({
-      playing: true
-    });
+    this.delayed = false;
+    this.playing = true;
 
-    this.audio.play();
+    this.audio.play(this.sprite);
+    this.startCount++;
+    super.play();
   }
 
   pause() {
-    if (!this.state.playing) return;
+    if (this.delayed) {
+      clearTimeout(this.timeout);
+    }
+
+    if (!this.playing) return;
     this.audio.pause();
-    this.setState({
-      paused: true,
-    });
+    this.paused = true;
   }
 
   resume() {
-    if (!this.state.paused) return;
-    this.setState(
-      {
-        paused: false,
-      },
-      this.playAudio.bind(this)
-    );
+    var state = skoash.trigger('getState');
+
+    if (state.paused) return;
+
+    if (this.delayed) {
+      this.timeout = setTimeout(
+        this.playAudio.bind(this),
+        this.props.delay
+      );
+    }
+
+    if (!this.paused) return;
+    this.paused = false;
+    this.playAudio();
   }
 
   stop() {
+    if (this.delayed && this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
     if (!this.audio) return;
-    play.trigger('audioStop', {
+    skoash.trigger('audioStop', {
       audio: this
     });
-    this.setState({
-      playing: false
-    });
-    this.audio.stop();
+    this.playing = false;
+    this.paused = false;
+    this.audio.stop(this.sprite);
   }
 
-  setVolume(value) {
-    this.audio.volume(value);
+  setVolume(volume) {
+    volume = Math.min(this.props.maxVolume, Math.max(this.props.minVolume, volume));
+    this.audio.volume(volume);
   }
 
-  increaseVolume(value) {
-    this.audio.fadeIn(value);
+  increaseVolume(volume) {
+    if (!this.playing) return;
+    volume = Math.min(volume || this.props.volume, this.props.maxVolume);
+    this.audio.fadeIn(volume);
   }
 
-  decreaseVolume(value) {
-    this.audio.fadeOut(value);
+  decreaseVolume(volume) {
+    if (!this.playing) return;
+    volume = Math.max(volume, this.props.minVolume);
+    this.audio.fadeOut(volume);
   }
 
   complete() {
     if (!this.props.loop) {
-      play.trigger('audioStop', {
+      skoash.trigger('audioStop', {
         audio: this
       });
     }
 
-    this.setState({
-      playing: false
-    });
+    this.completeCount++;
 
+    if (!this.props.complete && (!this.playing || this.paused)) return;
+    if (this.startCount > this.completeCount) return;
+
+    this.playing = false;
     super.complete();
   }
 
-  componentDidMount() {
+  shouldComponentUpdate() {
+    return false;
+  }
+
+  bootstrap() {
+    var sprite;
+
+    this.sprite = this.props.sprite ? 'sprite' : undefined;
+
+    if (this.audio) return;
+
+    if (this.props.sprite) {
+      sprite = {
+        sprite: this.props.sprite
+      };
+    }
+
     this.audio = new Howl({
-      src: this.props.src,
-      loop: this.props.loop || false,
+      urls: [].concat(this.props.src),
+      loop: this.props.loop,
+      volume: this.props.volume,
       onend: this.complete,
-      onload: this.ready
+      onload: this.ready,
+      sprite,
     });
     if (this.props.complete) {
       this.complete();
     }
   }
 }
+
+Audio.defaultProps = _.defaults({
+  delay: 0,
+  loop: false,
+  volume: 1,
+  maxVolume: 1,
+  minVolume: 0,
+  sprite: undefined,
+}, Media.defaultProps);
 
 export default Audio;

@@ -35,7 +35,9 @@ class Screen extends Component {
   }
 
   next() {
-    if (this.state.leaving) return;
+    var state = skoash.trigger('getState');
+
+    if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 
     this.setState({
       leaving: true
@@ -62,13 +64,22 @@ class Screen extends Component {
         self.bootstrap();
       });
     }
+  }
 
+  bootstrap() {
+    super.bootstrap();
+
+    if (this.props.load) this.load();
+  }
+
+  replay(replay = true) {
+    this.setState({
+      replay,
+    });
   }
 
   start() {
-    var self = this;
-
-    self.bootstrap();
+    this.bootstrap();
 
     Object.keys(this.refs).map(key => {
       if (typeof this.refs[key].start === 'function') {
@@ -76,18 +87,16 @@ class Screen extends Component {
       }
     });
 
-    self.startMedia();
+    this.startMedia();
 
-    self.setState({
+    this.setState({
       started: true,
     });
 
-    self.checkComplete();
+    this.checkComplete();
 
-    if (typeof self.props.completeDelay === 'number') {
-      setTimeout(() => {
-        self.complete();
-      }, self.props.completeDelay);
+    if (this.props.completeOnStart) {
+      this.complete();
     }
   }
 
@@ -107,20 +116,22 @@ class Screen extends Component {
     }
   }
 
-  complete() {
-    super.complete();
-    skoash.trigger('screenComplete', {
-      screenID: this.props.id,
-      silent: this.props.silentComplete
-    });
+  complete(opts = {}) {
+    super.complete(opts);
+    setTimeout(() => {
+      skoash.trigger('screenComplete', {
+        screenID: this.props.id,
+        silent: opts.silent || this.props.silentComplete
+      });
 
-    if (this.audio['screen-complete']) {
-      this.audio['screen-complete'].play();
-    }
+      if (this.audio['screen-complete']) {
+        this.audio['screen-complete'].play();
+      }
 
-    if (this.props.emitOnComplete) {
-      skoash.trigger('emit', this.props.emitOnComplete);
-    }
+      if (this.props.emitOnComplete) {
+        skoash.trigger('emit', this.props.emitOnComplete);
+      }
+    }, this.props.completeDelay);
   }
 
   open(opts) {
@@ -129,10 +140,11 @@ class Screen extends Component {
     self.setState({
       load: true,
       open: true,
+      opening: true,
       leaving: false,
       leave: false,
       close: false,
-      return: this.state.complete,
+      replay: this.state.complete || this.state.replay,
       opts,
     });
 
@@ -140,7 +152,10 @@ class Screen extends Component {
       if (!self.state.started) {
         self.start();
       }
-    }, this.props.startDelay || 250);
+      self.setState({
+        opening: false
+      });
+    }, this.props.startDelay);
 
     if (typeof this.props.onOpen === 'function') {
       this.props.onOpen(this);
@@ -168,51 +183,11 @@ class Screen extends Component {
   }
 
   collectData() {
-    var data = {};
-    if (!this.refs) return data;
-    if (this.refs['selectable-reveal']) {
-      data = [];
-      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
-        _.forIn(this.refs['selectable-reveal'].refs.selectable.refs, (ref) => {
-          if (_.includes(ref.props.className, 'SELECTED') || _.includes(ref.props.className, 'HIGHLIGHTED')) data.push(ref.props['data-ref']);
-        });
-      }
-    } else if (this.refs['dropzone-reveal']) {
-      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
-        _.forIn(this.refs['dropzone-reveal'].refs.dropzone.refs, (ref, key) => {
-          if (key.indexOf('dropzone-') === -1 || !ref.state.content) return;
-          if (this.props.multipleAnswers) {
-            data[key] = [];
-            _.forIn(ref.state.content, (ref2) => {
-              data[key].push(ref2.props.message);
-            });
-          } else {
-            data[key] = {
-              ref: ref.state.content.props.message,
-              state: ref.state.content.state
-            };
-          }
-        });
-      }
-    }
-    return data;
+    return this.callProp('collectData');
   }
 
   loadData() {
-    var loadData = {};
-    if (!this.refs) return;
-    if (this.refs['selectable-reveal']) {
-      if (this.refs['selectable-reveal'].refs && this.refs['selectable-reveal'].refs.selectable) {
-        _.forEach(this.metaData, (ref) => {
-          loadData[ref] = this.refs['selectable-reveal'].props.selectableSelectClass || this.refs['selectable-reveal'].refs.selectable.state.selectClass;
-          this.refs['selectable-reveal'].refs.selectable.loadData = loadData;
-        });
-      }
-    } else if (this.refs['dropzone-reveal']) {
-      if (this.refs['dropzone-reveal'].refs && this.refs['dropzone-reveal'].refs.dropzone) {
-        this.refs['dropzone-reveal'].refs.dropzone.loadData = this.metaData;
-      }
-    }
+    return this.callProp('loadData');
   }
 
   getClassNames() {
@@ -221,7 +196,7 @@ class Screen extends Component {
       LEAVING: this.state.leaving,
       LEAVE: this.state.leave,
       CLOSE: this.state.close,
-      RETURN: this.state.return,
+      REPLAY: this.state.replay,
     }, super.getClassNames(), 'screen');
   }
 
@@ -267,5 +242,10 @@ class Screen extends Component {
     );
   }
 }
+
+Screen.defaultProps = _.defaults({
+  resetOnClose: true,
+  startDelay: 250,
+}, Component.defaultProps);
 
 export default Screen;
