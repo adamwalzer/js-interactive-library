@@ -9,6 +9,7 @@ To build skoash either run `gulp` to build and watch or `gulp watch` to just wat
 
 Making a new game is simple. Just add the dependencies along with the library to your HTML file.
 ```html
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.2/lodash.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.min.js"></script>
 <script type="text/javascript" src="build/skoash.1.0.2.js"></script>
