@@ -16,14 +16,16 @@ You can also pull down the repo as a node module and import with Webpack.
 
 **package.json**
 ```json
-{ "devDependencies": {
-	"js-interactive-library": "github:ginasink/js-interactive-library"
-} }
+{
+  "devDependencies": {
+    "skoash": "github:ginasink/js-interactive-library"
+  }
+}
 ```
 **index.js**
 ```javascript
 // ES6 import. CommonJS or AMD will work too.
-import 'js-interactive-library';
+import 'skoash';
 ```
 
 Now define your game
@@ -31,10 +33,10 @@ Now define your game
 **index.html**
 ```html
 <html>
-	<head></head>
-	<body>
-		<div id="my-game"></div>
-	</body>
+  <head></head>
+  <body>
+    <div id="my-game"></div>
+  </body>
 </html>
 ```
 Make your configuration file.
@@ -62,9 +64,9 @@ import LastScreen from './components/last_screen';
 
 // Create your game
 var MyGame = (
-	<skoash.Game
-		config={config}
-	/>
+  <skoash.Game
+    config={config}
+  />
 );
 
 // Start your game
