@@ -58,7 +58,7 @@ export default config;
 // Import your configuration
 import config from './config.game';
 
-// Import your components
+// Import your screens
 import TitleScreen from './components/title_screen';
 import LastScreen from './components/last_screen';
 
