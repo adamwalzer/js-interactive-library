@@ -12,26 +12,27 @@ class Audio extends Media {
 
     this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
+    this.playAudio = this.playAudio.bind(this);
   }
 
   play() {
-    var state = skoash.trigger('getState');
+    skoash.trigger('getState').then(state => {
+      if (!this.state.ready) {
+        this.bootstrap();
+      } else {
+        skoash.trigger('audioPlay', {
+          audio: this
+        });
+        this.delayed = true;
 
-    if (!this.state.ready) {
-      this.bootstrap();
-    } else {
-      skoash.trigger('audioPlay', {
-        audio: this
-      });
-      this.delayed = true;
-
-      if (!state.paused) {
-        this.timeout = setTimeout(
-          this.playAudio.bind(this),
-          this.props.delay
-        );
+        if (!state.paused) {
+          this.timeout = setTimeout(
+            this.playAudio,
+            this.props.delay
+          );
+        }
       }
-    }
+    });
   }
 
   playAudio() {
@@ -56,20 +57,20 @@ class Audio extends Media {
   }
 
   resume() {
-    var state = skoash.trigger('getState');
+    skoash.trigger('getState').then(state => {
+      if (state.paused) return;
 
-    if (state.paused) return;
+      if (this.delayed) {
+        this.timeout = setTimeout(
+          this.playAudio,
+          this.props.delay
+        );
+      }
 
-    if (this.delayed) {
-      this.timeout = setTimeout(
-        this.playAudio.bind(this),
-        this.props.delay
-      );
-    }
-
-    if (!this.paused) return;
-    this.paused = false;
-    this.playAudio();
+      if (!this.paused) return;
+      this.paused = false;
+      this.playAudio();
+    });
   }
 
   stop() {
@@ -77,7 +78,9 @@ class Audio extends Media {
       clearTimeout(this.timeout);
     }
 
+    if (!this.playing && !this.delayed) return;
     if (!this.audio) return;
+
     skoash.trigger('audioStop', {
       audio: this
     });
@@ -137,7 +140,7 @@ class Audio extends Media {
     }
 
     this.audio = new Howl({
-      urls: [].concat(this.props.src),
+      urls: [].concat(this.props.src), // switch this to src when moving to Howler ^2.0.0
       loop: this.props.loop,
       volume: this.props.volume,
       onend: this.complete,

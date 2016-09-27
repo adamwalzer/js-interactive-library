@@ -1,36 +1,34 @@
-# Play.js
-*v0.2.2*
+# Skoash.js
+*v1.0.2*
 
-To make this buld work. Strict mode needs to be disabled for the ES6 modules.
-
-Simply add this line to line 41 of the `enter()` function in `node_modules/babel-core/lib/transformation/transformers/other/strict.js`
-```
-return false; // MR: Do not add strict mode.
-```
-Then you can run gulp.
+To build skoash either run `gulp` to build and watch or `gulp watch` to just watch or `gulp build` to build. You can also add the `--production` flag to build using the production webpack configuration.
 
 ## Make a game!
 
 ### Setup
 
-Making a new game is simple. Just add jQuery (only dependacy) and the the library to your HTML file.
+Making a new game is simple. Just add the dependencies along with the library to your HTML file.
 ```html
-<script type="text/javascript" src="jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="build/play.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.2/lodash.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.min.js"></script>
+<script type="text/javascript" src="build/skoash.1.0.2.js"></script>
 ```
 
-Or you pull down the repo as a node module and import with Webpack.
+You can also pull down the repo as a node module and import with Webpack.
 
 **package.json**
 ```json
-{ "devDependencies": {
-	"js-interactive-library": "github:ginasink/js-interactive-library#v0.1.0"
-} }
+{
+  "devDependencies": {
+    "skoash": "github:ginasink/js-interactive-library"
+  }
+}
 ```
 **index.js**
 ```javascript
 // ES6 import. CommonJS or AMD will work too.
-import 'js-interactive-library';
+import 'skoash';
 ```
 
 Now define your game
@@ -38,99 +36,48 @@ Now define your game
 **index.html**
 ```html
 <html>
-	<head></head>
-	<body id="my-game"></body>
+  <head></head>
+  <body>
+    <div id="my-game"></div>
+  </body>
 </html>
 ```
 Make your configuration file.
 **config.game.js**
 ```javascript
-pl.game.config({
-	// The CSS class name to match for screens
-	screenSelector: '.screen',
-	// Where your components live
-	componentDirectory: 'components/',
-	// defines the game viewport
-	dimensions: {
-		width: 960,
-		ratio: 16/9
-	}
-});
+var config = {
+  id: 'my-game',
+  version: 1,
+  dimensions: {
+    width: 960,
+    ratio: 16 / 9
+  },
+};
+
+export default config;
 ```
 **index.js**
 ```javascript
-import 'js-interactive-library';
 // Import your configuration
-import 'config.game';
+import config from './config.game';
 
-// Import your components
-import 'components/screen-basic/behavior';
-import 'components/title/behavior';
+// Import your screens
+import TitleScreen from './components/title_screen';
+import LastScreen from './components/last_screen';
 
-// Register your game
-pl.game('my-game', function () { 
+// Create your game
+var MyGame = (
+  <skoash.Game
+    config={config}
+  />
+);
 
-});
+// Start your game
+skoash.start(MyGame);
 ```
 
-### Create a screen
-
-Here we use the `<section>` element so we can use `<h1>` tags for each screen and still follow proper semantics. However you may use any node type you wish as long as you have the `screenSelector` class name you defined in your configuration on the element.
-
-```html
-<body id="my-game">
-	<section id="welcome" class="screen">
-		<h1>Welcom!</h1>
-		<!-- Attach a normalized interation event on the button. -->
-		<button pl-action="speak()">Hello</button>
-		<div class="message">World</div>
-	</section>
-</body>
-```
-
-This library relies heavily on UIState, a design patter in which you define changes in the user interface with ALL CAPS class names. Here we define what the `.message` element should look like when "`OPEN`" .
-
-```css
-/* By default our view is hidden */
-#welcome .message {
-	opacity: 0;
-	transition: opacity 1s;
-}
-
-/* When the class is added we get our element displayed with our 1 second transition. */
-#welcome .message.OPEN {
-	opacity: 1;
-}
-```
-
-Now we can define our behavior.
-
-```javascript
-pl.game('my-game', function () { 
-	
-	// Register the screen with id welcome.
-	this.screen('welcome', function () {
-
-		// define speak() which will be called when the user
-		// interacts (click: desktop, touchend: mobile) with the button.
-		this.speak = function () {
-			// Adds the OPEN class to the .message element.
-			// This will only match elements that live in
-			// your screen and are not decendants of a child scope.
-			//
-			this.open('.message');
-		};
-
-	});
-
-});
-```
-
-See {@link module:types/Entity~Entity} for reference on the UIState methods available.
+### More Instructions To Come
 
 ## Change Log
-<font color="green">*v0.2.1*</font>
- - Updates for Sea Turtle development. PR: [#15](https://github.com/ginasink/js-interactive-library/pull/15)
- - Revert previous implementation of draggable zoom transformation. PR: [#16](https://github.com/ginasink/js-interactive-library/pull/16)
- - BugFix: Do not override global screen variable, check for null. PR: [#18](https://github.com/ginasink/js-interactive-library/pull/18)
- - GAME-128: Enable demo mode via platform-event. PR: [#19](https://github.com/ginasink/js-interactive-library/pull/19)
+<font color="green">*v1.0.2*</font>
+ - skoash.trigger now uses events to trigger the actions and promises to respond. This means any action requiring data from the trigger must be coded inside a then.

@@ -1,6 +1,7 @@
 node_modules
 build
 build.log
+build_errors.log
 **/*.swp
 .DS_Store
 NOTES.txt

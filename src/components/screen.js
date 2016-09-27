@@ -16,6 +16,9 @@ class Screen extends Component {
       complete: false,
       load: false,
     };
+
+    this.next = this.next.bind(this);
+    this.prev = this.prev.bind(this);
   }
 
   goto(index, buttonSound) {
@@ -35,7 +38,7 @@ class Screen extends Component {
   }
 
   next() {
-    var state = skoash.trigger('getState');
+    var state = this.props.gameState;
 
     if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 
@@ -53,15 +56,14 @@ class Screen extends Component {
     this.goto(this.props.prevIndex || this.props.index - 1);
   }
 
-  load() {
-    var self = this;
-
-    if (!self.state.load) {
-      self.setState({
+  load(cb) {
+    this.onReady = cb || this.onReady;
+    if (!this.state.load) {
+      this.setState({
         load: true,
         ready: false,
       }, () => {
-        self.bootstrap();
+        super.bootstrap();
       });
     }
   }
@@ -79,25 +81,9 @@ class Screen extends Component {
   }
 
   start() {
+    super.start();
     this.bootstrap();
-
-    Object.keys(this.refs).map(key => {
-      if (typeof this.refs[key].start === 'function') {
-        this.refs[key].start();
-      }
-    });
-
     this.startMedia();
-
-    this.setState({
-      started: true,
-    });
-
-    this.checkComplete();
-
-    if (this.props.completeOnStart) {
-      this.complete();
-    }
   }
 
   startMedia() {
@@ -146,22 +132,31 @@ class Screen extends Component {
       close: false,
       replay: this.state.complete || this.state.replay,
       opts,
-    });
-
-    setTimeout(() => {
-      if (!self.state.started) {
-        self.start();
+    }, () => {
+      if (this.props.startDelay) {
+        setTimeout(() => {
+          if (!self.state.started) {
+            self.start();
+          }
+          self.setState({
+            opening: false
+          });
+        }, this.props.startDelay);
+      } else {
+        if (!self.state.started) {
+          self.start();
+        }
+        self.setState({
+          opening: false
+        });
       }
-      self.setState({
-        opening: false
-      });
-    }, this.props.startDelay);
 
-    if (typeof this.props.onOpen === 'function') {
-      this.props.onOpen(this);
-    }
+      if (typeof this.props.onOpen === 'function') {
+        this.props.onOpen(this);
+      }
 
-    this.loadData();
+      this.loadData();
+    });
   }
 
   leave() {
@@ -219,7 +214,7 @@ class Screen extends Component {
   renderPrevButton() {
     if (!this.props.hidePrev) {
       return (
-        <button className="prev-screen" onClick={this.prev.bind(this)}></button>
+        <button className="prev-screen" onClick={this.prev}></button>
       );
     }
   }
@@ -227,7 +222,7 @@ class Screen extends Component {
   renderNextButton() {
     if (!this.props.hideNext) {
       return (
-        <button className="next-screen" onClick={this.next.bind(this)}></button>
+        <button className="next-screen" onClick={this.next}></button>
       );
     }
   }
