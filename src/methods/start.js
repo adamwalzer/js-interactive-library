@@ -1,5 +1,9 @@
+import _ from 'lodash';
+
 var start = function (Game, id) {
   var el;
+
+  id = id || _.get(Game, 'props.config.id');
 
   el = document.getElementById(id);
 

@@ -3,10 +3,6 @@ import _ from 'lodash';
 import Asset from './asset.js';
 
 class Image extends Asset {
-  constructor() {
-    super();
-  }
-
   componentDidMount() {
     this.setState({
       complete: true
@@ -36,10 +32,10 @@ class Image extends Asset {
   }
 }
 
-Image.defaultProps = _.assign(Asset.defaultProps, {
+Image.defaultProps = _.defaults({
   shouldRender: true,
   bootstrap: true,
   checkReady: true,
-});
+}, Asset.defaultProps);
 
 export default Image;

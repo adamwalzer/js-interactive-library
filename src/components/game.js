@@ -1,22 +1,20 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 
-// import util from 'methods/util';
-
 import Component from 'components/component';
 import Screen from 'components/screen';
 
 class Game extends Component {
-  constructor(config) {
+  constructor(props = {}) {
     super();
 
-    this.config = config;
+    this.config = props.config ? props.config : props;
 
-    this.screens = {
+    this.screens = props.screens || {
       0: <Screen />
     };
 
-    this.menus = {
+    this.menus = props.menus || {
       Screen
     };
 
@@ -35,24 +33,22 @@ class Game extends Component {
       classes: [],
     };
 
-    skoash.trigger = this.trigger.bind(this);
+    this.state.data.screens = _.map(this.screens, () => ({}));
 
     this.attachEvents();
   }
 
   attachEvents() {
-    var self = this;
-
     window.addEventListener('load', window.focus);
     window.addEventListener('focus', () => {
-      self.resume();
+      this.resume();
     });
     window.addEventListener('blur', () => {
-      self.pause();
+      this.pause();
     });
 
     window.addEventListener('resize', () => {
-      self.scale();
+      this.scale();
     });
     window.addEventListener('orientationchange', () => {
       window.dispatchEvent(new Event('resize'));
@@ -63,17 +59,21 @@ class Game extends Component {
       });
     }
 
-    window.addEventListener('keydown', function (e) {
-      self.onKeyUp(e);
+    window.addEventListener('keydown', e => {
+      this.onKeyDown(e);
     });
 
-    window.addEventListener('platform-event', function (e) {
-      self.trigger(e.name, e.gameData);
+    window.addEventListener('platform-event', e => {
+      this.trigger(e.name, e.gameData);
+    });
+
+    window.addEventListener('trigger', e => {
+      this.trigger(e.name, e.opts);
     });
   }
 
-  getState() {
-    return this.state;
+  getState(opts = {}) {
+    if (typeof opts.respond === 'function') opts.respond(this.state);
   }
 
   demo() {
@@ -83,7 +83,7 @@ class Game extends Component {
     });
   }
 
-  onKeyUp(e) {
+  onKeyDown(e) {
     if (e.keyCode === 39) { // right
       this.goto({index: this.state.currentScreenIndex + 1});
     } else if (e.keyCode === 37) { // left
@@ -114,7 +114,7 @@ class Game extends Component {
     });
 
     self.collectMedia();
-    self.loadScreens();
+    self.loadScreens(this.state.currentScreenIndex, false);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
@@ -125,41 +125,43 @@ class Game extends Component {
     firstScreen = this.refs['screen-' + currentScreenIndex];
     secondScreen = this.refs['screen-' + currentScreenIndex + 1];
 
-    if (firstScreen) firstScreen.load();
-    if (secondScreen) secondScreen.load();
-
-    setTimeout(() => {
-      if (!this.state.ready) {
+    if (firstScreen) {
+      firstScreen.load(() => {
         this.checkReady();
-      }
 
-      if (goto) {
-        this.goto({
-          index: currentScreenIndex,
-          load: true,
-          silent: true,
-        });
-      }
-    }, 0);
+        if (goto) {
+          this.goto({
+            index: currentScreenIndex,
+            load: true,
+            silent: true,
+          });
+        }
+      });
+    }
+    if (secondScreen) secondScreen.load();
   }
 
   ready() {
     if (!this.state.ready) {
-      this.emit({
-        name: 'ready',
-        game: this.config.id,
-      });
       this.setState({
         ready: true,
-      });
-      this.goto({
-        index: this.state.currentScreenIndex,
-        silent: true,
+      }, () => {
+        this.emit({
+          name: 'ready',
+          game: this.config.id,
+        });
+        this.goto({
+          index: this.state.currentScreenIndex,
+          silent: true,
+        });
       });
     }
   }
 
   resume() {
+    if (this.state.playingVO.length) {
+      this.fadeBackground();
+    }
     this.setPause(false);
   }
 
@@ -245,7 +247,7 @@ class Game extends Component {
      * not the index of the highest screen that exists.
      */
     var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
-      highestScreenIndex, screenIndexArray, data;
+      highestScreenIndex, screenIndexArray, data, back = false, buttonSound;
 
     data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
@@ -294,6 +296,7 @@ class Game extends Component {
 
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
+        back = true;
         oldScreen.close();
       } else {
         oldScreen.leave();
@@ -324,10 +327,12 @@ class Game extends Component {
 
     if (!opts.silent) {
       if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
-        opts.buttonSound.play();
+        buttonSound = opts.buttonSound;
       } else if (this.audio.button) {
-        this.audio.button.play();
+        buttonSound = this.audio.next || this.audio.button;
+        if (back) buttonSound = this.audio.back || this.audio.button;
       }
+      if (buttonSound) buttonSound.play();
     }
 
     this.playBackground(currentScreenIndex);
@@ -377,8 +382,8 @@ class Game extends Component {
     if (screen && !openMenus.length) screen.resume();
   }
 
-  getBackgroundIndex() {
-    return 0;
+  getBackgroundIndex(index) {
+    return this.props.getBackgroundIndex.call(this, index);
   }
 
   playBackground(currentScreenIndex) {
@@ -438,7 +443,9 @@ class Game extends Component {
       save: this.load,
       complete: this.checkComplete,
       incomplete: this.checkComplete,
+      ready: this.checkReady,
       resize: this.scale,
+      getGame: this.getGame,
     };
 
     fn = events[event];
@@ -447,7 +454,7 @@ class Game extends Component {
     }
   }
 
-  emit(gameData) {
+  emit(gameData = {}) {
     var p, self = this;
     p = new Promise((resolve) => {
       var event;
@@ -466,9 +473,9 @@ class Game extends Component {
 
       event.name = gameData.name;
       event.gameData = gameData;
-      event.respond = data => {
+      event.respond = gameData.respond || (data => {
         resolve(data);
-      };
+      });
 
       if (window.frameElement) {
         window.frameElement.dispatchEvent(event);
@@ -482,15 +489,22 @@ class Game extends Component {
     return p;
   }
 
+  getGame(opts) {
+    if (this.config.id === opts.id) {
+      opts.respond(this);
+    }
+  }
+
   getData(opts) {
     opts.name = 'getData';
     return this.emit(opts);
   }
 
-  passData() {
-    // this should be implemented per game
-    if (typeof this.props.passData === 'function') {
-      this.props.passData.apply(this, arguments);
+  passData(opts) {
+    if (typeof opts.respond === 'function') {
+      opts.respond(this.props.passData.apply(this, arguments));
+    } else {
+      return this.props.passData.apply(this, arguments);
     }
   }
 
@@ -500,11 +514,6 @@ class Game extends Component {
       opts.highestScreenIndex) {
       if (opts.highestScreenIndex === this.screensLength - 1) return;
       this.loadScreens(opts.highestScreenIndex);
-      for (var i = 0; i < opts.highestScreenIndex - 1; i++) {
-        if (this.refs['screen-' + i]) {
-          this.refs['screen-' + i].completeRefs();
-        }
-      }
     }
   }
 
@@ -632,16 +641,14 @@ class Game extends Component {
     });
   }
 
-  fadeBackground(value) {
-    if (typeof value !== 'number') value = .25;
+  fadeBackground(value = .25) {
     this.state.playingBKG.forEach(bkg => {
       bkg.setVolume(value);
     });
   }
 
-  raiseBackground(value) {
-    if (typeof value !== 'number') value = 1;
-    if (this.state.playingVO.length === 0) {
+  raiseBackground(value = 1) {
+    if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
       this.state.playingBKG.forEach(bkg => {
         bkg.setVolume(value);
       });
@@ -704,11 +711,11 @@ class Game extends Component {
   }
 
   renderLoader() {
-    return null;
+    return this.renderContentList('loader');
   }
 
   renderAssets() {
-    return null;
+    return this.renderContentList('assets');
   }
 
   renderMenu() {
@@ -720,16 +727,16 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screens, screenKeys, self = this;
-    screens = self.props.screens || self.screens;
-    screenKeys = Object.keys(screens);
+    var screenKeys, self = this;
+    screenKeys = Object.keys(self.screens);
     self.screensLength = screenKeys.length;
     return screenKeys.map((key, index) => {
       var ScreenComponent, props;
-      props = screens[key].props || {};
+      props = self.screens[key].props || {};
       props.data = self.state.data.screens[key];
+      props.gameState = self.state;
       props.index = index;
-      ScreenComponent = screens[key];
+      ScreenComponent = self.screens[key];
       return ScreenComponent(props, 'screen-' + key, key);
     });
   }
@@ -758,5 +765,25 @@ class Game extends Component {
     );
   }
 }
+
+Game.defaultProps = _.defaults({
+  getBackgroundIndex: () => 0,
+  passData: _.identity,
+  screens: {
+    0: function (props, ref, key) {
+      return (
+        <Screen
+          {...props}
+          ref={ref}
+          key={key}
+        />
+      );
+    }
+  },
+  menus: {
+    Screen
+  },
+  ignoreReady: true
+}, Component.defaultProps);
 
 export default Game;

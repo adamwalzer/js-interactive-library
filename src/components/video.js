@@ -7,9 +7,13 @@ class Video extends Media {
 
   play() {
     if (this.state.playing) return;
+    /*
+     * In order for videos to play on mobile devices,
+     * the screen must have prop.startDelay=0
+     */
     this.el.play();
     super.play();
-    play.trigger('videoPlay', {
+    skoash.trigger('videoPlay', {
       video: this
     });
     this.setState({
@@ -23,7 +27,7 @@ class Video extends Media {
 
   stop() {
     this.el.pause();
-    play.trigger('videoStop', {
+    skoash.trigger('videoStop', {
       video: this
     });
     this.setState({
@@ -46,7 +50,7 @@ class Video extends Media {
 
   complete() {
     if (!this.props.loop) {
-      play.trigger('videoStop', {
+      skoash.trigger('videoStop', {
         video: this
       });
     }

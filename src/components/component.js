@@ -9,9 +9,16 @@ class Component extends React.Component {
       started: false,
       ready: false,
     };
+
+    this.onReady = _.identity;
   }
 
   callProp(action, opts) {
+    // TODO AW - 20160915
+    // Let's get rid of the function and remove instances of its use in games.
+    /* eslint-disable */
+    console.error('Let\'s avoid using callProp in preference of using defaultProps to ensure the prop type is a function.');
+    /* eslint-enable */
     if (typeof this.props[action] === 'function') {
       return this.props[action].call(this, opts);
     }
@@ -23,10 +30,7 @@ class Component extends React.Component {
         complete: true,
       }, () => {
         skoash.trigger('complete');
-
-        if (typeof this.props.onComplete === 'function') {
-          this.props.onComplete.call(this, this);
-        }
+        this.props.onComplete.call(this, this);
       });
     }, this.props.completeDelay);
   }
@@ -38,6 +42,7 @@ class Component extends React.Component {
       complete: false,
     }, () => {
       skoash.trigger('incomplete');
+      this.props.onIncomplete.call(this, this);
     });
   }
 
@@ -64,6 +69,10 @@ class Component extends React.Component {
   ready() {
     this.setState({
       ready: true,
+    }, () => {
+      skoash.trigger('ready');
+      this.onReady.call(this);
+      this.props.onReady.call(this);
     });
   }
 
@@ -72,59 +81,66 @@ class Component extends React.Component {
       started: true
     }, () => {
       this.checkComplete();
-    });
+      _.each(this.refs, ref => {
+        if (typeof ref.start === 'function') ref.start();
+      });
 
-    _.each(this.refs, ref => {
-      if (typeof ref.start === 'function') ref.start();
-    });
+      if (this.props.completeOnStart) this.complete();
 
-    if (this.props.completeOnStart) {
-      this.complete();
-    }
+      this.props.onStart.call(this);
+    });
   }
 
   stop() {
     this.setState({
       started: false
-    });
+    }, () => {
+      _.each(this.refs, ref => {
+        if (ref && typeof ref.stop === 'function') {
+          ref.stop();
+        }
+      });
 
-    _.each(this.refs, ref => {
-      if (ref && typeof ref.stop === 'function') {
-        ref.stop();
-      }
+      this.props.onStop.call(this);
     });
   }
 
   pause() {
-    if (typeof this.props.onPause === 'function') {
-      this.props.onPause(this);
-    }
-
     _.each(this.refs, ref => {
       if (typeof ref.pause === 'function') ref.pause();
     });
+
+    this.props.onPause.call(this);
   }
 
   resume() {
-    if (typeof this.props.onResume === 'function') {
-      this.props.onResume(this);
-    }
-
     _.each(this.refs, ref => {
       if (typeof ref.resume === 'function') ref.resume();
     });
+
+    this.props.onResume.call(this);
   }
 
   open() {
     this.setState({
       open: true
+    }, () => {
+      this.props.onOpen.call(this);
     });
   }
 
   close() {
     this.setState({
       open: false
+    }, () => {
+      this.props.onClose.call(this);
     });
+  }
+
+  componentWillMount() {
+    if (this.props.completeIncorrect && !this.props.correct) {
+      this.complete();
+    }
   }
 
   componentDidMount() {
@@ -134,33 +150,21 @@ class Component extends React.Component {
   bootstrap() {
     var self = this;
 
-    if (this.props.complete) {
-      this.complete();
-    }
+    if (self.props.complete) self.complete();
 
-    this.requireForReady = Object.keys(self.refs);
-    this.requireForComplete = this.requireForReady.filter(key => {
-      return self.refs[key].checkComplete;
-    });
+    self.requireForReady = Object.keys(self.refs);
+    self.requireForComplete = self.requireForReady.filter(key => self.refs[key].checkComplete);
 
-    this.collectMedia();
-    this.checkReady();
-
-    // this seems to duplicate a lot of data
-    // let's think more about this before adding this code
-    // this.setState(this.props);
+    self.collectMedia();
+    self.checkReady();
   }
 
   collectData() {
-    if (typeof this.props.collectData === 'function') {
-      return this.props.collectData.call(this);
-    }
+    return this.props.collectData.call(this);
   }
 
   loadData() {
-    if (this.metaData && typeof this.props.loadData === 'function') {
-      this.props.loadData.call(this, this.metaData);
-    }
+    if (this.metaData) return this.props.loadData.call(this, this.metaData);
   }
 
   collectMedia() {
@@ -218,7 +222,7 @@ class Component extends React.Component {
   checkReady() {
     var ready, self = this;
 
-    if (!this.props.checkReady || this.state.ready) return;
+    if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
 
     self.requireForReady.forEach(key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
@@ -236,8 +240,6 @@ class Component extends React.Component {
 
     if (ready) {
       self.ready();
-    } else {
-      setTimeout(self.checkReady.bind(self), 100);
     }
   }
 
@@ -285,7 +287,7 @@ class Component extends React.Component {
       STARTED: this.state.started,
       COMPLETE: this.state.complete,
       OPEN: this.state.open,
-    }, this.props.className);
+    }, this.props.className, this.props.getClassNames.call(this));
   }
 
   renderContentList(listName = 'children') {
@@ -295,6 +297,7 @@ class Component extends React.Component {
       var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
       return (
         <component.type
+          gameState={this.props.gameState}
           {...component.props}
           ref={ref}
           key={key}
@@ -318,8 +321,22 @@ Component.defaultProps = {
   bootstrap: true,
   checkComplete: true,
   checkReady: true,
+  collectData: _.identity,
   completeDelay: 0,
+  completeIncorrect: false,
   completeOnStart: false,
+  getClassNames: _.identity,
+  ignoreReady: false,
+  loadData: _.identity,
+  onClose: _.identity,
+  onComplete: _.identity,
+  onReady: _.identity,
+  onIncomplete: _.identity,
+  onOpen: _.identity,
+  onPause: _.identity,
+  onResume: _.identity,
+  onStart: _.identity,
+  onStop: _.identity,
   shouldRender: true,
   type: 'div',
 };
