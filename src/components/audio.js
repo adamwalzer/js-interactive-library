@@ -140,7 +140,7 @@ class Audio extends Media {
     }
 
     this.audio = new Howl({
-      urls: [].concat(this.props.src),
+      urls: [].concat(this.props.src), // switch this to src when moving to Howler ^2.0.0
       loop: this.props.loop,
       volume: this.props.volume,
       onend: this.complete,
