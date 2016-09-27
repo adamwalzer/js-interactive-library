@@ -138,7 +138,7 @@ class Component extends React.Component {
   }
 
   componentWillMount() {
-    if (this.props.completeIncorrect && (!this.props.correct || this.props.incorrect)) {
+    if (this.props.completeIncorrect && !this.props.correct) {
       this.complete();
     }
   }

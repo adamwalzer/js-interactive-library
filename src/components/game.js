@@ -60,7 +60,7 @@ class Game extends Component {
     }
 
     window.addEventListener('keydown', e => {
-      this.onKeyUp(e);
+      this.onKeyDown(e);
     });
 
     window.addEventListener('platform-event', e => {
@@ -83,7 +83,7 @@ class Game extends Component {
     });
   }
 
-  onKeyUp(e) {
+  onKeyDown(e) {
     if (e.keyCode === 39) { // right
       this.goto({index: this.state.currentScreenIndex + 1});
     } else if (e.keyCode === 37) { // left
