@@ -57,13 +57,13 @@ class Component extends React.Component {
   }
 
   incompleteRefs() {
-    this.incomplete();
-
     _.forEach(this.refs, ref => {
       if (typeof ref.incompleteRefs === 'function') {
         ref.incompleteRefs();
       }
     });
+
+    this.incomplete();
   }
 
   ready() {
