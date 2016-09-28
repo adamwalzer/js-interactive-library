@@ -44,6 +44,13 @@ class Game extends Component {
       this.resume();
     });
     window.addEventListener('blur', () => {
+      var node = document.activeElement.parentNode;
+      while (node != null) {
+        if (node === this.DOMNode) {
+          return;
+        }
+        node = node.parentNode;
+      }
       this.pause();
     });
 
@@ -115,6 +122,8 @@ class Game extends Component {
 
     self.collectMedia();
     self.loadScreens(this.state.currentScreenIndex, false);
+
+    this.DOMNode = ReactDOM.findDOMNode(this);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
