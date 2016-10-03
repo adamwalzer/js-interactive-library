@@ -178,11 +178,11 @@ class Screen extends Component {
   }
 
   collectData() {
-    return this.callProp('collectData');
+    return this.props.collectData.call(this);
   }
 
   loadData() {
-    return this.callProp('loadData');
+    return this.props.loadData.call(this);
   }
 
   getClassNames() {
@@ -241,6 +241,8 @@ class Screen extends Component {
 Screen.defaultProps = _.defaults({
   resetOnClose: true,
   startDelay: 250,
+  collectData: _.identity,
+  loadData: _.identity,
 }, Component.defaultProps);
 
 export default Screen;

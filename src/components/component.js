@@ -150,8 +150,6 @@ class Component extends React.Component {
   bootstrap() {
     var self = this;
 
-    if (self.props.complete) self.complete();
-
     self.requireForReady = Object.keys(self.refs);
     self.requireForComplete = self.requireForReady.filter(key => self.refs[key].checkComplete);
 
