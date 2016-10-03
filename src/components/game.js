@@ -728,11 +728,7 @@ class Game extends Component {
   }
 
   renderMenu() {
-    return (
-      <div className="menu">
-        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
-      </div>
-    );
+    return this.props.renderMenu.call(this);
   }
 
   renderScreens() {
@@ -792,7 +788,14 @@ Game.defaultProps = _.defaults({
   menus: {
     Screen
   },
-  ignoreReady: true
+  ignoreReady: true,
+  renderMenu: function () {
+    return (
+      <div className="menu">
+        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
+      </div>
+    );
+  }
 }, Component.defaultProps);
 
 export default Game;
