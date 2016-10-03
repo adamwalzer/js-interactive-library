@@ -243,6 +243,7 @@ Screen.defaultProps = _.defaults({
   startDelay: 250,
   collectData: _.identity,
   loadData: _.identity,
+  gameState: {},
 }, Component.defaultProps);
 
 export default Screen;
