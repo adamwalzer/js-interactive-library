@@ -23,6 +23,8 @@ class Media extends Asset {
         }
       });
     }
+
+    this.props.onPlay.call(this);
   }
 
   complete() {
@@ -47,6 +49,7 @@ Media.defaultProps = _.defaults({
   completeDelay: 0,
   completeOnStart: false,
   silentOnStart: true,
+  onPlay: _.identity,
 }, Asset.defaultProps);
 
 export default Media;
