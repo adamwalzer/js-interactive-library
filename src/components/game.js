@@ -186,7 +186,7 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      this.state.playingBKG.forEach(audio => {
+      _.forEach(this.state.playingBKG, audio => {
         audio[fnKey]();
       });
 
@@ -465,7 +465,7 @@ class Game extends Component {
 
   emit(gameData = {}) {
     var p, self = this;
-    p = new Promise((resolve) => {
+    p = new Promise(resolve => {
       var event;
 
       if (typeof gameData !== 'object') return;
@@ -651,14 +651,14 @@ class Game extends Component {
   }
 
   fadeBackground(value = .25) {
-    this.state.playingBKG.forEach(bkg => {
+    _.forEach(this.state.playingBKG, bkg => {
       bkg.setVolume(value);
     });
   }
 
   raiseBackground(value = 1) {
     if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
-      this.state.playingBKG.forEach(bkg => {
+      _.forEach(this.state.playingBKG, bkg => {
         bkg.setVolume(value);
       });
     }

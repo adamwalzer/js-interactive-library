@@ -222,13 +222,13 @@ class Component extends React.Component {
 
     if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
 
-    self.requireForReady.forEach(key => {
+    _.forEach(self.requireForReady, key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
         self.refs[key].bootstrap();
       }
     });
 
-    ready = self.requireForReady.every(key => {
+    ready = _.every(self.requireForReady, key => {
       return self.refs[key] && (
           !self.refs[key].state || (
             self.refs[key].state && self.refs[key].state.ready
@@ -246,13 +246,13 @@ class Component extends React.Component {
 
     if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
 
-    self.requireForComplete.forEach(key => {
+    _.forEach(self.requireForComplete, key => {
       if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
         self.refs[key].checkComplete();
       }
     });
 
-    complete = self.requireForComplete.every(key => {
+    complete = _.every(self.requireForComplete, key => {
       if (self.refs[key] instanceof Node) {
         return true;
       }
