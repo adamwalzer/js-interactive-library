@@ -10,7 +10,7 @@ class Component extends React.Component {
       ready: false,
     };
 
-    this.onReady = _.identity;
+    this.onReady = this.onReady || _.identity;
   }
 
   callProp(action, opts) {
