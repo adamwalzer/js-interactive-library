@@ -155,6 +155,8 @@ class Component extends React.Component {
 
     self.collectMedia();
     self.checkReady();
+
+    self.props.onBootstrap.call(self);
   }
 
   collectData() {
@@ -326,6 +328,7 @@ Component.defaultProps = {
   getClassNames: _.identity,
   ignoreReady: false,
   loadData: _.identity,
+  onBootstrap: _.identity,
   onClose: _.identity,
   onComplete: _.identity,
   onReady: _.identity,

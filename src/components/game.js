@@ -121,9 +121,11 @@ class Game extends Component {
     });
 
     self.collectMedia();
-    self.loadScreens(this.state.currentScreenIndex, false);
+    self.loadScreens(self.state.currentScreenIndex, false);
 
-    this.DOMNode = ReactDOM.findDOMNode(this);
+    self.DOMNode = ReactDOM.findDOMNode(self);
+
+    self.props.onBootstrap.call(self);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
@@ -257,6 +259,8 @@ class Game extends Component {
      */
     var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
       highestScreenIndex, screenIndexArray, data, back = false, buttonSound;
+
+    opts = this.props.getGotoOpts.call(this, opts);
 
     data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
@@ -795,7 +799,8 @@ Game.defaultProps = _.defaults({
         <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
       </div>
     );
-  }
+  },
+  getGotoOpts: _.identity,
 }, Component.defaultProps);
 
 export default Game;
