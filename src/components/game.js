@@ -91,9 +91,9 @@ class Game extends Component {
   }
 
   onKeyDown(e) {
-    if (e.keyCode === 39) { // right
+    if (e.keyCode === 78) { // n for next
       this.goto({index: this.state.currentScreenIndex + 1});
-    } else if (e.keyCode === 37) { // left
+    } else if (e.keyCode === 66) { // b for back
       this.goto({index: this.state.currentScreenIndex - 1});
     } else if (e.altKey && e.ctrlKey && e.keyCode === 68) { // alt + ctrl + d
       this.demo();
