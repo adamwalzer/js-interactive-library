@@ -13,17 +13,6 @@ class Component extends React.Component {
     this.onReady = this.onReady || _.identity;
   }
 
-  callProp(action, opts) {
-    // TODO AW - 20160915
-    // Let's get rid of the function and remove instances of its use in games.
-    /* eslint-disable */
-    console.error('Let\'s avoid using callProp in preference of using defaultProps to ensure the prop type is a function.');
-    /* eslint-enable */
-    if (typeof this.props[action] === 'function') {
-      return this.props[action].call(this, opts);
-    }
-  }
-
   complete() {
     setTimeout(() => {
       this.setState({
