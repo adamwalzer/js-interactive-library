@@ -685,6 +685,11 @@ class Game extends Component {
   }
 
   getClassNames() {
+    var screen, screenClass;
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    screenClass = screen ? 'SCREEN-' + screen.props.id : '';
+
     return classNames(
       'pl-game',
       'skoash-game',
@@ -698,8 +703,9 @@ class Game extends Component {
         MENU: this.state.openMenus.length,
         ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
         DEMO: this.state.demo,
-        ['SCREEN-' + this.state.currentScreenIndex]: true,
       },
+      'SCREEN-' + this.state.currentScreenIndex,
+      screenClass,
       ...this.state.classes,
       super.getClassNames()
     );
