@@ -3,6 +3,13 @@ import _ from 'lodash';
 import Asset from './asset.js';
 
 class Image extends Asset {
+  constructor() {
+    super();
+
+    this.ready = this.ready.bind(this);
+    this.error = this.error.bind(this);
+  }
+
   componentDidMount() {
     this.setState({
       complete: true
@@ -27,7 +34,7 @@ class Image extends Asset {
 
   render() {
     return (
-      <img {...this.props} onLoad={this.ready.bind(this)} onError={this.error.bind(this)} draggable={false} />
+      <img {...this.props} onLoad={this.ready} onError={this.error} draggable={false} />
     );
   }
 }
