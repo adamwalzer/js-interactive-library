@@ -268,6 +268,14 @@ class Component extends React.Component {
     if (props.complete === true && props.complete !== this.props.complete) {
       this.complete();
     }
+
+    if (props.start === true && props.start !== this.props.start) {
+      this.start();
+    }
+
+    if (props.stop === true && props.stop !== this.props.stop) {
+      this.stop();
+    }
   }
 
   getClassNames() {
