@@ -20,7 +20,7 @@ class Image extends Asset {
     if (!this.state.error) {
       this.setState({
         ready: true,
-        complete: !this.props.incomplete,
+        complete: this.props.complete,
       });
     }
   }
@@ -43,6 +43,7 @@ Image.defaultProps = _.defaults({
   shouldRender: true,
   bootstrap: true,
   checkReady: true,
+  complete: true,
 }, Asset.defaultProps);
 
 export default Image;

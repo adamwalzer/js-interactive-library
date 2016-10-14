@@ -151,9 +151,7 @@ class Screen extends Component {
         });
       }
 
-      if (typeof this.props.onOpen === 'function') {
-        this.props.onOpen(this);
-      }
+      this.props.onOpen.call(this);
 
       this.loadData();
     });
@@ -243,6 +241,7 @@ Screen.defaultProps = _.defaults({
   startDelay: 250,
   collectData: _.identity,
   loadData: _.identity,
+  onOpen: _.identity,
   gameState: {},
 }, Component.defaultProps);
 
