@@ -91,9 +91,9 @@ class Game extends Component {
   }
 
   onKeyDown(e) {
-    if (e.keyCode === 39) { // right
+    if (e.keyCode === 78) { // n for next
       this.goto({index: this.state.currentScreenIndex + 1});
-    } else if (e.keyCode === 37) { // left
+    } else if (e.keyCode === 66) { // b for back
       this.goto({index: this.state.currentScreenIndex - 1});
     } else if (e.altKey && e.ctrlKey && e.keyCode === 68) { // alt + ctrl + d
       this.demo();
@@ -685,6 +685,11 @@ class Game extends Component {
   }
 
   getClassNames() {
+    var screen, screenClass;
+
+    screen = this.refs['screen-' + this.state.currentScreenIndex];
+    screenClass = screen ? 'SCREEN-' + screen.props.id : '';
+
     return classNames(
       'pl-game',
       'skoash-game',
@@ -698,8 +703,9 @@ class Game extends Component {
         MENU: this.state.openMenus.length,
         ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
         DEMO: this.state.demo,
-        ['SCREEN-' + this.state.currentScreenIndex]: true,
       },
+      'SCREEN-' + this.state.currentScreenIndex,
+      screenClass,
       ...this.state.classes,
       super.getClassNames()
     );
