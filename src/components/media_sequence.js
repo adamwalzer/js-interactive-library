@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Component from './component.js';
 
 class MediaSequence extends Component {

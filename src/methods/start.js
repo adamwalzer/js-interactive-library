@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 var start = function (Game, id) {
   var el;
 

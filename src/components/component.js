@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import classNames from 'classnames';
 
 class Component extends React.Component {

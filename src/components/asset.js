@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Component from './component.js';
 
 /*

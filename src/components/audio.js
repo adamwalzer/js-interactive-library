@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { Howl } from 'howler';
 import Media from './media.js';
 

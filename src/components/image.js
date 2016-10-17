@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Asset from './asset.js';
 
 class Image extends Asset {
