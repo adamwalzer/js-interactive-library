@@ -10,7 +10,7 @@ class Component extends React.Component {
       ready: false,
     };
 
-    this.onReady = _.identity;
+    this.onReady = this.onReady || _.identity;
   }
 
   callProp(action, opts) {
@@ -57,13 +57,13 @@ class Component extends React.Component {
   }
 
   incompleteRefs() {
-    this.incomplete();
-
     _.forEach(this.refs, ref => {
       if (typeof ref.incompleteRefs === 'function') {
         ref.incompleteRefs();
       }
     });
+
+    this.incomplete();
   }
 
   ready() {
@@ -150,13 +150,13 @@ class Component extends React.Component {
   bootstrap() {
     var self = this;
 
-    if (self.props.complete) self.complete();
-
     self.requireForReady = Object.keys(self.refs);
     self.requireForComplete = self.requireForReady.filter(key => self.refs[key].checkComplete);
 
     self.collectMedia();
     self.checkReady();
+
+    self.props.onBootstrap.call(self);
   }
 
   collectData() {
@@ -224,13 +224,13 @@ class Component extends React.Component {
 
     if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
 
-    self.requireForReady.forEach(key => {
+    _.forEach(self.requireForReady, key => {
       if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
         self.refs[key].bootstrap();
       }
     });
 
-    ready = self.requireForReady.every(key => {
+    ready = _.every(self.requireForReady, key => {
       return self.refs[key] && (
           !self.refs[key].state || (
             self.refs[key].state && self.refs[key].state.ready
@@ -248,13 +248,13 @@ class Component extends React.Component {
 
     if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
 
-    self.requireForComplete.forEach(key => {
+    _.forEach(self.requireForComplete, key => {
       if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
         self.refs[key].checkComplete();
       }
     });
 
-    complete = self.requireForComplete.every(key => {
+    complete = _.every(self.requireForComplete, key => {
       if (self.refs[key] instanceof Node) {
         return true;
       }
@@ -328,6 +328,7 @@ Component.defaultProps = {
   getClassNames: _.identity,
   ignoreReady: false,
   loadData: _.identity,
+  onBootstrap: _.identity,
   onClose: _.identity,
   onComplete: _.identity,
   onReady: _.identity,

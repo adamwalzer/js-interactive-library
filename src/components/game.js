@@ -44,6 +44,13 @@ class Game extends Component {
       this.resume();
     });
     window.addEventListener('blur', () => {
+      var node = document.activeElement.parentNode;
+      while (node != null) {
+        if (node === this.DOMNode) {
+          return;
+        }
+        node = node.parentNode;
+      }
       this.pause();
     });
 
@@ -114,7 +121,11 @@ class Game extends Component {
     });
 
     self.collectMedia();
-    self.loadScreens(this.state.currentScreenIndex, false);
+    self.loadScreens(self.state.currentScreenIndex, false);
+
+    self.DOMNode = ReactDOM.findDOMNode(self);
+
+    self.props.onBootstrap.call(self);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
@@ -177,7 +188,7 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      this.state.playingBKG.forEach(audio => {
+      _.forEach(this.state.playingBKG, audio => {
         audio[fnKey]();
       });
 
@@ -248,6 +259,8 @@ class Game extends Component {
      */
     var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
       highestScreenIndex, screenIndexArray, data, back = false, buttonSound;
+
+    opts = this.props.getGotoOpts.call(this, opts);
 
     data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
@@ -456,7 +469,7 @@ class Game extends Component {
 
   emit(gameData = {}) {
     var p, self = this;
-    p = new Promise((resolve) => {
+    p = new Promise(resolve => {
       var event;
 
       if (typeof gameData !== 'object') return;
@@ -642,14 +655,14 @@ class Game extends Component {
   }
 
   fadeBackground(value = .25) {
-    this.state.playingBKG.forEach(bkg => {
+    _.forEach(this.state.playingBKG, bkg => {
       bkg.setVolume(value);
     });
   }
 
   raiseBackground(value = 1) {
     if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
-      this.state.playingBKG.forEach(bkg => {
+      _.forEach(this.state.playingBKG, bkg => {
         bkg.setVolume(value);
       });
     }
@@ -719,11 +732,7 @@ class Game extends Component {
   }
 
   renderMenu() {
-    return (
-      <div className="menu">
-        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
-      </div>
-    );
+    return this.props.renderMenu.call(this);
   }
 
   renderScreens() {
@@ -783,7 +792,15 @@ Game.defaultProps = _.defaults({
   menus: {
     Screen
   },
-  ignoreReady: true
+  ignoreReady: true,
+  renderMenu: function () {
+    return (
+      <div className="menu">
+        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
+      </div>
+    );
+  },
+  getGotoOpts: _.identity,
 }, Component.defaultProps);
 
 export default Game;
