@@ -195,7 +195,7 @@ class Screen extends Component {
 
   renderContent() {
     return (
-      <div>
+      <div className="screen-content">
         {this.renderContentList()}
       </div>
     );
