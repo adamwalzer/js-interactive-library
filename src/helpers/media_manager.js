@@ -101,6 +101,33 @@ var mediaManager = {
       });
     }
   },
+
+  playBackground(currentScreenIndex) {
+    var index, playingBKG, currentScreen;
+
+    if (!_.isFinite(currentScreenIndex)) return;
+
+    // re-factor to index = this.props.getBackgroundIndex.call(this, index);
+    // after games that override it have be re-factored
+    // all-about-you, polar-bear, tag-it
+    index = this.getBackgroundIndex(currentScreenIndex);
+    playingBKG = this.state.playingBKG;
+
+    currentScreen = this.refs['screen-' + currentScreenIndex];
+
+    if (!currentScreen.props.restartBackground &&
+      playingBKG.indexOf(this.audio.background[index]) !== -1) {
+      return;
+    }
+
+    _.each(playingBKG, bkg => {
+      bkg.stop();
+    });
+
+    if (this.audio.background[index]) {
+      this.audio.background[index].play();
+    }
+  },
 };
 
 export default mediaManager;
