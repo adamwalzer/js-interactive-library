@@ -1,6 +1,8 @@
 import classNames from 'classnames';
 
+import attachEvents from 'helpers/attach_events';
 import deviceDetector from 'helpers/device_detector';
+import mediaManager from 'helpers/media_manager';
 
 import Component from 'components/component';
 import Screen from 'components/screen';
@@ -36,48 +38,7 @@ class Game extends Component {
 
     this.state.data.screens = _.map(this.screens, () => ({}));
 
-    this.attachEvents();
-  }
-
-  attachEvents() {
-    window.addEventListener('load', window.focus);
-    window.addEventListener('focus', () => {
-      this.resume();
-    });
-    window.addEventListener('blur', () => {
-      var node = document.activeElement.parentNode;
-      while (node != null) {
-        if (node === this.DOMNode) {
-          return;
-        }
-        node = node.parentNode;
-      }
-      this.pause();
-    });
-
-    window.addEventListener('resize', () => {
-      this.scale();
-    });
-    window.addEventListener('orientationchange', () => {
-      window.dispatchEvent(new Event('resize'));
-    });
-    if (window.parent) {
-      window.parent.addEventListener('orientationchange', () => {
-        window.dispatchEvent(new Event('orientationchange'));
-      });
-    }
-
-    window.addEventListener('keydown', e => {
-      this.onKeyDown(e);
-    });
-
-    window.addEventListener('platform-event', e => {
-      this.trigger(e.name, e.gameData);
-    });
-
-    window.addEventListener('trigger', e => {
-      this.trigger(e.name, e.opts);
-    });
+    attachEvents.call(this);
   }
 
   getState(opts = {}) {
@@ -352,15 +313,21 @@ class Game extends Component {
     if (screen && !openMenus.length) screen.resume();
   }
 
+  // Remove this method after refactoring games that override it.
+  // all-about-you, polar-bear, tag-it
   getBackgroundIndex(index) {
     return this.props.getBackgroundIndex.call(this, index);
   }
 
+  // Add this method to the media manager in the future.
   playBackground(currentScreenIndex) {
     var index, playingBKG, currentScreen;
 
     if (!_.isFinite(currentScreenIndex)) return;
 
+    // re-factor to index = this.props.getBackgroundIndex.call(this, index);
+    // after games that override it have be re-factored
+    // all-about-you, polar-bear, tag-it
     index = this.getBackgroundIndex(currentScreenIndex);
     playingBKG = this.state.playingBKG;
 
@@ -392,10 +359,10 @@ class Game extends Component {
     events = {
       goto: this.goto,
       goBack: this.goBack,
-      audioPlay: this.audioPlay,
-      audioStop: this.audioStop,
-      videoPlay: this.videoPlay,
-      videoStop: this.videoStop,
+      audioPlay: mediaManager.audioPlay,
+      audioStop: mediaManager.audioStop,
+      videoPlay: mediaManager.videoPlay,
+      videoStop: mediaManager.videoStop,
       demo: this.demo,
       'toggle-demo-mode': this.demo,
       getData: this.getData,
@@ -521,109 +488,6 @@ class Game extends Component {
         opts.callback.call(this);
       }
     });
-  }
-
-  audioPlay(opts) {
-    var playingSFX, playingVO, playingBKG, classes;
-
-    playingSFX = this.state.playingSFX || [];
-    playingVO = this.state.playingVO || [];
-    playingBKG = this.state.playingBKG || [];
-    classes = this.state.classes || [];
-
-    if (opts.audio.props.gameClass) {
-      classes.push(opts.audio.props.gameClass);
-    }
-
-    switch (opts.audio.props.type) {
-    case 'sfx':
-      playingSFX.push(opts.audio);
-      break;
-    case 'voiceOver':
-      playingVO.push(opts.audio);
-      this.fadeBackground();
-      break;
-    case 'background':
-      playingBKG.push(opts.audio);
-      break;
-    }
-
-    this.setState({
-      playingSFX,
-      playingVO,
-      playingBKG,
-      classes
-    });
-  }
-
-  audioStop(opts) {
-    var playingSFX, playingVO, playingBKG, index;
-
-    playingSFX = this.state.playingSFX || [];
-    playingVO = this.state.playingVO || [];
-    playingBKG = this.state.playingBKG || [];
-
-    switch (opts.audio.props.type) {
-    case 'sfx':
-      index = playingSFX.indexOf(opts.audio);
-      index !== -1 && playingSFX.splice(index, 1);
-      break;
-    case 'voiceOver':
-      index = playingVO.indexOf(opts.audio);
-      index !== -1 && playingVO.splice(index, 1);
-      if (!playingVO.length) {
-        this.raiseBackground();
-      }
-      break;
-    case 'background':
-      index = playingBKG.indexOf(opts.audio);
-      index !== -1 && playingBKG.splice(index, 1);
-      break;
-    }
-
-    this.setState({
-      playingSFX,
-      playingVO,
-      playingBKG,
-    });
-  }
-
-  videoPlay(opts) {
-    var playingVideo = this.state.playingVideo;
-
-    if (playingVideo) {
-      playingVideo.stop();
-    }
-
-    playingVideo = opts.video;
-
-    this.fadeBackground(0);
-
-    this.setState({
-      playingVideo,
-    });
-  }
-
-  videoStop() {
-    this.raiseBackground(1);
-
-    this.setState({
-      playingVideo: null,
-    });
-  }
-
-  fadeBackground(value = .25) {
-    _.forEach(this.state.playingBKG, bkg => {
-      bkg.setVolume(value);
-    });
-  }
-
-  raiseBackground(value = 1) {
-    if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
-      _.forEach(this.state.playingBKG, bkg => {
-        bkg.setVolume(value);
-      });
-    }
   }
 
   checkComplete() {
