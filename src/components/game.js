@@ -133,7 +133,7 @@ class Game extends Component {
 
   resume() {
     if (this.state.playingVO.length) {
-      this.fadeBackground();
+      mediaManager.fadeBackground.call(this);
     }
     this.setPause(false);
   }
@@ -509,11 +509,7 @@ class Game extends Component {
     var transform, transformOrigin;
 
     transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
-    transformOrigin = '50% 0px 0px';
-
-    if (this.state.scale < 1) {
-      transformOrigin = '0px 0px 0px';
-    }
+    transformOrigin = this.state.scale < 1 ? '0px 0px 0px' : '50% 0px 0px';
 
     return {
       transform,
