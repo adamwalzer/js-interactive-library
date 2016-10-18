@@ -183,6 +183,7 @@ class Game extends Component {
     data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
+
     if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
       return;
     }
@@ -198,6 +199,7 @@ class Game extends Component {
       currentScreenIndex = opts.index;
       highestScreenIndex = this.state.highestScreenIndex;
     }
+
     newScreen = this.refs['screen-' + currentScreenIndex];
     prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
     screenIndexArray = this.state.screenIndexArray;
@@ -215,7 +217,7 @@ class Game extends Component {
     }
 
     if (newScreen) {
-      // this should never be dropped into
+      // this should only be dropped into for non-linear screens
       if (!newScreen.state.load || !newScreen.state.ready) {
         this.loadScreens(currentScreenIndex, false);
       }
@@ -233,15 +235,23 @@ class Game extends Component {
         oldScreen.leave();
       }
 
+      if (!opts.silent) {
+        if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
+          buttonSound = opts.buttonSound;
+        } else if (this.audio.button) {
+          buttonSound = this.audio.next || this.audio.button;
+          if (back) buttonSound = this.audio.back || this.audio.button;
+        }
+        if (buttonSound) buttonSound.play();
+      }
+
       if (oldScreen.props.resetOnClose) {
         data = _.cloneDeep(this.state.data);
         data.screens[oldIndex] = {};
       }
     }
 
-    if (nextScreen) {
-      nextScreen.load();
-    }
+    if (nextScreen) nextScreen.load();
 
     this.setState({
       loading: false,
@@ -252,19 +262,7 @@ class Game extends Component {
       data,
     });
 
-    if (!opts.load) {
-      this.emitSave(highestScreenIndex, currentScreenIndex);
-    }
-
-    if (!opts.silent) {
-      if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
-        buttonSound = opts.buttonSound;
-      } else if (this.audio.button) {
-        buttonSound = this.audio.next || this.audio.button;
-        if (back) buttonSound = this.audio.back || this.audio.button;
-      }
-      if (buttonSound) buttonSound.play();
-    }
+    if (!opts.load) this.emitSave(highestScreenIndex, currentScreenIndex);
 
     mediaManager.playBackground.call(this, currentScreenIndex);
   }
