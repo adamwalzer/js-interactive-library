@@ -139,6 +139,7 @@ class Audio extends Media {
 
     this.audio = new Howl({
       urls: [].concat(this.props.src), // switch this to src when moving to Howler ^2.0.0
+      format: [].concat(this.props.format),
       loop: this.props.loop,
       volume: this.props.volume,
       onend: this.complete,
@@ -152,6 +153,7 @@ class Audio extends Media {
 }
 
 Audio.defaultProps = _.defaults({
+  format: 'mp3',
   delay: 0,
   loop: false,
   volume: 1,
