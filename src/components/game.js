@@ -302,14 +302,19 @@ class Game extends Component {
   }
 
   menuClose(opts) {
-    var openMenus, screen;
+    var menu, openMenus, screen;
 
-    openMenus = this.state.openMenus || [];
-    openMenus.splice(opts.id, 1);
-    if (this.media.button) this.media.button.play();
-    this.setState({
-      openMenus,
-    });
+    menu = this.refs['menu-' + opts.id];
+
+    if (menu) {
+      menu.close();
+      openMenus = this.state.openMenus || [];
+      openMenus.splice(opts.id, 1);
+      if (this.media.button) this.media.button.play();
+      this.setState({
+        openMenus,
+      });
+    }
 
     screen = this.refs['screen-' + this.state.currentScreenIndex];
     if (screen && !openMenus.length) screen.resume();
