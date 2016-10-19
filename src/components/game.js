@@ -196,7 +196,7 @@ class Game extends Component {
     }
 
     newScreen = this.refs['screen-' + currentScreenIndex];
-    console.error(newScreen.props.id);
+
     if (!this.shouldGoto(oldScreen, newScreen, opts)) return;
 
     data = this.closeOldScreen(oldScreen, newScreen, opts, oldIndex);
