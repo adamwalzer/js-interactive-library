@@ -176,46 +176,70 @@ class Game extends Component {
      * not the index of the highest screen that exists.
      */
     var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
-      highestScreenIndex, screenIndexArray, data, back = false, buttonSound;
+      highestScreenIndex, screenIndexArray, data;
 
     opts = this.props.getGotoOpts.call(this, opts);
 
-    data = this.state.data;
     oldIndex = this.state.currentScreenIndex;
     oldScreen = this.refs['screen-' + oldIndex];
-
-    if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
-      return;
-    }
 
     if (typeof opts.index === 'number') {
       if (opts.index > this.screensLength - 1) {
         return this.quit();
       }
       currentScreenIndex = Math.min(this.screensLength - 1, Math.max(0, opts.index));
-      nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
       highestScreenIndex = Math.max(this.state.highestScreenIndex, currentScreenIndex);
+      nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
+      prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
     } else if (typeof opts.index === 'string') {
       currentScreenIndex = opts.index;
       highestScreenIndex = this.state.highestScreenIndex;
     }
 
     newScreen = this.refs['screen-' + currentScreenIndex];
-    prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
-    screenIndexArray = this.state.screenIndexArray;
+
+    if (!this.shouldGoto(oldScreen, newScreen, opts)) return;
+
+    screenIndexArray = this.openNewScreen(newScreen, currentScreenIndex, opts);
+    data = this.closeOldScreen(oldScreen, newScreen, opts, oldIndex);
+
+    if (prevScreen) prevScreen.replay();
+    if (nextScreen) nextScreen.load();
+    if (!opts.load) this.emitSave(highestScreenIndex, currentScreenIndex);
+    mediaManager.playBackground.call(this, currentScreenIndex);
+
+    this.setState({
+      loading: false,
+      currentScreenIndex,
+      highestScreenIndex,
+      screenIndexArray,
+      classes: [],
+      data,
+    });
+  }
+
+  shouldGoto(oldScreen, newScreen, opts) {
+    if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
+      return false;
+    }
 
     if (oldScreen.props.index < newScreen.props.index) {
       if (!opts.load && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
-        return;
+        return false;
       }
     }
 
     if (oldScreen.props.index > newScreen.props.index) {
       if (newScreen.props.index === 0) {
-        return;
+        return false;
       }
     }
 
+    return true;
+  }
+
+  openNewScreen(newScreen, currentScreenIndex, opts) {
+    var screenIndexArray = this.state.screenIndexArray;
     if (newScreen) {
       // this should only be dropped into for non-linear screens
       if (!newScreen.state.load || !newScreen.state.ready) {
@@ -224,9 +248,11 @@ class Game extends Component {
       screenIndexArray.push(currentScreenIndex);
       newScreen.open(opts);
     }
+    return screenIndexArray;
+  }
 
-    if (prevScreen) prevScreen.replay();
-
+  closeOldScreen(oldScreen, newScreen, opts, oldIndex) {
+    var back, buttonSound, data = _.cloneDeep(this.state.data);
     if (oldScreen && oldScreen !== newScreen) {
       if (oldScreen.props.index > newScreen.props.index) {
         back = true;
@@ -246,25 +272,10 @@ class Game extends Component {
       }
 
       if (oldScreen.props.resetOnClose) {
-        data = _.cloneDeep(this.state.data);
         data.screens[oldIndex] = {};
       }
     }
-
-    if (nextScreen) nextScreen.load();
-
-    this.setState({
-      loading: false,
-      currentScreenIndex,
-      highestScreenIndex,
-      screenIndexArray,
-      classes: [],
-      data,
-    });
-
-    if (!opts.load) this.emitSave(highestScreenIndex, currentScreenIndex);
-
-    mediaManager.playBackground.call(this, currentScreenIndex);
+    return data;
   }
 
   emitSave(highestScreenIndex, currentScreenIndex) {
