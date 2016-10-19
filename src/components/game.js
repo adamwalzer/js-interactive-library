@@ -46,9 +46,8 @@ class Game extends Component {
   }
 
   demo() {
-    var demo = !this.state.demo;
     this.setState({
-      demo
+      demo: !this.state.demo,
     });
   }
 
@@ -339,12 +338,8 @@ class Game extends Component {
       videoPlay: mediaManager.videoPlay,
       videoStop: mediaManager.videoStop,
       demo: this.demo,
-      'toggle-demo-mode': this.demo,
       getData: this.getData,
-      'get-data': this.getData,
       passData: this.passData,
-      'pass-data': this.passData,
-      'update-data': this.updateData,
       updateData: this.updateData,
       updateState: this.updateState,
       screenComplete: this.screenComplete,
