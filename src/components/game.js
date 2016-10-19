@@ -193,8 +193,8 @@ class Game extends Component {
 
     if (!this.shouldGoto(oldScreen, newScreen, opts)) return;
 
-    screenIndexArray = this.openNewScreen(newScreen, currentScreenIndex, opts);
     data = this.closeOldScreen(oldScreen, newScreen, opts, oldIndex);
+    screenIndexArray = this.openNewScreen(newScreen, currentScreenIndex, opts);
 
     if (prevScreen) prevScreen.replay();
     if (nextScreen) nextScreen.load();
