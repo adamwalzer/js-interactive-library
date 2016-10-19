@@ -113,15 +113,21 @@ class Game extends Component {
     if (secondScreen) secondScreen.load();
   }
 
-  onReady() {
-    this.emit({
-      name: 'ready',
-      game: this.config.id,
-    });
-    this.goto({
-      index: this.state.currentScreenIndex,
-      silent: true,
-    });
+  ready() {
+    if (!this.state.ready) {
+      this.setState({
+        ready: true,
+      }, () => {
+        this.emit({
+          name: 'ready',
+          game: this.config.id,
+        });
+        this.goto({
+          index: this.state.currentScreenIndex,
+          silent: true,
+        });
+      });
+    }
   }
 
   resume() {
@@ -190,7 +196,7 @@ class Game extends Component {
     }
 
     newScreen = this.refs['screen-' + currentScreenIndex];
-
+    console.error(newScreen.props.id);
     if (!this.shouldGoto(oldScreen, newScreen, opts)) return;
 
     data = this.closeOldScreen(oldScreen, newScreen, opts, oldIndex);
