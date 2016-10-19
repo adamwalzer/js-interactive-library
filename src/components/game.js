@@ -114,21 +114,15 @@ class Game extends Component {
     if (secondScreen) secondScreen.load();
   }
 
-  ready() {
-    if (!this.state.ready) {
-      this.setState({
-        ready: true,
-      }, () => {
-        this.emit({
-          name: 'ready',
-          game: this.config.id,
-        });
-        this.goto({
-          index: this.state.currentScreenIndex,
-          silent: true,
-        });
-      });
-    }
+  onReady() {
+    this.emit({
+      name: 'ready',
+      game: this.config.id,
+    });
+    this.goto({
+      index: this.state.currentScreenIndex,
+      silent: true,
+    });
   }
 
   resume() {
@@ -594,6 +588,7 @@ Game.defaultProps = _.defaults({
     );
   },
   getGotoOpts: _.identity,
+  triggerReady: false,
 }, Component.defaultProps);
 
 export default Game;

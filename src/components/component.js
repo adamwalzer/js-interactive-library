@@ -58,7 +58,7 @@ class Component extends React.Component {
     this.setState({
       ready: true,
     }, () => {
-      skoash.trigger('ready');
+      if (this.props.triggerReady) skoash.trigger('ready');
       this.onReady.call(this);
       this.props.onReady.call(this);
     });
@@ -335,6 +335,7 @@ Component.defaultProps = {
   onStart: _.identity,
   onStop: _.identity,
   shouldRender: true,
+  triggerReady: true,
   type: 'div',
 };
 
