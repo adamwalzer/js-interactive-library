@@ -59,6 +59,7 @@ class Component extends React.Component {
       ready: true,
     }, () => {
       if (this.props.triggerReady) skoash.trigger('ready');
+      if (this.state.open) this.start();
       this.onReady.call(this);
       this.props.onReady.call(this);
     });
