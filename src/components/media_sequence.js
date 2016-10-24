@@ -8,7 +8,14 @@ class MediaSequence extends Component {
   }
 
   start() {
-    if (!this.props.silentOnStart) this.play();
+    if (!this.props.silentOnStart && (!this.state.started || this.props.playMultiple)) this.play();
+  }
+
+  complete() {
+    super.complete();
+    this.setState({
+      started: false
+    });
   }
 
   play() {
@@ -49,6 +56,8 @@ class MediaSequence extends Component {
 
 MediaSequence.defaultProps = _.defaults({
   silentOnStart: false,
+  // this prop toggles if the media sequence can be started while it is currently playing
+  playMultiple: false,
 }, Component.defaultProps);
 
 export default MediaSequence;

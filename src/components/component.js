@@ -284,7 +284,7 @@ class Component extends React.Component {
       STARTED: this.state.started,
       COMPLETE: this.state.complete,
       OPEN: this.state.open,
-    }, this.props.className, this.props.getClassNames.call(this));
+    }, this.state.className, this.props.className, this.props.getClassNames.call(this));
   }
 
   renderContentList(listName = 'children') {
