@@ -278,6 +278,18 @@ class Component extends React.Component {
     }
   }
 
+  addClassName(className) {
+    this.setState({
+      className: classNames(this.state.className, className),
+    });
+  }
+
+  removeClassName(className) {
+    this.setState({
+      className: this.state.className.replace(className, ''),
+    });
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
