@@ -210,6 +210,10 @@ class Component extends React.Component {
     this.media.sequence.push(this.refs[key]);
   }
 
+  playMedia(path) {
+    _.invoke(this.media, path + '.play');
+  }
+
   checkReady() {
     var ready, self = this;
 
