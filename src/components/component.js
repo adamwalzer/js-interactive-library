@@ -65,7 +65,7 @@ class Component extends React.Component {
     });
   }
 
-  start() {
+  start(callback) {
     this.setState({
       started: true
     }, () => {
@@ -77,6 +77,8 @@ class Component extends React.Component {
       if (this.props.completeOnStart) this.complete();
 
       this.props.onStart.call(this);
+
+      if (typeof callback === 'function') callback.call(this);
     });
   }
 
