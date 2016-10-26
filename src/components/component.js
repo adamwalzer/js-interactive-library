@@ -10,6 +10,7 @@ class Component extends React.Component {
     };
 
     this.onReady = this.onReady || _.identity;
+    this.start = _.debounce(this.start.bind(this), 100);
   }
 
   complete() {
