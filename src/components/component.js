@@ -310,7 +310,7 @@ class Component extends React.Component {
     var children = [].concat(this.props[listName]);
     return children.map((component, key) => {
       if (!component) return;
-      var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
+      var ref = component.ref || (component.props && component.props['data-ref']) || listName + '-' + key;
       return (
         <component.type
           gameState={this.props.gameState}
