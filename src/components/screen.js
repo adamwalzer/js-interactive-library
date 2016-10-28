@@ -80,9 +80,10 @@ class Screen extends Component {
   }
 
   start() {
-    super.start();
-    this.bootstrap();
-    this.startMedia();
+    super.start(() => {
+      this.bootstrap();
+      this.startMedia();
+    });
   }
 
   startMedia() {
