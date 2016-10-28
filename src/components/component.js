@@ -67,6 +67,7 @@ class Component extends React.Component {
   }
 
   start(callback) {
+    if (!this.state || !this.state.ready) return;
     this.setState({
       started: true
     }, () => {
