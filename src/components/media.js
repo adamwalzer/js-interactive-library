@@ -47,7 +47,7 @@ Media.defaultProps = _.defaults({
   completeDelay: 0,
   completeOnStart: false,
   silentOnStart: true,
-  onPlay: _.identity,
+  onPlay: _.noop,
 }, Asset.defaultProps);
 
 export default Media;

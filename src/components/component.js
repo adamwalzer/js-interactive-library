@@ -9,7 +9,7 @@ class Component extends React.Component {
       ready: false,
     };
 
-    this.onReady = this.onReady || _.identity;
+    this.onReady = this.onReady || _.noop;
     this.start = _.debounce(this.start.bind(this), 100);
   }
 
@@ -337,23 +337,23 @@ Component.defaultProps = {
   bootstrap: true,
   checkComplete: true,
   checkReady: true,
-  collectData: _.identity,
+  collectData: _.noop,
   completeDelay: 0,
   completeIncorrect: false,
   completeOnStart: false,
-  getClassNames: _.identity,
+  getClassNames: _.noop,
   ignoreReady: false,
-  loadData: _.identity,
-  onBootstrap: _.identity,
-  onClose: _.identity,
-  onComplete: _.identity,
-  onReady: _.identity,
-  onIncomplete: _.identity,
-  onOpen: _.identity,
-  onPause: _.identity,
-  onResume: _.identity,
-  onStart: _.identity,
-  onStop: _.identity,
+  loadData: _.noop,
+  onBootstrap: _.noop,
+  onClose: _.noop,
+  onComplete: _.noop,
+  onReady: _.noop,
+  onIncomplete: _.noop,
+  onOpen: _.noop,
+  onPause: _.noop,
+  onResume: _.noop,
+  onStart: _.noop,
+  onStop: _.noop,
   shouldRender: true,
   triggerReady: true,
   type: 'div',

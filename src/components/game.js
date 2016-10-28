@@ -570,7 +570,7 @@ class Game extends Component {
 
 Game.defaultProps = _.defaults({
   getBackgroundIndex: () => 0,
-  passData: _.identity,
+  passData: _.noop,
   screens: {
     0: function (props, ref, key) {
       return (
@@ -593,7 +593,7 @@ Game.defaultProps = _.defaults({
       </div>
     );
   },
-  getGotoOpts: _.identity,
+  getGotoOpts: _.identity, // don't change to _.noop
   triggerReady: false,
 }, Component.defaultProps);
 

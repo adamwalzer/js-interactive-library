@@ -238,9 +238,9 @@ class Screen extends Component {
 Screen.defaultProps = _.defaults({
   resetOnClose: true,
   startDelay: 250,
-  collectData: _.identity,
-  loadData: _.identity,
-  onOpen: _.identity,
+  collectData: _.noop,
+  loadData: _.noop,
+  onOpen: _.noop,
   gameState: {},
 }, Component.defaultProps);
 
