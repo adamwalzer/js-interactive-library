@@ -130,10 +130,10 @@ class Screen extends Component {
       leaving: false,
       leave: false,
       close: false,
-      replay: this.state.complete || this.state.replay,
+      replay: self.state.complete || self.state.replay,
       opts,
     }, () => {
-      if (this.props.startDelay) {
+      if (self.props.startDelay) {
         setTimeout(() => {
           if (!self.state.started) {
             self.start();
@@ -141,7 +141,7 @@ class Screen extends Component {
           self.setState({
             opening: false
           });
-        }, this.props.startDelay);
+        }, self.props.startDelay);
       } else {
         if (!self.state.started) {
           self.start();
@@ -151,9 +151,9 @@ class Screen extends Component {
         });
       }
 
-      this.props.onOpen.call(this);
+      self.props.onOpen.call(self);
 
-      this.loadData();
+      self.loadData();
     });
   }
 
@@ -194,6 +194,7 @@ class Screen extends Component {
   }
 
   renderContent() {
+    if (!this.state.load) return null;
     return (
       <div className="screen-content">
         {this.renderContentList()}
@@ -201,34 +202,24 @@ class Screen extends Component {
     );
   }
 
-  renderScreen() {
-    if (!this.state.load) {
-      return null;
-    }
-
-    return this.renderContent();
-  }
-
   renderPrevButton() {
-    if (!this.props.hidePrev) {
-      return (
-        <button className="prev-screen" onClick={this.prev}></button>
-      );
-    }
+    if (this.props.hidePrev) return null;
+    return (
+      <button className="prev-screen" onClick={this.prev} />
+    );
   }
 
   renderNextButton() {
-    if (!this.props.hideNext) {
-      return (
-        <button className="next-screen" onClick={this.next}></button>
-      );
-    }
+    if (this.props.hideNext) return null;
+    return (
+      <button className="next-screen" onClick={this.next} />
+    );
   }
 
   render() {
     return (
       <div id={this.props.id} className={this.getClassNames()}>
-        {this.renderScreen()}
+        {this.renderContent()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
       </div>

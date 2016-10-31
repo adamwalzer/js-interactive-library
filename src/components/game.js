@@ -12,14 +12,8 @@ class Game extends Component {
     super(props);
 
     this.config = props.config ? props.config : props;
-
-    this.screens = props.screens || {
-      0: <Screen />
-    };
-
-    this.menus = props.menus || {
-      Screen
-    };
+    this.screens = props.screens;
+    this.menus = props.menus;
 
     this.state = {
       currentScreenIndex: 0,
