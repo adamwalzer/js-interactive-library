@@ -9,7 +9,7 @@ class Video extends Media {
   }
 
   play() {
-    if (this.state.playing) return;
+    if (this.playing) return;
     /*
      * In order for videos to play on mobile devices,
      * the screen must have prop.startDelay=0
@@ -19,9 +19,7 @@ class Video extends Media {
     skoash.trigger('videoPlay', {
       video: this
     });
-    this.setState({
-      playing: true,
-    });
+    this.playing = true;
   }
 
   start() {
@@ -33,22 +31,17 @@ class Video extends Media {
     skoash.trigger('videoStop', {
       video: this
     });
-    this.setState({
-      playing: false,
-    });
+    this.playing = false;
   }
 
   pause() {
     this.video.pause();
-    this.setState({
-      paused: true,
-    });
+    this.paused = true;
   }
 
   resume() {
-    this.setState({
-      paused: false,
-    }, this.play);
+    this.paused = false;
+    this.play();
   }
 
   complete() {
@@ -58,9 +51,7 @@ class Video extends Media {
       });
     }
 
-    this.setState({
-      playing: false
-    });
+    this.playing = false;
 
     super.complete();
   }
