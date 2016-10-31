@@ -1,13 +1,20 @@
 import Media from './media.js';
 
 class Video extends Media {
+  constructor(props) {
+    super(props);
+
+    this.play = this.play.bind(this);
+    this.ready = this.ready.bind(this);
+  }
+
   play() {
     if (this.state.playing) return;
     /*
      * In order for videos to play on mobile devices,
      * the screen must have prop.startDelay=0
      */
-    this.el.play();
+    this.video.play();
     super.play();
     skoash.trigger('videoPlay', {
       video: this
@@ -22,7 +29,7 @@ class Video extends Media {
   }
 
   stop() {
-    this.el.pause();
+    this.video.pause();
     skoash.trigger('videoStop', {
       video: this
     });
@@ -32,7 +39,7 @@ class Video extends Media {
   }
 
   pause() {
-    this.el.pause();
+    this.video.pause();
     this.setState({
       paused: true,
     });
@@ -41,7 +48,7 @@ class Video extends Media {
   resume() {
     this.setState({
       paused: false,
-    }, this.play.bind(this));
+    }, this.play);
   }
 
   complete() {
@@ -58,13 +65,19 @@ class Video extends Media {
     super.complete();
   }
 
-  componentDidMount() {
-    this.el = ReactDOM.findDOMNode(this);
+  bootstrap() {
+    this.video = ReactDOM.findDOMNode(this);
   }
 
   render() {
     return (
-      <video {...this.props} onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} preload="auto" controls={true} />
+      <video
+        {...this.props}
+        onCanPlay={this.ready}
+        onEnded={this.complete}
+        preload="auto"
+        controls={true}
+      />
     );
   }
 }
