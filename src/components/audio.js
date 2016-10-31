@@ -120,10 +120,6 @@ class Audio extends Media {
     super.complete();
   }
 
-  shouldComponentUpdate() {
-    return false;
-  }
-
   bootstrap() {
     var sprite;
 
@@ -160,6 +156,7 @@ Audio.defaultProps = _.defaults({
   maxVolume: 1,
   minVolume: 0,
   sprite: undefined,
+  shouldComponentUpdate: () => false,
 }, Media.defaultProps);
 
 export default Audio;

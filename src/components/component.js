@@ -271,6 +271,10 @@ class Component extends React.Component {
     skoash.trigger('updateState', opts);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.shouldComponentUpdate.call(this, nextProps, nextState);
+  }
+
   componentWillReceiveProps(props) {
     if (props.complete === true && props.complete !== this.props.complete) {
       this.complete();
@@ -354,6 +358,7 @@ Component.defaultProps = {
   onResume: _.noop,
   onStart: _.noop,
   onStop: _.noop,
+  shouldComponentUpdate: () => true,
   shouldRender: true,
   triggerReady: true,
   type: 'div',
