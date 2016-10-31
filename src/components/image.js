@@ -1,8 +1,8 @@
 import Asset from './asset.js';
 
 class Image extends Asset {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.ready = this.ready.bind(this);
     this.error = this.error.bind(this);

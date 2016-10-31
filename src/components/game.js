@@ -9,7 +9,7 @@ import Screen from 'components/screen';
 
 class Game extends Component {
   constructor(props = {}) {
-    super();
+    super(props);
 
     this.config = props.config ? props.config : props;
 

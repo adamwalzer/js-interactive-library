@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 
 class Component extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       started: false,
@@ -143,15 +143,15 @@ class Component extends React.Component {
   }
 
   bootstrap() {
-    var self = this;
+    if (!this.props.bootstrap) return;
 
-    self.requireForReady = Object.keys(self.refs);
-    self.requireForComplete = self.requireForReady.filter(key => self.refs[key].checkComplete);
+    this.requireForReady = Object.keys(this.refs);
+    this.requireForComplete = this.requireForReady.filter(key => this.refs[key].checkComplete);
 
-    self.collectMedia();
-    self.checkReady();
+    this.collectMedia();
+    this.checkReady();
 
-    self.props.onBootstrap.call(self);
+    this.props.onBootstrap.call(this);
   }
 
   collectData() {

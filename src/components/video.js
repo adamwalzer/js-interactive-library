@@ -1,10 +1,6 @@
 import Media from './media.js';
 
 class Video extends Media {
-  constructor() {
-    super();
-  }
-
   play() {
     if (this.state.playing) return;
     /*

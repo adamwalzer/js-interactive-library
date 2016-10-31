@@ -1,8 +1,8 @@
 import Component from './component.js';
 
 class MediaSequence extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.playNext = this.playNext.bind(this);
   }
