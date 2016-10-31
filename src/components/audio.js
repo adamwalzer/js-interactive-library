@@ -2,15 +2,15 @@ import { Howl } from 'howler';
 import Media from './media.js';
 
 class Audio extends Media {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.startCount = 0;
     this.completeCount = 0;
 
-    this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
     this.playAudio = this.playAudio.bind(this);
+    this.play = _.throttle(this.play.bind(this), props.playThrottle);
   }
 
   play() {
@@ -155,6 +155,7 @@ Audio.defaultProps = _.defaults({
   volume: 1,
   maxVolume: 1,
   minVolume: 0,
+  playThrottle: 100,
   sprite: undefined,
   shouldComponentUpdate: () => false,
 }, Media.defaultProps);
