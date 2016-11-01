@@ -15,7 +15,6 @@ class Component extends React.Component {
   }
 
   complete() {
-    if (!this.state || !this.state.ready) return;
     setTimeout(() => {
       this.setState({
         complete: true,
