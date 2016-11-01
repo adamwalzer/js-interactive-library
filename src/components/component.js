@@ -269,7 +269,7 @@ class Component extends React.Component {
   }
 
   updateGameState(opts) {
-    skoash.trigger('updateState', opts);
+    return skoash.trigger('updateState', opts);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
