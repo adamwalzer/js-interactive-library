@@ -343,6 +343,7 @@ class Game extends Component {
       videoPlay: mediaManager.videoPlay,
       videoStop: mediaManager.videoStop,
       demo: this.demo,
+      'toggle-demo-mode': this.demo,
       getData: this.getData,
       passData: this.passData,
       updateData: this.updateData,
