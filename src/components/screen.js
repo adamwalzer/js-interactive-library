@@ -39,7 +39,7 @@ class Screen extends Component {
   next() {
     var state = this.props.gameState;
 
-    if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
+    if (!this.state.started || this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 
     this.setState({
       leaving: true
