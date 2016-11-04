@@ -116,7 +116,7 @@ class Audio extends Media {
     if (!this.props.complete && (!this.playing || this.paused)) return;
     if (this.startCount > this.completeCount) return;
 
-    this.playing = false;
+    if (!this.props.loop) this.playing = false;
     super.complete();
   }
 
