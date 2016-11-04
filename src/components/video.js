@@ -9,7 +9,7 @@ class Video extends Media {
   }
 
   play() {
-    if (this.playing) return;
+    if (this.playing && !this.paused) return;
     /*
      * In order for videos to play on mobile devices,
      * the screen must have prop.startDelay=0
@@ -20,6 +20,7 @@ class Video extends Media {
       video: this
     });
     this.playing = true;
+    this.paused = false;
   }
 
   start() {
@@ -40,7 +41,6 @@ class Video extends Media {
   }
 
   resume() {
-    this.paused = false;
     this.play();
   }
 
@@ -72,5 +72,9 @@ class Video extends Media {
     );
   }
 }
+
+Video.defaultProps = _.defaults({
+  shouldComponentUpdate: () => false,
+}, Media.defaultProps);
 
 export default Video;
