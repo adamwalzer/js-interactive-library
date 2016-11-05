@@ -70,10 +70,12 @@ class Game extends Component {
       self.state.currentScreenIndex = 1;
     }
 
+    self.screensLength = Object.keys(self.screens).length;
+
     self.requireForReady = Object.keys(self.refs);
-    self.requireForComplete = self.requireForReady.filter(key => {
-      return !self.refs[key].state || !self.refs[key].state.complete;
-    });
+    self.requireForComplete = self.requireForReady.filter(key =>
+      !self.refs[key].state || !self.refs[key].state.complete
+    );
 
     self.collectMedia();
     self.loadScreens(self.state.currentScreenIndex, false);
@@ -108,26 +110,23 @@ class Game extends Component {
   }
 
   ready() {
-    if (!this.state.ready) {
-      this.setState({
-        ready: true,
-      }, () => {
-        this.emit({
-          name: 'ready',
-          game: this.config.id,
-        });
-        this.goto({
-          index: this.state.currentScreenIndex,
-          silent: true,
-        });
+    if (this.state.ready) return;
+    this.setState({
+      ready: true,
+    }, () => {
+      this.emit({
+        name: 'ready',
+        game: this.config.id,
       });
-    }
+      this.goto({
+        index: this.state.currentScreenIndex,
+        silent: true,
+      });
+    });
   }
 
   resume() {
-    if (this.state.playingVO.length) {
-      mediaManager.fadeBackground.call(this);
-    }
+    if (this.state.playingVO.length) mediaManager.fadeBackground.call(this);
     this.setPause(false);
   }
 
@@ -138,7 +137,7 @@ class Game extends Component {
   // paused should be a boolean determining if whether to call
   // audio.pause or audio.resume
   setPause(paused) {
-    var openScreen, fnKey = paused ? 'pause' : 'resume';
+    var fnKey = paused ? 'pause' : 'resume';
 
     this.setState({
       paused
@@ -147,10 +146,7 @@ class Game extends Component {
         audio[fnKey]();
       });
 
-      openScreen = this.refs['screen-' + this.state.currentScreenIndex];
-      if (openScreen && typeof openScreen[fnKey] === 'function') {
-        openScreen[fnKey]();
-      }
+      _.invoke(this.refs['screen-' + this.state.currentScreenIndex], fnKey);
     });
   }
 
@@ -212,23 +208,12 @@ class Game extends Component {
   }
 
   shouldGoto(oldScreen, newScreen, opts) {
-    if (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) {
-      return false;
-    }
-
-    if (oldScreen.props.index < newScreen.props.index) {
-      if (!opts.load && !this.state.demo && !(oldScreen.state.complete || oldScreen.state.replay)) {
-        return false;
-      }
-    }
-
-    if (oldScreen.props.index > newScreen.props.index) {
-      if (newScreen.props.index === 0) {
-        return false;
-      }
-    }
-
-    return true;
+    return !(
+      (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) ||
+      (oldScreen.props.index < newScreen.props.index && !opts.load && !this.state.demo &&
+        !(oldScreen.state.complete || oldScreen.state.replay)) ||
+      (oldScreen.props.index > newScreen.props.index && newScreen.props.index === 0)
+    );
   }
 
   openNewScreen(newScreen, currentScreenIndex, opts) {
@@ -283,7 +268,7 @@ class Game extends Component {
   }
 
   openMenu(opts) {
-    var menu, openMenus, screen;
+    var menu, openMenus;
 
     menu = this.refs['menu-' + opts.id];
 
@@ -291,18 +276,17 @@ class Game extends Component {
       menu.open();
       openMenus = this.state.openMenus || [];
       openMenus.push(opts.id);
-      if (this.media.button) this.media.button.play();
+      this.playMedia('button');
       this.setState({
         openMenus,
       });
     }
 
-    screen = this.refs['screen-' + this.state.currentScreenIndex];
-    if (screen) screen.pause();
+    _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'pause');
   }
 
   menuClose(opts) {
-    var menu, openMenus, screen;
+    var menu, openMenus;
 
     menu = this.refs['menu-' + opts.id];
 
@@ -310,14 +294,15 @@ class Game extends Component {
       menu.close();
       openMenus = this.state.openMenus || [];
       openMenus.splice(opts.id, 1);
-      if (this.media.button) this.media.button.play();
+      this.playMedia('button');
       this.setState({
         openMenus,
       });
     }
 
-    screen = this.refs['screen-' + this.state.currentScreenIndex];
-    if (screen && !openMenus.length) screen.resume();
+    if (!openMenus.length) {
+      _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'resume');
+    }
   }
 
   // Remove this method after refactoring games that override it.
@@ -363,9 +348,7 @@ class Game extends Component {
     };
 
     fn = events[event];
-    if (typeof fn === 'function') {
-      return fn.call(this, opts);
-    }
+    if (typeof fn === 'function') return fn.call(this, opts);
   }
 
   emit(gameData = {}) {
@@ -460,26 +443,18 @@ class Game extends Component {
     this.setState({
       data,
     }, () => {
-      if (typeof opts.callback === 'function') {
-        opts.callback.call(this);
-      }
+      if (typeof opts.callback === 'function') opts.callback.call(this);
     });
   }
 
   checkComplete() {
-    var openScreen = this.refs['screen-' + this.state.currentScreenIndex];
-
-    if (openScreen && typeof openScreen.checkComplete === 'function') {
-      openScreen.checkComplete();
-    }
+    _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'checkComplete');
   }
 
   // this method takes in an opts method with screenID
   screenComplete(opts) {
     if (opts.silent) return;
-    if (this.audio['screen-complete']) {
-      this.audio['screen-complete'].play();
-    }
+    this.playMedia('screen-complete');
   }
 
   getClassNames() {
@@ -524,17 +499,12 @@ class Game extends Component {
   }
 
   renderScreens() {
-    var screenKeys, self = this;
-    screenKeys = Object.keys(self.screens);
-    self.screensLength = screenKeys.length;
-    return screenKeys.map((key, index) => {
-      var ScreenComponent, props;
-      props = self.screens[key].props || {};
-      props.data = self.state.data.screens[key];
-      props.gameState = self.state;
+    return _.map(Object.keys(this.screens), (key, index) => {
+      var props = this.screens[key].props || {};
+      props.data = this.state.data.screens[key];
+      props.gameState = this.state;
       props.index = index;
-      ScreenComponent = self.screens[key];
-      return ScreenComponent(props, 'screen-' + key, key);
+      return this.screens[key](props, 'screen-' + key, key);
     });
   }
 
@@ -584,7 +554,7 @@ Game.defaultProps = _.defaults({
   renderMenu: function () {
     return (
       <div className="menu">
-        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})}></button>
+        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})} />
       </div>
     );
   },
