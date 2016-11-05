@@ -110,7 +110,7 @@ class Navigator {
     screenIndexArray.pop();
     index = screenIndexArray.pop();
 
-    this.goto({index});
+    this.navigator.goto({index});
   }
 }
 

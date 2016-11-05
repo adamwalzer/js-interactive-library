@@ -50,9 +50,9 @@ class Game extends Component {
 
   onKeyDown(e) {
     if (e.keyCode === 78) { // n for next
-      this.goto({index: this.state.currentScreenIndex + 1});
+      this.navigator.goto({index: this.state.currentScreenIndex + 1});
     } else if (e.keyCode === 66) { // b for back
-      this.goto({index: this.state.currentScreenIndex - 1});
+      this.navigator.goto({index: this.state.currentScreenIndex - 1});
     } else if (e.altKey && e.ctrlKey && e.keyCode === 68) { // alt + ctrl + d
       this.demo();
     }
@@ -101,7 +101,7 @@ class Game extends Component {
         this.checkReady();
 
         if (goto) {
-          this.goto({
+          this.navigator.goto({
             index: currentScreenIndex,
             load: true,
             silent: true,
@@ -121,7 +121,7 @@ class Game extends Component {
         name: 'ready',
         game: this.config.id,
       });
-      this.goto({
+      this.navigator.goto({
         index: this.state.currentScreenIndex,
         silent: true,
       });
@@ -222,7 +222,7 @@ class Game extends Component {
     var events, fn;
 
     events = {
-      goto: this.goto,
+      goto: this.navigator.goto,
       goBack: this.navigator.goBack,
       audioPlay: this.mediaManager.audioPlay,
       audioStop: this.mediaManager.audioStop,
