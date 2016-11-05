@@ -1,4 +1,14 @@
-var mediaManager = {
+class MediaManager {
+  constructor(game) {
+    this.audioPlay = this.audioPlay.bind(game);
+    this.audioStop = this.audioStop.bind(game);
+    this.videoPlay = this.videoPlay.bind(game);
+    this.videoStop = this.videoStop.bind(game);
+    this.fadeBackground = this.fadeBackground.bind(game);
+    this.raiseBackground = this.raiseBackground.bind(game);
+    this.playBackground = this.playBackground.bind(game);
+  }
+
   audioPlay(opts) {
     var playingSFX, playingVO, playingBKG, classes;
 
@@ -17,7 +27,7 @@ var mediaManager = {
       break;
     case 'voiceOver':
       playingVO.push(opts.audio);
-      mediaManager.fadeBackground.call(this);
+      this.mediaManager.fadeBackground();
       break;
     case 'background':
       playingBKG.push(opts.audio);
@@ -30,7 +40,7 @@ var mediaManager = {
       playingBKG,
       classes
     });
-  },
+  }
 
   audioStop(opts) {
     var playingSFX, playingVO, playingBKG, index;
@@ -48,7 +58,7 @@ var mediaManager = {
       index = playingVO.indexOf(opts.audio);
       index !== -1 && playingVO.splice(index, 1);
       if (!playingVO.length) {
-        mediaManager.raiseBackground.call(this);
+        this.mediaManager.raiseBackground();
       }
       break;
     case 'background':
@@ -62,7 +72,7 @@ var mediaManager = {
       playingVO,
       playingBKG,
     });
-  },
+  }
 
   videoPlay(opts) {
     var playingVideo = this.state.playingVideo;
@@ -73,26 +83,26 @@ var mediaManager = {
 
     playingVideo = opts.video;
 
-    mediaManager.fadeBackground.call(this, 0);
+    this.mediaManager.fadeBackground(0);
 
     this.setState({
       playingVideo,
     });
-  },
+  }
 
   videoStop() {
-    mediaManager.raiseBackground.call(this, 1);
+    this.mediaManager.raiseBackground(1);
 
     this.setState({
       playingVideo: null,
     });
-  },
+  }
 
   fadeBackground(value = .25) {
     _.forEach(this.state.playingBKG, bkg => {
       bkg.setVolume(value);
     });
-  },
+  }
 
   raiseBackground(value = 1) {
     if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
@@ -100,7 +110,7 @@ var mediaManager = {
         bkg.setVolume(value);
       });
     }
-  },
+  }
 
   playBackground(currentScreenIndex, currentScreenID) {
     var index, playingBKG, currentScreen;
@@ -127,7 +137,7 @@ var mediaManager = {
     if (this.audio.background[index]) {
       this.audio.background[index].play();
     }
-  },
-};
+  }
+}
 
-export default mediaManager;
+export default MediaManager;
