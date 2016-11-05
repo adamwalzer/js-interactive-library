@@ -199,7 +199,7 @@ class Game extends Component {
     if (prevScreen) prevScreen.replay();
     if (nextScreen) nextScreen.load();
     if (!opts.load) this.emitSave(highestScreenIndex, currentScreenIndex);
-    mediaManager.playBackground.call(this, currentScreenIndex);
+    mediaManager.playBackground.call(this, currentScreenIndex, newScreen.props.id);
 
     this.setState({
       loading: false,
@@ -322,8 +322,8 @@ class Game extends Component {
 
   // Remove this method after refactoring games that override it.
   // all-about-you, polar-bear, tag-it
-  getBackgroundIndex(index) {
-    return this.props.getBackgroundIndex.call(this, index);
+  getBackgroundIndex(index, id) {
+    return this.props.getBackgroundIndex.call(this, index, id);
   }
 
   scale() {

@@ -102,7 +102,7 @@ var mediaManager = {
     }
   },
 
-  playBackground(currentScreenIndex) {
+  playBackground(currentScreenIndex, currentScreenID) {
     var index, playingBKG, currentScreen;
 
     if (!_.isFinite(currentScreenIndex)) return;
@@ -110,7 +110,7 @@ var mediaManager = {
     // re-factor to index = this.props.getBackgroundIndex.call(this, index);
     // after games that override it have be re-factored
     // all-about-you, polar-bear, tag-it
-    index = this.getBackgroundIndex(currentScreenIndex);
+    index = this.getBackgroundIndex(currentScreenIndex, currentScreenID);
     playingBKG = this.state.playingBKG;
 
     currentScreen = this.refs['screen-' + currentScreenIndex];
