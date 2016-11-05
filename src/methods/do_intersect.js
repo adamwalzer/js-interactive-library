@@ -9,7 +9,7 @@
  * @param b an array of connected points [{x:, y:}, {x:, y:},...] that form a closed polygon
  * @return true if there is any intersection between the 2 polygons, false otherwise
  */
-var doIntersect = (a, b) => {
+export default (a, b) => {
   var polygons = [a, b];
   var minA, maxA, projected, i, i1, j, minB, maxB;
 
@@ -63,5 +63,3 @@ var doIntersect = (a, b) => {
   }
   return true;
 };
-
-export default doIntersect;

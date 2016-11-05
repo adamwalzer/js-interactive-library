@@ -1,4 +1,4 @@
-var start = function (Game, id) {
+export default function (Game, id) {
   var el;
 
   id = id || _.get(Game, 'props.config.id');
@@ -17,6 +17,4 @@ var start = function (Game, id) {
     Game,
     el
   );
-};
-
-export default start;
+}
