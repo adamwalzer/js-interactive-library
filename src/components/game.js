@@ -276,7 +276,7 @@ class Game extends Component {
 
   getGame(opts) {
     if (this.config.id === opts.id) {
-      opts.respond(this);
+      _.invoke(opts, 'respond', this);
     }
   }
 
