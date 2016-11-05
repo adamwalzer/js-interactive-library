@@ -219,7 +219,7 @@ class Game extends Component {
   }
 
   trigger(event, opts) {
-    var events = {
+    _.invoke(({
       goto: this.navigator.goto,
       goBack: this.navigator.goBack,
       audioPlay: this.mediaManager.audioPlay,
@@ -244,9 +244,7 @@ class Game extends Component {
       ready: this.checkReady,
       resize: this.scale,
       getGame: this.getGame,
-    };
-
-    _.invoke(events[event], 'call', this, opts);
+    })[event], 'call', this, opts);
   }
 
   emit(gameData = {}) {
