@@ -39,7 +39,7 @@ class Game extends Component {
   }
 
   getState(opts = {}) {
-    if (typeof opts.respond === 'function') opts.respond(this.state);
+    _.invoke(opts, 'respond', this.state);
   }
 
   demo() {
@@ -248,8 +248,7 @@ class Game extends Component {
       getGame: this.getGame,
     };
 
-    fn = events[event];
-    if (typeof fn === 'function') return fn.call(this, opts);
+    _.invoke(events[event], 'call', this);
   }
 
   emit(gameData = {}) {
@@ -344,7 +343,7 @@ class Game extends Component {
     this.setState({
       data,
     }, () => {
-      if (typeof opts.callback === 'function') opts.callback.call(this);
+      _.invoke(opts.callback, 'call', this);
     });
   }
 

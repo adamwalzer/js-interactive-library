@@ -38,9 +38,7 @@ class Component extends React.Component {
 
   completeRefs() {
     _.forEach(this.refs, ref => {
-      if (typeof ref.completeRefs === 'function') {
-        ref.completeRefs();
-      }
+      _.invoke(ref, 'completeRefs');
     });
 
     this.complete({silent: true});
@@ -48,9 +46,7 @@ class Component extends React.Component {
 
   incompleteRefs() {
     _.forEach(this.refs, ref => {
-      if (typeof ref.incompleteRefs === 'function') {
-        ref.incompleteRefs();
-      }
+      _.invoke(ref, 'incompleteRefs');
     });
 
     this.incomplete();
@@ -74,7 +70,7 @@ class Component extends React.Component {
     }, () => {
       this.checkComplete();
       _.each(this.refs, ref => {
-        if (typeof ref.start === 'function') ref.start();
+        _.invoke(ref, 'start');
       });
 
       if (this.props.completeOnStart) this.complete();
@@ -90,9 +86,7 @@ class Component extends React.Component {
       started: false
     }, () => {
       _.each(this.refs, ref => {
-        if (ref && typeof ref.stop === 'function') {
-          ref.stop();
-        }
+        _.invoke(ref, 'stop');
       });
 
       this.props.onStop.call(this);
@@ -101,7 +95,7 @@ class Component extends React.Component {
 
   pause() {
     _.each(this.refs, ref => {
-      if (typeof ref.pause === 'function') ref.pause();
+      _.invoke(ref, 'pause');
     });
 
     this.props.onPause.call(this);
@@ -109,7 +103,7 @@ class Component extends React.Component {
 
   resume() {
     _.each(this.refs, ref => {
-      if (typeof ref.resume === 'function') ref.resume();
+      _.invoke(ref, 'resume');
     });
 
     this.props.onResume.call(this);
@@ -191,6 +185,7 @@ class Component extends React.Component {
     // TODO: remove this after making sure components reference
     // this.media.audio and this.media.video instead of
     // this.audio and this.video directly
+    // this is done for the framework but should be checked in games
     self.audio = self.media.audio;
     self.video = self.media.video;
   }
@@ -250,15 +245,11 @@ class Component extends React.Component {
       }
     });
 
-    complete = _.every(self.requireForComplete, key => {
-      if (self.refs[key] instanceof Node) {
-        return true;
-      }
-      if (!self.refs[key] || !self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
-        return false;
-      }
-      return true;
-    });
+    complete = _.every(self.requireForComplete, key =>
+      self.refs[key] instanceof Node ||
+        (!self.refs[key] || !self.refs[key].state ||
+          (self.refs[key].state && !self.refs[key].state.complete))
+    );
 
     if (complete && !self.state.complete) {
       self.complete();
@@ -311,15 +302,13 @@ class Component extends React.Component {
   }
 
   renderContentList(listName = 'children') {
-    var children = [].concat(this.props[listName]);
-    return children.map((component, key) => {
+    return _.map([].concat(this.props[listName]), (component, key) => {
       if (!component) return;
-      var ref = component.ref || (component.props && component.props['data-ref']) || listName + '-' + key;
       return (
         <component.type
           gameState={this.props.gameState}
           {...component.props}
-          ref={ref}
+          ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
           key={key}
         />
       );
