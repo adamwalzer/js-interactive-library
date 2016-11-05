@@ -253,14 +253,8 @@ class Game extends Component {
       var event;
 
       if (typeof gameData !== 'object') return;
-
-      if (!gameData.game) {
-        gameData.game = self.config.id;
-      }
-
-      if (!gameData.version) {
-        gameData.version = self.config.version;
-      }
+      if (!gameData.game) gameData.game = self.config.id;
+      if (!gameData.version) gameData.version = self.config.version;
 
       event = new Event('game-event', {bubbles: true, cancelable: false});
 
@@ -270,9 +264,7 @@ class Game extends Component {
         resolve(data);
       });
 
-      if (window.frameElement) {
-        window.frameElement.dispatchEvent(event);
-      }
+      if (window.frameElement) window.frameElement.dispatchEvent(event);
     });
 
     p.then(d => {
