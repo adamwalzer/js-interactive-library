@@ -90,9 +90,9 @@ class Navigator {
       if (!opts.silent) {
         if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
           buttonSound = opts.buttonSound;
-        } else if (this.audio.button) {
-          buttonSound = this.audio.next || this.audio.button;
-          if (back) buttonSound = this.audio.back || this.audio.button;
+        } else if (this.media.audio.button) {
+          buttonSound = this.media.audio.next || this.media.audio.button;
+          if (back) buttonSound = this.media.audio.back || this.media.audio.button;
         }
         if (buttonSound) buttonSound.play();
       }

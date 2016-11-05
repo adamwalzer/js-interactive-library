@@ -126,7 +126,7 @@ class MediaManager {
     currentScreen = this.refs['screen-' + currentScreenIndex];
 
     if (!currentScreen.props.restartBackground &&
-      playingBKG.indexOf(this.audio.background[index]) !== -1) {
+      playingBKG.indexOf(this.media.audio.background[index]) !== -1) {
       return;
     }
 
@@ -134,9 +134,7 @@ class MediaManager {
       bkg.stop();
     });
 
-    if (this.audio.background[index]) {
-      this.audio.background[index].play();
-    }
+    this.playMedia('audio.background.' + index);
   }
 }
 

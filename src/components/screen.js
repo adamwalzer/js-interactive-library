@@ -46,7 +46,7 @@ class Screen extends Component {
     });
 
     setTimeout(
-      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.audio.button),
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.media.audio.button),
       this.props.nextDelay || 0
     );
   }
@@ -88,18 +88,13 @@ class Screen extends Component {
 
   startMedia() {
     if (this.video[0]) {
-      this.video[0].play();
-    } else if (this.audio.voiceOver[0]) {
-      this.audio.voiceOver[0].play();
+      this.playMedia('video.0');
+    } else if (this.media.audio.voiceOver[0]) {
+      this.playMedia('audio.voiceOver.0');
     }
 
-    if (this.audio.start) {
-      this.audio.start.play();
-    }
-
-    if (this.props.playOnStart && this.refs[this.props.playOnStart]) {
-      this.refs[this.props.playOnStart].play();
-    }
+    this.playMedia('start');
+    this.playMedia(this.props.playOnStart);
   }
 
   complete(opts = {}) {
@@ -110,9 +105,7 @@ class Screen extends Component {
         silent: opts.silent || this.props.silentComplete
       });
 
-      if (this.audio['screen-complete']) {
-        this.audio['screen-complete'].play();
-      }
+      this.playMedia('screen-complete');
 
       if (this.props.emitOnComplete) {
         skoash.trigger('emit', this.props.emitOnComplete);
