@@ -219,7 +219,7 @@ class Game extends Component {
   }
 
   trigger(event, opts) {
-    _.invoke(({
+    _.invoke(this.props.getTriggerEvents.call(this, {
       goto: this.navigator.goto,
       goBack: this.navigator.goBack,
       audioPlay: this.mediaManager.audioPlay,
@@ -447,6 +447,7 @@ Game.defaultProps = _.defaults({
     );
   },
   getGotoOpts: _.identity, // don't change to _.noop
+  getTriggerEvents: _.identity, // don't change to _.noop
   triggerReady: false,
 }, Component.defaultProps);
 
