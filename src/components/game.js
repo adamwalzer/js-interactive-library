@@ -125,6 +125,8 @@ class Game extends Component {
         index: this.state.currentScreenIndex,
         silent: true,
       });
+      this.onReady.call(this);
+      this.props.onReady.call(this);
     });
   }
 
@@ -281,8 +283,7 @@ class Game extends Component {
   }
 
   getData(opts) {
-    opts.name = 'getData';
-    return this.emit(opts);
+    this.props.getData.call(this, opts);
   }
 
   passData(opts) {
@@ -449,6 +450,10 @@ Game.defaultProps = _.defaults({
   getGotoOpts: _.identity, // don't change to _.noop
   getTriggerEvents: _.identity, // don't change to _.noop
   triggerReady: false,
+  getData: function (opts) {
+    opts.name = 'getData';
+    return this.emit(opts);
+  },
 }, Component.defaultProps);
 
 export default Game;
