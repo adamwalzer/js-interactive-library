@@ -223,13 +223,11 @@ class Component extends React.Component {
       }
     });
 
-    ready = _.every(self.requireForReady, key => {
-      return self.refs[key] && (
-          !self.refs[key].state || (
-            self.refs[key].state && self.refs[key].state.ready
-          )
-        );
-    });
+    ready = _.every(self.requireForReady, key =>
+      self.refs[key] &&
+        (!self.refs[key].state ||
+          (self.refs[key].state && self.refs[key].state.ready))
+    );
 
     if (ready) self.ready();
   }
