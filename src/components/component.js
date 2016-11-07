@@ -248,7 +248,7 @@ class Component extends React.Component {
     complete = _.every(self.requireForComplete, key =>
       self.refs[key] instanceof Node ||
         (!self.refs[key] || !self.refs[key].state ||
-          (self.refs[key].state && !self.refs[key].state.complete))
+          (self.refs[key].state && self.refs[key].state.complete))
     );
 
     if (complete && !self.state.complete) {
