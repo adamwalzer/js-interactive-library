@@ -156,6 +156,7 @@ Audio.defaultProps = _.defaults({
   maxVolume: 1,
   minVolume: 0,
   playThrottle: 100,
+  shouldRender: false,
   sprite: undefined,
 }, Media.defaultProps);
 

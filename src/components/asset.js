@@ -7,10 +7,8 @@ import Component from './component.js';
 class Asset extends Component {}
 
 Asset.defaultProps = _.defaults({
-  bootstrap: false,
   checkComplete: false,
   checkReady: false,
-  shouldRender: false,
 }, Component.defaultProps);
 
 export default Asset;

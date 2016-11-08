@@ -38,9 +38,6 @@ class Image extends Asset {
 }
 
 Image.defaultProps = _.defaults({
-  shouldRender: true,
-  bootstrap: true,
-  checkReady: true,
   complete: true,
 }, Asset.defaultProps);
 

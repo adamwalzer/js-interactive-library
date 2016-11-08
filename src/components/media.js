@@ -43,7 +43,6 @@ Media.defaultProps = _.defaults({
   bootstrap: false,
   checkComplete: false,
   checkReady: false,
-  shouldRender: false,
   completeDelay: 0,
   completeOnStart: false,
   silentOnStart: true,
