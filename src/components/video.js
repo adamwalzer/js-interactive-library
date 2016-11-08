@@ -73,8 +73,4 @@ class Video extends Media {
   }
 }
 
-Video.defaultProps = _.defaults({
-  shouldComponentUpdate: () => false,
-}, Media.defaultProps);
-
 export default Video;

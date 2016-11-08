@@ -157,7 +157,6 @@ Audio.defaultProps = _.defaults({
   minVolume: 0,
   playThrottle: 100,
   sprite: undefined,
-  shouldComponentUpdate: () => false,
 }, Media.defaultProps);
 
 export default Audio;
