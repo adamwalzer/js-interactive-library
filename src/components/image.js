@@ -10,17 +10,8 @@ class Image extends Asset {
 
   componentDidMount() {
     this.setState({
-      complete: true
+      complete: this.props.complete
     });
-  }
-
-  ready() {
-    if (!this.state.error) {
-      this.setState({
-        ready: true,
-        complete: this.props.complete,
-      });
-    }
   }
 
   error() {
