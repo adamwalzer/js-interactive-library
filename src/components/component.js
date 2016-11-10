@@ -216,7 +216,7 @@ class Component extends React.Component {
     if (!this.props.checkReady || (!this.props.ignoreReady && this.state.ready)) return;
 
     _.each(this.refs, ref => {
-      if (!_.get(ref, 'state.ready')) ref.checkReady();
+      if (!_.get(ref, 'state.ready')) _.invoke(ref, 'checkReady');
     });
 
     ready = _.every(this.refs, ref =>
