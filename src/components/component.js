@@ -211,46 +211,40 @@ class Component extends React.Component {
   }
 
   checkReady() {
-    var ready, self = this;
+    var ready;
 
-    if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
+    if (!this.props.checkReady || (!this.props.ignoreReady && this.state.ready)) return;
 
-    _.forEach(self.requireForReady, key => {
-      if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
-        self.refs[key].bootstrap();
-      }
+    _.each(this.refs, ref => {
+      if (!_.get(ref, 'state.ready')) ref.checkReady();
     });
 
-    ready = _.every(self.requireForReady, key =>
-      self.refs[key] &&
-        (!self.refs[key].state ||
-          (self.refs[key].state && self.refs[key].state.ready))
+    ready = _.every(this.refs, ref =>
+      ref &&
+        (!ref.state ||
+          (ref.state && ref.state.ready))
     );
 
-    if (ready) self.ready();
+    if (ready) this.ready();
   }
 
   checkComplete() {
-    var self = this, complete;
+    var complete;
 
-    if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
+    if (!this.props.checkComplete || !this.state.ready || !this.requireForComplete) return;
 
-    _.forEach(self.requireForComplete, key => {
-      if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
-        self.refs[key].checkComplete();
-      }
-    });
+    _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 
-    complete = _.every(self.requireForComplete, key =>
-      self.refs[key] instanceof Node ||
-        (!self.refs[key] || !self.refs[key].state ||
-          (self.refs[key].state && self.refs[key].state.complete))
+    complete = _.every(this.refs, ref =>
+      ref instanceof Node ||
+        (!ref || !ref.state ||
+          (ref.state && ref.state.complete))
     );
 
-    if (complete && !self.state.complete) {
-      self.complete();
-    } else if (self.state.started && !complete && self.state.complete) {
-      self.incomplete();
+    if (complete && !this.state.complete) {
+      this.complete();
+    } else if (this.state.started && !complete && this.state.complete) {
+      this.incomplete();
     }
   }
 
