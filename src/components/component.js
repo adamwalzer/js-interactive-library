@@ -125,18 +125,16 @@ class Component extends React.Component {
     });
   }
 
-  componentWillMount() {
-    if ((this.props.completeIncorrect && !this.props.correct) || this.props.complete) {
-      this.complete();
-    }
-  }
-
   componentDidMount() {
     this.bootstrap();
   }
 
   bootstrap() {
     if (!this.props.bootstrap) return;
+
+    if ((this.props.completeIncorrect && !this.props.correct) || this.props.complete) {
+      this.complete();
+    }
 
     this.requireForReady = Object.keys(this.refs);
     this.requireForComplete = this.requireForReady.filter(key => this.refs[key].checkComplete);
