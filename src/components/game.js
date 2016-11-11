@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
-import attachEvents from 'helpers/attach_events';
-import deviceDetector from 'helpers/device_detector';
+import EventManager from 'helpers/event_manager';
+import DeviceDetector from 'helpers/device_detector';
 import MediaManager from 'helpers/media_manager';
 import Navigator from 'helpers/navigator';
 
@@ -33,7 +33,8 @@ class Game extends Component {
 
     this.state.data.screens = _.map(this.screens, () => ({}));
 
-    attachEvents.call(this);
+    this.eventManager = new EventManager(this);
+    this.deviceDetector = new DeviceDetector(this);
     this.mediaManager = new MediaManager(this);
     this.navigator = new Navigator(this);
   }
@@ -48,21 +49,11 @@ class Game extends Component {
     });
   }
 
-  onKeyDown(e) {
-    if (e.keyCode === 78) { // n for next
-      this.navigator.goto({index: this.state.currentScreenIndex + 1});
-    } else if (e.keyCode === 66) { // b for back
-      this.navigator.goto({index: this.state.currentScreenIndex - 1});
-    } else if (e.altKey && e.ctrlKey && e.keyCode === 68) { // alt + ctrl + d
-      this.demo();
-    }
-  }
-
   componentWillMount() {
-    this.emit({
+    this.eventManager.emit({
       name: 'init',
     });
-    deviceDetector.detechDevice.call(this);
+    this.deviceDetector.detechDevice();
     this.scale();
   }
 
@@ -117,7 +108,7 @@ class Game extends Component {
     this.setState({
       ready: true,
     }, () => {
-      this.emit({
+      this.eventManager.emit({
         name: 'ready',
         game: this.config.id,
       });
@@ -155,57 +146,19 @@ class Game extends Component {
     });
   }
 
+  // remove once games are refactored to call this.navigator.goto(opts);
   goto(opts) {
     this.navigator.goto(opts);
   }
 
-  emitSave(highestScreenIndex, currentScreenIndex) {
-    if (highestScreenIndex < 2) return;
-    this.emit({
-      name: 'save',
-      game: this.config.id,
-      version: this.config.version,
-      highestScreenIndex,
-      currentScreenIndex,
-    });
-  }
-
+  // remove once games are refactored to call this.navigator.openMenu(opts);
   openMenu(opts) {
-    var menu, openMenus;
-
-    menu = this.refs['menu-' + opts.id];
-
-    if (menu) {
-      menu.open();
-      openMenus = this.state.openMenus || [];
-      openMenus.push(opts.id);
-      this.playMedia('button');
-      this.setState({
-        openMenus,
-      });
-    }
-
-    _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'pause');
+    this.navigator.openMenu(opts);
   }
 
+  // remove once games are refactored to call this.navigator.menuClose(opts);
   menuClose(opts) {
-    var menu, openMenus;
-
-    menu = this.refs['menu-' + opts.id];
-
-    if (menu) {
-      menu.close();
-      openMenus = this.state.openMenus || [];
-      openMenus.splice(opts.id, 1);
-      this.playMedia('button');
-      this.setState({
-        openMenus,
-      });
-    }
-
-    if (!openMenus.length) {
-      _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'resume');
-    }
+    this.navigator.menuClose(opts);
   }
 
   // Remove this method after refactoring games that override it.
@@ -220,60 +173,14 @@ class Game extends Component {
     });
   }
 
+  // remove once games are refactored to call this.navigator.menuClose(opts);
   trigger(event, opts) {
-    _.invoke(this.props.getTriggerEvents.call(this, {
-      goto: this.navigator.goto,
-      goBack: this.navigator.goBack,
-      audioPlay: this.mediaManager.audioPlay,
-      audioStop: this.mediaManager.audioStop,
-      videoPlay: this.mediaManager.videoPlay,
-      videoStop: this.mediaManager.videoStop,
-      demo: this.demo,
-      'toggle-demo-mode': this.demo,
-      getData: this.getData,
-      passData: this.passData,
-      updateData: this.updateData,
-      updateState: this.updateState,
-      screenComplete: this.screenComplete,
-      openMenu: this.openMenu,
-      menuClose: this.menuClose,
-      getState: this.getState,
-      emit: this.emit,
-      quit: this.quit,
-      save: this.load,
-      complete: this.checkComplete,
-      incomplete: this.checkComplete,
-      ready: this.checkReady,
-      resize: this.scale,
-      getGame: this.getGame,
-    })[event], 'call', this, opts);
+    this.eventManager.trigger(event, opts);
   }
 
+  // remove once games are refactored to call this.eventManager.emit(gameData);
   emit(gameData = {}) {
-    var p, self = this;
-    p = new Promise(resolve => {
-      var event;
-
-      if (typeof gameData !== 'object') return;
-      if (!gameData.game) gameData.game = self.config.id;
-      if (!gameData.version) gameData.version = self.config.version;
-
-      event = new Event('game-event', {bubbles: true, cancelable: false});
-
-      event.name = gameData.name;
-      event.gameData = gameData;
-      event.respond = gameData.respond || (data => {
-        resolve(data);
-      });
-
-      if (window.frameElement) window.frameElement.dispatchEvent(event);
-    });
-
-    p.then(d => {
-      self.trigger(d.name, d);
-    });
-
-    return p;
+    return this.eventManager.emit(gameData);
   }
 
   getGame(opts) {
@@ -304,7 +211,7 @@ class Game extends Component {
   }
 
   quit() {
-    this.emit({
+    this.eventManager.emit({
       name: 'exit',
       game: this.config.id,
     });
@@ -443,7 +350,7 @@ Game.defaultProps = _.defaults({
   renderMenu: function () {
     return (
       <div className="menu">
-        <button className="close" onClick={this.openMenu.bind(this, {id: 'quit'})} />
+        <button className="close" onClick={this.navigator.openMenu.bind(this, {id: 'quit'})} />
       </div>
     );
   },
@@ -452,7 +359,7 @@ Game.defaultProps = _.defaults({
   triggerReady: false,
   getData: function (opts) {
     opts.name = 'getData';
-    return this.emit(opts);
+    return this.eventManager.emit(opts);
   },
 }, Component.defaultProps);
 

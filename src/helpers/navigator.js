@@ -5,6 +5,8 @@ class Navigator {
     this.openNewScreen = this.openNewScreen.bind(game);
     this.closeOldScreen = this.closeOldScreen.bind(game);
     this.goBack = this.goBack.bind(game);
+    this.openMenu = this.openMenu.bind(game);
+    this.menuClose = this.menuClose.bind(game);
   }
 
   goto(opts) {
@@ -42,7 +44,7 @@ class Navigator {
 
     _.invoke(prevScreen, 'replay');
     _.invoke(nextScreen, 'load');
-    if (!opts.load) this.emitSave(highestScreenIndex, currentScreenIndex);
+    if (!opts.load) this.eventManager.emitSave(highestScreenIndex, currentScreenIndex);
     this.mediaManager.playBackground(currentScreenIndex, newScreen.props.id);
 
     this.setState({
@@ -111,6 +113,44 @@ class Navigator {
     index = screenIndexArray.pop();
 
     this.navigator.goto({index});
+  }
+
+  openMenu(opts) {
+    var menu, openMenus;
+
+    menu = this.refs['menu-' + opts.id];
+
+    if (menu) {
+      menu.open();
+      openMenus = this.state.openMenus || [];
+      openMenus.push(opts.id);
+      this.playMedia('button');
+      this.setState({
+        openMenus,
+      });
+    }
+
+    _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'pause');
+  }
+
+  menuClose(opts) {
+    var menu, openMenus;
+
+    menu = this.refs['menu-' + opts.id];
+
+    if (menu) {
+      menu.close();
+      openMenus = this.state.openMenus || [];
+      openMenus.splice(opts.id, 1);
+      this.playMedia('button');
+      this.setState({
+        openMenus,
+      });
+    }
+
+    if (!openMenus.length) {
+      _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'resume');
+    }
   }
 }
 
