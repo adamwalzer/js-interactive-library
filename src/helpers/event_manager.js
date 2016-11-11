@@ -145,7 +145,7 @@ class EventManager {
       openMenu: this.navigator.openMenu,
       menuClose: this.navigator.menuClose,
       getState: this.getState,
-      emit: this.emit,
+      emit: this.eventManager.emit,
       quit: this.quit,
       save: this.load,
       complete: this.checkComplete,
