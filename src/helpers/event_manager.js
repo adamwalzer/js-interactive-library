@@ -58,16 +58,14 @@ class EventManager {
     window.addEventListener('blur', onblur);
 
     // code from http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
-    hidden = 'hidden';
-
     // Standards:
-    if (hidden in document) {
+    if ('hidden' in document) {
       document.addEventListener('visibilitychange', onfocusout);
-    } else if ((hidden = 'mozHidden') in document) {
+    } else if ('mozHidden' in document) {
       document.addEventListener('mozvisibilitychange', onfocusout);
-    } else if ((hidden = 'webkitHidden') in document) {
+    } else if ('webkitHidden' in document) {
       document.addEventListener('webkitvisibilitychange', onfocusout);
-    } else if ((hidden = 'msHidden') in document) {
+    } else if ('msHidden' in document) {
       document.addEventListener('msvisibilitychange', onfocusout);
     } else if ('onfocusin' in document) {
       // IE 9 and lower:
