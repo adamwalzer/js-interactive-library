@@ -102,7 +102,7 @@ class Screen extends Component {
     setTimeout(() => {
       skoash.trigger('screenComplete', {
         screenID: this.props.id,
-        silent: opts.silent || this.props.silentComplete
+        silent: opts.silent || this.props.silentComplete || this.media['screen-complete']
       });
 
       this.playMedia('screen-complete');
