@@ -1,10 +1,8 @@
-import _ from 'lodash';
-
 import Asset from './asset.js';
 
 class Image extends Asset {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.ready = this.ready.bind(this);
     this.error = this.error.bind(this);
@@ -12,17 +10,8 @@ class Image extends Asset {
 
   componentDidMount() {
     this.setState({
-      complete: true
+      complete: this.props.complete
     });
-  }
-
-  ready() {
-    if (!this.state.error) {
-      this.setState({
-        ready: true,
-        complete: this.props.complete,
-      });
-    }
   }
 
   error() {
@@ -40,9 +29,6 @@ class Image extends Asset {
 }
 
 Image.defaultProps = _.defaults({
-  shouldRender: true,
-  bootstrap: true,
-  checkReady: true,
   complete: true,
 }, Asset.defaultProps);
 

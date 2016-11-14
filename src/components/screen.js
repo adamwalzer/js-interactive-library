@@ -1,11 +1,10 @@
-import _ from 'lodash';
 import classNames from 'classnames';
 
 import Component from 'components/component';
 
 class Screen extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       ready: false,
@@ -40,14 +39,14 @@ class Screen extends Component {
   next() {
     var state = this.props.gameState;
 
-    if (this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
+    if (!this.state.started || this.state.leaving || (!state.demo && !this.state.complete && !this.state.replay)) return;
 
     this.setState({
       leaving: true
     });
 
     setTimeout(
-      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.audio.button),
+      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.media.audio.button),
       this.props.nextDelay || 0
     );
   }
@@ -81,25 +80,21 @@ class Screen extends Component {
   }
 
   start() {
-    super.start();
-    this.bootstrap();
-    this.startMedia();
+    super.start(() => {
+      this.bootstrap();
+      this.startMedia();
+    });
   }
 
   startMedia() {
     if (this.video[0]) {
-      this.video[0].play();
-    } else if (this.audio.voiceOver[0]) {
-      this.audio.voiceOver[0].play();
+      this.playMedia('video.0');
+    } else if (this.media.audio.voiceOver[0]) {
+      this.playMedia('audio.voiceOver.0');
     }
 
-    if (this.audio.start) {
-      this.audio.start.play();
-    }
-
-    if (this.props.playOnStart && this.refs[this.props.playOnStart]) {
-      this.refs[this.props.playOnStart].play();
-    }
+    this.playMedia('start');
+    this.playMedia(this.props.playOnStart);
   }
 
   complete(opts = {}) {
@@ -110,9 +105,7 @@ class Screen extends Component {
         silent: opts.silent || this.props.silentComplete
       });
 
-      if (this.audio['screen-complete']) {
-        this.audio['screen-complete'].play();
-      }
+      this.playMedia('screen-complete');
 
       if (this.props.emitOnComplete) {
         skoash.trigger('emit', this.props.emitOnComplete);
@@ -130,10 +123,10 @@ class Screen extends Component {
       leaving: false,
       leave: false,
       close: false,
-      replay: this.state.complete || this.state.replay,
+      replay: self.state.complete || self.state.replay,
       opts,
     }, () => {
-      if (this.props.startDelay) {
+      if (self.props.startDelay) {
         setTimeout(() => {
           if (!self.state.started) {
             self.start();
@@ -141,7 +134,7 @@ class Screen extends Component {
           self.setState({
             opening: false
           });
-        }, this.props.startDelay);
+        }, self.props.startDelay);
       } else {
         if (!self.state.started) {
           self.start();
@@ -151,9 +144,9 @@ class Screen extends Component {
         });
       }
 
-      this.props.onOpen.call(this);
+      self.props.onOpen.call(self);
 
-      this.loadData();
+      self.loadData();
     });
   }
 
@@ -194,41 +187,32 @@ class Screen extends Component {
   }
 
   renderContent() {
+    if (!this.state.load) return null;
     return (
-      <div>
+      <div className="screen-content">
         {this.renderContentList()}
       </div>
     );
   }
 
-  renderScreen() {
-    if (!this.state.load) {
-      return null;
-    }
-
-    return this.renderContent();
-  }
-
   renderPrevButton() {
-    if (!this.props.hidePrev) {
-      return (
-        <button className="prev-screen" onClick={this.prev}></button>
-      );
-    }
+    if (this.props.hidePrev) return null;
+    return (
+      <button className="prev-screen" onClick={this.prev} />
+    );
   }
 
   renderNextButton() {
-    if (!this.props.hideNext) {
-      return (
-        <button className="next-screen" onClick={this.next}></button>
-      );
-    }
+    if (this.props.hideNext) return null;
+    return (
+      <button className="next-screen" onClick={this.next} />
+    );
   }
 
   render() {
     return (
       <div id={this.props.id} className={this.getClassNames()}>
-        {this.renderScreen()}
+        {this.renderContent()}
         {this.renderPrevButton()}
         {this.renderNextButton()}
       </div>
@@ -239,9 +223,9 @@ class Screen extends Component {
 Screen.defaultProps = _.defaults({
   resetOnClose: true,
   startDelay: 250,
-  collectData: _.identity,
-  loadData: _.identity,
-  onOpen: _.identity,
+  collectData: _.noop,
+  loadData: _.noop,
+  onOpen: _.noop,
   gameState: {},
 }, Component.defaultProps);
 

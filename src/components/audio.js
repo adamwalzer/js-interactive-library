@@ -1,18 +1,16 @@
-import _ from 'lodash';
-
 import { Howl } from 'howler';
 import Media from './media.js';
 
 class Audio extends Media {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.startCount = 0;
     this.completeCount = 0;
 
-    this.complete = this.complete.bind(this);
     this.ready = this.ready.bind(this);
     this.playAudio = this.playAudio.bind(this);
+    this.play = _.throttle(this.play.bind(this), props.playThrottle);
   }
 
   play() {
@@ -118,12 +116,8 @@ class Audio extends Media {
     if (!this.props.complete && (!this.playing || this.paused)) return;
     if (this.startCount > this.completeCount) return;
 
-    this.playing = false;
+    if (!this.props.loop) this.playing = false;
     super.complete();
-  }
-
-  shouldComponentUpdate() {
-    return false;
   }
 
   bootstrap() {
@@ -141,6 +135,7 @@ class Audio extends Media {
 
     this.audio = new Howl({
       urls: [].concat(this.props.src), // switch this to src when moving to Howler ^2.0.0
+      format: [].concat(this.props.format),
       loop: this.props.loop,
       volume: this.props.volume,
       onend: this.complete,
@@ -154,11 +149,14 @@ class Audio extends Media {
 }
 
 Audio.defaultProps = _.defaults({
+  format: 'mp3',
   delay: 0,
   loop: false,
   volume: 1,
   maxVolume: 1,
   minVolume: 0,
+  playThrottle: 100,
+  shouldRender: false,
   sprite: undefined,
 }, Media.defaultProps);
 

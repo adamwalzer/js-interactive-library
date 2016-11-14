@@ -1,24 +1,26 @@
 import Media from './media.js';
 
 class Video extends Media {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
+    this.play = this.play.bind(this);
+    this.ready = this.ready.bind(this);
   }
 
   play() {
-    if (this.state.playing) return;
+    if (this.playing && !this.paused) return;
     /*
      * In order for videos to play on mobile devices,
      * the screen must have prop.startDelay=0
      */
-    this.el.play();
+    this.video.play();
     super.play();
     skoash.trigger('videoPlay', {
       video: this
     });
-    this.setState({
-      playing: true,
-    });
+    this.playing = true;
+    this.paused = false;
   }
 
   start() {
@@ -26,26 +28,20 @@ class Video extends Media {
   }
 
   stop() {
-    this.el.pause();
+    this.video.pause();
     skoash.trigger('videoStop', {
       video: this
     });
-    this.setState({
-      playing: false,
-    });
+    this.playing = false;
   }
 
   pause() {
-    this.el.pause();
-    this.setState({
-      paused: true,
-    });
+    this.video.pause();
+    this.paused = true;
   }
 
   resume() {
-    this.setState({
-      paused: false,
-    }, this.play.bind(this));
+    this.play();
   }
 
   complete() {
@@ -55,20 +51,24 @@ class Video extends Media {
       });
     }
 
-    this.setState({
-      playing: false
-    });
+    this.playing = false;
 
     super.complete();
   }
 
-  componentDidMount() {
-    this.el = ReactDOM.findDOMNode(this);
+  bootstrap() {
+    this.video = ReactDOM.findDOMNode(this);
   }
 
   render() {
     return (
-      <video {...this.props} onCanPlay={this.ready.bind(this)} onEnded={this.complete.bind(this)} preload="auto" controls={true} />
+      <video
+        {...this.props}
+        onCanPlay={this.ready}
+        onEnded={this.complete}
+        preload="auto"
+        controls={true}
+      />
     );
   }
 }

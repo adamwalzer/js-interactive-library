@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Asset from './asset.js';
 
 /*
@@ -45,11 +43,11 @@ Media.defaultProps = _.defaults({
   bootstrap: false,
   checkComplete: false,
   checkReady: false,
-  shouldRender: false,
   completeDelay: 0,
   completeOnStart: false,
   silentOnStart: true,
-  onPlay: _.identity,
+  shouldComponentUpdate: () => false,
+  onPlay: _.noop,
 }, Asset.defaultProps);
 
 export default Media;

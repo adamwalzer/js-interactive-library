@@ -1,4 +1,4 @@
-var trigger = function (name, opts = {}) {
+export default function (name, opts = {}) {
   return (
     new Promise(resolve => {
       var e = new Event('trigger', {bubbles: false, cancelable: false});
@@ -10,6 +10,4 @@ var trigger = function (name, opts = {}) {
       window.dispatchEvent(e);
     })
   );
-};
-
-export default trigger;
+}

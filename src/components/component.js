@@ -1,16 +1,17 @@
-import _ from 'lodash';
 import classNames from 'classnames';
 
 class Component extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       started: false,
       ready: false,
     };
 
-    this.onReady = this.onReady || _.identity;
+    this.onReady = this.onReady || _.noop;
+    this.start = _.throttle(this.start.bind(this), 100);
+    this.complete = _.throttle(this.complete.bind(this), 100);
   }
 
   complete() {
@@ -37,9 +38,7 @@ class Component extends React.Component {
 
   completeRefs() {
     _.forEach(this.refs, ref => {
-      if (typeof ref.completeRefs === 'function') {
-        ref.completeRefs();
-      }
+      _.invoke(ref, 'completeRefs');
     });
 
     this.complete({silent: true});
@@ -47,9 +46,7 @@ class Component extends React.Component {
 
   incompleteRefs() {
     _.forEach(this.refs, ref => {
-      if (typeof ref.incompleteRefs === 'function') {
-        ref.incompleteRefs();
-      }
+      _.invoke(ref, 'incompleteRefs');
     });
 
     this.incomplete();
@@ -59,24 +56,28 @@ class Component extends React.Component {
     this.setState({
       ready: true,
     }, () => {
-      skoash.trigger('ready');
+      if (this.props.triggerReady) skoash.trigger('ready');
+      if (this.state.open) this.start();
       this.onReady.call(this);
       this.props.onReady.call(this);
     });
   }
 
-  start() {
+  start(callback) {
+    if (!this.state || !this.state.ready || this.state.started) return;
     this.setState({
       started: true
     }, () => {
       this.checkComplete();
       _.each(this.refs, ref => {
-        if (typeof ref.start === 'function') ref.start();
+        _.invoke(ref, 'start');
       });
 
       if (this.props.completeOnStart) this.complete();
 
       this.props.onStart.call(this);
+
+      if (typeof callback === 'function') callback.call(this);
     });
   }
 
@@ -85,9 +86,7 @@ class Component extends React.Component {
       started: false
     }, () => {
       _.each(this.refs, ref => {
-        if (ref && typeof ref.stop === 'function') {
-          ref.stop();
-        }
+        _.invoke(ref, 'stop');
       });
 
       this.props.onStop.call(this);
@@ -96,7 +95,7 @@ class Component extends React.Component {
 
   pause() {
     _.each(this.refs, ref => {
-      if (typeof ref.pause === 'function') ref.pause();
+      _.invoke(ref, 'pause');
     });
 
     this.props.onPause.call(this);
@@ -104,7 +103,7 @@ class Component extends React.Component {
 
   resume() {
     _.each(this.refs, ref => {
-      if (typeof ref.resume === 'function') ref.resume();
+      _.invoke(ref, 'resume');
     });
 
     this.props.onResume.call(this);
@@ -126,26 +125,24 @@ class Component extends React.Component {
     });
   }
 
-  componentWillMount() {
-    if (this.props.completeIncorrect && !this.props.correct) {
-      this.complete();
-    }
-  }
-
   componentDidMount() {
     this.bootstrap();
   }
 
   bootstrap() {
-    var self = this;
+    if (!this.props.bootstrap) return;
 
-    self.requireForReady = Object.keys(self.refs);
-    self.requireForComplete = self.requireForReady.filter(key => self.refs[key].checkComplete);
+    if ((this.props.completeIncorrect && !this.props.correct) || this.props.complete) {
+      this.complete();
+    }
 
-    self.collectMedia();
-    self.checkReady();
+    this.requireForReady = Object.keys(this.refs);
+    this.requireForComplete = this.requireForReady.filter(key => this.refs[key].checkComplete);
 
-    self.props.onBootstrap.call(self);
+    this.collectMedia();
+    this.checkReady();
+
+    this.props.onBootstrap.call(this);
   }
 
   collectData() {
@@ -186,6 +183,7 @@ class Component extends React.Component {
     // TODO: remove this after making sure components reference
     // this.media.audio and this.media.video instead of
     // this.audio and this.video directly
+    // this is done for the framework but should be checked in games
     self.audio = self.media.audio;
     self.video = self.media.video;
   }
@@ -208,60 +206,54 @@ class Component extends React.Component {
     this.media.sequence.push(this.refs[key]);
   }
 
+  playMedia(path) {
+    _.invoke(this.media, path + '.play');
+  }
+
   checkReady() {
-    var ready, self = this;
+    var ready;
 
-    if (!self.props.checkReady || (!this.props.ignoreReady && self.state.ready)) return;
+    if (!this.props.checkReady || (!this.props.ignoreReady && this.state.ready)) return;
 
-    _.forEach(self.requireForReady, key => {
-      if (self.refs[key] && self.refs[key].state && !self.refs[key].state.ready) {
-        self.refs[key].bootstrap();
-      }
+    _.each(this.refs, ref => {
+      if (!_.get(ref, 'state.ready')) _.invoke(ref, 'checkReady');
     });
 
-    ready = _.every(self.requireForReady, key => {
-      return self.refs[key] && (
-          !self.refs[key].state || (
-            self.refs[key].state && self.refs[key].state.ready
-          )
-        );
-    });
+    ready = _.every(this.refs, ref =>
+      ref &&
+        (!ref.state ||
+          (ref.state && ref.state.ready))
+    );
 
-    if (ready) {
-      self.ready();
-    }
+    if (ready) this.ready();
   }
 
   checkComplete() {
-    var self = this, complete;
+    var complete;
 
-    if (!self.props.checkComplete || !self.state.ready || !self.requireForComplete) return;
+    if (!this.props.checkComplete || !this.state.ready || !this.requireForComplete) return;
 
-    _.forEach(self.requireForComplete, key => {
-      if (self.refs[key] && typeof self.refs[key].checkComplete === 'function') {
-        self.refs[key].checkComplete();
-      }
-    });
+    _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 
-    complete = _.every(self.requireForComplete, key => {
-      if (self.refs[key] instanceof Node) {
-        return true;
-      }
-      if (!self.refs[key] || !self.refs[key].state || (self.refs[key].state && !self.refs[key].state.complete)) {
-        return false;
-      }
-      return true;
-    });
+    complete = _.every(this.refs, ref =>
+      ref instanceof Node ||
+        (!ref || !ref.state ||
+          (ref.state && ref.state.complete))
+    );
 
-    if (complete && !self.state.complete) {
-      self.complete();
-    } else if (self.state.started && !complete && self.state.complete) {
-      self.incomplete();
+    if (complete && !this.state.complete) {
+      this.complete();
+    } else if (this.state.started && !complete && this.state.complete) {
+      this.incomplete();
     }
   }
 
   updateGameState(opts) {
-    skoash.trigger('updateState', opts);
+    return skoash.trigger('updateState', opts);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.shouldComponentUpdate.call(this, nextProps, nextState);
   }
 
   componentWillReceiveProps(props) {
@@ -278,25 +270,35 @@ class Component extends React.Component {
     }
   }
 
+  addClassName(className) {
+    this.setState({
+      className: classNames(this.state.className, className),
+    });
+  }
+
+  removeClassName(className) {
+    this.setState({
+      className: this.state.className.replace(className, ''),
+    });
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
       STARTED: this.state.started,
       COMPLETE: this.state.complete,
       OPEN: this.state.open,
-    }, this.props.className, this.props.getClassNames.call(this));
+    }, this.state.className, this.props.className, this.props.getClassNames.call(this));
   }
 
   renderContentList(listName = 'children') {
-    var children = [].concat(this.props[listName]);
-    return children.map((component, key) => {
+    return _.map([].concat(this.props[listName]), (component, key) => {
       if (!component) return;
-      var ref = component.ref || component.props['data-ref'] || listName + '-' + key;
       return (
         <component.type
           gameState={this.props.gameState}
           {...component.props}
-          ref={ref}
+          ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
           key={key}
         />
       );
@@ -318,24 +320,26 @@ Component.defaultProps = {
   bootstrap: true,
   checkComplete: true,
   checkReady: true,
-  collectData: _.identity,
+  collectData: _.noop,
   completeDelay: 0,
   completeIncorrect: false,
   completeOnStart: false,
-  getClassNames: _.identity,
+  getClassNames: _.noop,
   ignoreReady: false,
-  loadData: _.identity,
-  onBootstrap: _.identity,
-  onClose: _.identity,
-  onComplete: _.identity,
-  onReady: _.identity,
-  onIncomplete: _.identity,
-  onOpen: _.identity,
-  onPause: _.identity,
-  onResume: _.identity,
-  onStart: _.identity,
-  onStop: _.identity,
+  loadData: _.noop,
+  onBootstrap: _.noop,
+  onClose: _.noop,
+  onComplete: _.noop,
+  onReady: _.noop,
+  onIncomplete: _.noop,
+  onOpen: _.noop,
+  onPause: _.noop,
+  onResume: _.noop,
+  onStart: _.noop,
+  onStop: _.noop,
+  shouldComponentUpdate: () => true,
   shouldRender: true,
+  triggerReady: true,
   type: 'div',
 };
 
