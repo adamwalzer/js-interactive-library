@@ -9,7 +9,7 @@ class EventManager {
   }
 
   attachEvents() {
-    var onblur, onfocusout, hidden;
+    var onblur, onfocusout;
 
     window.addEventListener('resize', () => {
       this.scale();
