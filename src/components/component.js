@@ -282,6 +282,12 @@ class Component extends React.Component {
     });
   }
 
+  removeAllClassNames() {
+    this.setState({
+      className: null
+    });
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
