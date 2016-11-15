@@ -87,7 +87,7 @@ class Screen extends Component {
   }
 
   startMedia() {
-    if (this.video[0]) {
+    if (this.media.video[0]) {
       this.playMedia('video.0');
     } else if (this.media.audio.voiceOver[0]) {
       this.playMedia('audio.voiceOver.0');

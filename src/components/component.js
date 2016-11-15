@@ -309,9 +309,10 @@ class Component extends React.Component {
   renderContentList(listName = 'children') {
     return _.map([].concat(this.props[listName]), (component, key) => {
       if (!component) return;
+      var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
       return (
         <component.type
-          gameState={this.props.gameState}
+          gameState={gameState}
           {...component.props}
           ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
           key={key}
