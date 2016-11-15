@@ -10,7 +10,9 @@ class Component extends React.Component {
     };
 
     this.onReady = this.onReady || _.noop;
+
     this.start = _.throttle(this.start.bind(this), 100);
+    this.ready = _.throttle(this.ready.bind(this), 100);
     this.complete = _.throttle(this.complete.bind(this), 100);
   }
 
