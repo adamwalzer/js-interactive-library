@@ -5,7 +5,6 @@ class Video extends Media {
     super(props);
 
     this.play = this.play.bind(this);
-    this.ready = this.ready.bind(this);
   }
 
   play() {

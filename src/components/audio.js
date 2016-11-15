@@ -8,7 +8,6 @@ class Audio extends Media {
     this.startCount = 0;
     this.completeCount = 0;
 
-    this.ready = this.ready.bind(this);
     this.playAudio = this.playAudio.bind(this);
     this.play = _.throttle(this.play.bind(this), props.playThrottle);
   }
