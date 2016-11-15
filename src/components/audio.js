@@ -7,6 +7,7 @@ class Audio extends Media {
 
     this.startCount = 0;
     this.completeCount = 0;
+    this.allowMultiPlay = props.allowMultiPlay || props.type === 'sfx';
 
     this.playAudio = this.playAudio.bind(this);
     this.play = _.throttle(this.play.bind(this), props.playThrottle);
@@ -32,8 +33,9 @@ class Audio extends Media {
     });
   }
 
-  playAudio() {
+  playAudio(resume) {
     if (this.paused) return;
+    if (!resume && !this.allowMultiPlay && this.playing) return;
 
     this.delayed = false;
     this.playing = true;
@@ -66,7 +68,7 @@ class Audio extends Media {
 
       if (!this.paused) return;
       this.paused = false;
-      this.playAudio();
+      this.playAudio(true);
     });
   }
 
@@ -156,6 +158,7 @@ Audio.defaultProps = _.defaults({
   playThrottle: 100,
   shouldRender: false,
   sprite: undefined,
+  allowMultiPlay: false,
 }, Media.defaultProps);
 
 export default Audio;
