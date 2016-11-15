@@ -210,6 +210,13 @@ class Component extends React.Component {
     _.invoke(this.media, path + '.play');
   }
 
+  getUnready(ready = 'ready') {
+    return _.reduce(this.refs, (a, v, k) => {
+      if (v.state && !v.state[ready]) a[k] = v;
+      return a;
+    }, {});
+  }
+
   checkReady() {
     var ready;
 

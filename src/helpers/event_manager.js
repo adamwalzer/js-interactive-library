@@ -1,6 +1,7 @@
 class EventManager {
   constructor(game) {
     this.attachEvents = this.attachEvents.bind(game);
+    this.onKeyDown = this.onKeyDown.bind(game);
     this.emit = this.emit.bind(game);
     this.emitSave = this.emitSave.bind(game);
     this.trigger = this.trigger.bind(game);
