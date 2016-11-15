@@ -4,6 +4,7 @@ class Navigator {
     this.shouldGoto = this.shouldGoto.bind(game);
     this.openNewScreen = this.openNewScreen.bind(game);
     this.closeOldScreen = this.closeOldScreen.bind(game);
+    this.getDefaultButtonSound = this.getDefaultButtonSound.bind(game);
     this.goBack = this.goBack.bind(game);
     this.openMenu = this.openMenu.bind(game);
     this.menuClose = this.menuClose.bind(game);
@@ -68,42 +69,43 @@ class Navigator {
 
   openNewScreen(newScreen, currentScreenIndex, opts) {
     var screenIndexArray = this.state.screenIndexArray;
-    if (newScreen) {
-      // this should only be dropped into for non-linear screens
-      if (!newScreen.state.load || !newScreen.state.ready) {
-        this.loadScreens(currentScreenIndex, false);
-      }
-      screenIndexArray.push(currentScreenIndex);
-      newScreen.open(opts);
+    if (!newScreen) return screenIndexArray;
+
+    // this should only be dropped into for non-linear screens
+    if (!newScreen.state.load || !newScreen.state.ready) {
+      this.loadScreens(currentScreenIndex, false);
     }
+
+    screenIndexArray.push(currentScreenIndex);
+    newScreen.open(opts);
+
     return screenIndexArray;
   }
 
   closeOldScreen(oldScreen, newScreen, opts, oldIndex) {
-    var back, buttonSound, data = _.cloneDeep(this.state.data);
-    if (oldScreen && oldScreen !== newScreen) {
-      if (oldScreen.props.index > newScreen.props.index) {
-        back = true;
-        oldScreen.close();
-      } else {
-        oldScreen.leave();
-      }
+    var back = oldScreen.props.index > newScreen.props.index, buttonSound, data = _.cloneDeep(this.state.data);
 
-      if (!opts.silent) {
-        if (opts.buttonSound && typeof opts.buttonSound.play === 'function') {
-          buttonSound = opts.buttonSound;
-        } else if (this.media.audio.button) {
-          buttonSound = this.media.audio.next || this.media.audio.button;
-          if (back) buttonSound = this.media.audio.back || this.media.audio.button;
-        }
-        if (buttonSound) buttonSound.play();
-      }
+    if (!oldScreen || oldScreen === newScreen) return data;
 
-      if (oldScreen.props.resetOnClose) {
-        data.screens[oldIndex] = {};
-      }
+    back ? oldScreen.close() : oldScreen.leave();
+
+    if (oldScreen.props.resetOnClose) data.screens[oldIndex] = {};
+
+    if (opts.silent) return data;
+
+    buttonSound = this.navigator.getDefaultButtonSound(back);
+    if (opts.buttonSound) {
+      buttonSound = opts.buttonSound;
     }
+    _.invoke(buttonSound, 'play');
+
     return data;
+  }
+
+  getDefaultButtonSound(back) {
+    var audioName = back ? 'back' : 'next', buttonSound;
+    buttonSound = this.media.audio[audioName] || this.media.audio.button || buttonSound;
+    return buttonSound;
   }
 
   goBack() {
