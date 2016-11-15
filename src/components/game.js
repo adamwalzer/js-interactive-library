@@ -131,7 +131,7 @@ class Game extends Component {
     this.setPause(true);
   }
 
-  // paused should be a boolean determining if whether to call
+  // paused should be a boolean determining whether to call
   // audio.pause or audio.resume
   setPause(paused) {
     var fnKey = paused ? 'pause' : 'resume';
@@ -139,27 +139,9 @@ class Game extends Component {
     this.setState({
       paused
     }, () => {
-      _.forEach(this.state.playingBKG, audio => {
-        audio[fnKey]();
-      });
-
+      _.each(this.state.playingBKG, audio => _.invoke(audio, fnKey));
       _.invoke(this.refs['screen-' + this.state.currentScreenIndex], fnKey);
     });
-  }
-
-  // remove once games are refactored to call this.navigator.goto(opts);
-  goto(opts) {
-    this.navigator.goto(opts);
-  }
-
-  // remove once games are refactored to call this.navigator.openMenu(opts);
-  openMenu(opts) {
-    this.navigator.openMenu(opts);
-  }
-
-  // remove once games are refactored to call this.navigator.menuClose(opts);
-  menuClose(opts) {
-    this.navigator.menuClose(opts);
   }
 
   // Remove this method after refactoring games that override it.
@@ -174,12 +156,8 @@ class Game extends Component {
     });
   }
 
-  // remove once games are refactored to call this.navigator.menuClose(opts);
-  trigger(event, opts) {
-    this.eventManager.trigger(event, opts);
-  }
-
   // remove once games are refactored to call this.eventManager.emit(gameData);
+  // all-about-you
   emit(gameData = {}) {
     return this.eventManager.emit(gameData);
   }
