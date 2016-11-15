@@ -4,6 +4,7 @@ import Component from 'components/component';
 import Screen from 'components/screen';
 import Game from 'components/game';
 import Image from 'components/image';
+import Font from 'components/font';
 import Audio from 'components/audio';
 import Video from 'components/video';
 import MediaSequence from 'components/media_sequence';
@@ -18,6 +19,7 @@ window.skoash = {
   Screen,
   Game,
   Image,
+  Font,
   Audio,
   MediaSequence,
   Video,

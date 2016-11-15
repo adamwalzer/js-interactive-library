@@ -8,16 +8,16 @@ class Image extends Asset {
     this.error = this.error.bind(this);
   }
 
-  componentDidMount() {
-    this.setState({
-      complete: this.props.complete
-    });
-  }
-
   error() {
     this.setState({
       error: true,
       ready: false
+    });
+  }
+
+  bootstrap() {
+    this.setState({
+      complete: this.props.complete
     });
   }
 

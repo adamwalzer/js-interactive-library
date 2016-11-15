@@ -104,7 +104,8 @@ class Game extends Component {
   }
 
   ready() {
-    if (this.state.ready) return;
+    if (this.state.ready || this.isReady) return;
+    this.isReady = true;
     this.setState({
       ready: true,
     }, () => {

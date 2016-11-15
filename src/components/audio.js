@@ -142,9 +142,8 @@ class Audio extends Media {
       onload: this.ready,
       sprite,
     });
-    if (this.props.complete) {
-      this.complete();
-    }
+
+    if (this.props.complete) this.complete();
   }
 }
 

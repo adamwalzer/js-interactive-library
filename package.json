@@ -12,6 +12,7 @@
     "babel-eslint": "^6.0.4",
     "babel-polyfill": "^6.0.16",
     "classnames": "^2.2.5",
+    "fontfaceobserver": "^2.0.5",
     "howler": "1.1.29",
     "lodash": "^4.3.0",
     "moment": "^2.12.0",
