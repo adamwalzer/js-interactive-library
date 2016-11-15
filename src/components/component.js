@@ -169,23 +169,17 @@ class Component extends React.Component {
     };
 
     _.each(self.refs, (ref, key) => {
-      if (skoash.Video && ref instanceof skoash.Video) {
-        self.collectVideo(key);
-      }
-
-      if (skoash.Audio && ref instanceof skoash.Audio) {
-        self.collectAudio(key);
-      }
-
-      if (skoash.MediaSequence && ref instanceof skoash.MediaSequence) {
-        self.collectMediaSequence(key);
-      }
+      if (ref instanceof skoash.Video) self.collectVideo(key);
+      if (ref instanceof skoash.Audio) self.collectAudio(key);
+      if (ref instanceof skoash.MediaSequence) self.collectMediaSequence(key);
     });
 
     // TODO: remove this after making sure components reference
     // this.media.audio and this.media.video instead of
     // this.audio and this.video directly
     // this is done for the framework but should be checked in games
+    // this.video seems to be removed from the games,
+    // but this.audio is used in many games and components
     self.audio = self.media.audio;
     self.video = self.media.video;
   }
