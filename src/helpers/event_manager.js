@@ -109,7 +109,7 @@ class EventManager {
     });
 
     p.then(d => {
-      self.trigger(d.name, d);
+      self.eventManager.trigger(d.name, d);
     });
 
     return p;
