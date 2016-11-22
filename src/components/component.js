@@ -168,14 +168,6 @@ class Component extends React.Component {
       if (ref instanceof skoash.Audio) this.collectAudio(key);
       if (ref instanceof skoash.MediaSequence) this.collectMediaSequence(key);
     });
-
-    // TODO: remove this after making sure components reference
-    // this.media.audio and this.media.video instead of
-    // this.audio and this.video directly
-    // this is done for the framework but should be checked in games
-    // this.video seems to be removed from the games,
-    // but this.audio is used in many games and components
-    this.audio = this.media.audio;
   }
 
   collectVideo(key) {
