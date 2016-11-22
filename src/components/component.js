@@ -138,9 +138,6 @@ class Component extends React.Component {
       this.complete();
     }
 
-    this.requireForReady = Object.keys(this.refs);
-    this.requireForComplete = this.requireForReady.filter(key => this.refs[key].checkComplete);
-
     this.collectMedia();
     this.checkReady();
 
@@ -234,7 +231,7 @@ class Component extends React.Component {
   checkComplete() {
     var complete;
 
-    if (!this.props.checkComplete || !this.state.ready || !this.requireForComplete) return;
+    if (!this.props.checkComplete || !this.state.ready) return;
 
     _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 

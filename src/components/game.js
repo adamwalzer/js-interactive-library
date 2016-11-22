@@ -66,11 +66,6 @@ class Game extends Component {
 
     self.screensLength = Object.keys(self.screens).length;
 
-    self.requireForReady = Object.keys(self.refs);
-    self.requireForComplete = self.requireForReady.filter(key =>
-      !self.refs[key].state || !self.refs[key].state.complete
-    );
-
     self.collectMedia();
     self.loadScreens(self.state.currentScreenIndex, false);
 
