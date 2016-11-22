@@ -153,9 +153,7 @@ class Component extends React.Component {
   }
 
   collectMedia() {
-    var self = this;
-
-    self.media = {
+    this.media = {
       video: [],
       audio: {
         background: [],
@@ -165,10 +163,10 @@ class Component extends React.Component {
       sequence: [],
     };
 
-    _.each(self.refs, (ref, key) => {
-      if (ref instanceof skoash.Video) self.collectVideo(key);
-      if (ref instanceof skoash.Audio) self.collectAudio(key);
-      if (ref instanceof skoash.MediaSequence) self.collectMediaSequence(key);
+    _.each(this.refs, (ref, key) => {
+      if (ref instanceof skoash.Video) this.collectVideo(key);
+      if (ref instanceof skoash.Audio) this.collectAudio(key);
+      if (ref instanceof skoash.MediaSequence) this.collectMediaSequence(key);
     });
 
     // TODO: remove this after making sure components reference
@@ -177,8 +175,7 @@ class Component extends React.Component {
     // this is done for the framework but should be checked in games
     // this.video seems to be removed from the games,
     // but this.audio is used in many games and components
-    self.audio = self.media.audio;
-    self.video = self.media.video;
+    this.audio = this.media.audio;
   }
 
   collectVideo(key) {

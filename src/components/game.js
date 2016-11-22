@@ -158,9 +158,7 @@ class Game extends Component {
   }
 
   getGame(opts) {
-    if (this.config.id === opts.id) {
-      _.invoke(opts, 'respond', this);
-    }
+    if (this.config.id === opts.id) _.invoke(opts, 'respond', this);
   }
 
   getData(opts) {
@@ -221,10 +219,9 @@ class Game extends Component {
     _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'checkComplete');
   }
 
-  // this method takes in an opts method with screenID
+  // this method takes in an opts parameter object with screenID
   screenComplete(opts) {
-    if (opts.silent) return;
-    this.playMedia('screen-complete');
+    this.props.screenComplete.call(this, opts);
   }
 
   getClassNames() {
@@ -334,6 +331,10 @@ Game.defaultProps = _.defaults({
   getData: function (opts) {
     opts.name = 'getData';
     return this.eventManager.emit(opts);
+  },
+  screenComplete: function (opts) {
+    if (opts.silent) return;
+    this.playMedia('screen-complete');
   },
 }, Component.defaultProps);
 
