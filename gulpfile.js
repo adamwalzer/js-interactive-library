@@ -1,45 +1,60 @@
+var gulp;
+var args;
+var gutil;
+var webpack;
+var gulpWebpack;
+var webpackDevConfig;
+var webpackProdConfig;
+var appPackage;
+var childProcess;
+var spawn;
+var eslint;
+var fs;
+var eslintConfigJs;
+var env;
+var mocha;
+var mode;
+var executeAsProcess;
+var buildDevelopment;
+var buildProduction;
+var selectBuildMode;
+
 require('babel-core/register');//for mocha to use es6
 /*global require process*/
 /*eslint-env node */
 /*eslint no-console:0 */
-var gulp = require('gulp');
-var args = require('yargs').argv;
-var gutil = require('gulp-util');
-var webpack = require('webpack');
-var gulpWebpack = require('webpack-stream');
-var webpackDevConfig = require('./webpack.config.dev.js');
-var webpackProdConfig = require('./webpack.config.prod.js');
-var appPackage = require('./package.json');
+gulp = require('gulp');
+args = require('yargs').argv;
+gutil = require('gulp-util');
+webpack = require('webpack');
+gulpWebpack = require('webpack-stream');
+webpackDevConfig = require('./webpack.config.dev.js');
+webpackProdConfig = require('./webpack.config.prod.js');
+appPackage = require('./package.json');
 webpackDevConfig.output.filename = 'skoash.' + appPackage.version + '.js';
 webpackProdConfig.output.filename = 'skoash.' + appPackage.version + '.js';
-var childProcess = require('child_process');
-// var exec = childProcess.exec;
-var spawn = childProcess.spawn;
-var eslint = require('gulp-eslint');
-var fs = require('fs');
-var eslintConfigJs = JSON.parse(fs.readFileSync('./.eslintrc'));
-var env = require('gulp-env');
-// var _ = require('lodash');
-// var inject = require('gulp-inject');
-// var ExtractTextPlugin = require('extract-text-webpack-plugin');
-// var mergeStream = require('merge-stream');
-// var sri = require('gulp-sri');
-var mocha = require('gulp-mocha');
+childProcess = require('child_process');
+spawn = childProcess.spawn;
+eslint = require('gulp-eslint');
+fs = require('fs');
+eslintConfigJs = JSON.parse(fs.readFileSync('./.eslintrc'));
+env = require('gulp-env');
+mocha = require('gulp-mocha');
 
 //mode defaults to development and is selected with the following precedences:
 // --development flag
 // --production flag
 // APP_ENV environment variable
 // NODE_ENV environment variable
-var mode = 'development';
+mode = 'development';
 if (args.development || args.prod) {
-  mode = 'development';
+    mode = 'development';
 } else if (args.prod || args.production) {
-  mode = 'production';
+    mode = 'production';
 } else if (process.env.APP_ENV) {
-  mode = process.env.APP_ENV;
+    mode = process.env.APP_ENV;
 } else if (process.env.NODE_ENV) {
-  mode = process.env.NODE_ENV;
+    mode = process.env.NODE_ENV;
 }
 
 /*
@@ -52,102 +67,102 @@ ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
 (______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)
 */
 
-/**
+/*
  * Higher order function. Starts an arbitrary shell command
  * note that this is not a gulp best practice, and should be
  * used sparingly and only with justification.
  * @param {string} command - command to run
  * @param {string[]} [flags = []] - any flags that need to be passed to command
  */
-var executeAsProcess = function (command, flags) {
-  return function () {
-    var start = spawn(command, flags);
-    start.stdout.on('data', function (data) {
-      console.log('stdout: ' + data);
-    });
+executeAsProcess = function (command, flags) {
+    return function () {
+        var start = spawn(command, flags);
+        start.stdout.on('data', function (data) {
+            console.log('stdout: ' + data);
+        });
 
-    start.stderr.on('data', function (data) {
-      console.log('stderr: ' + data);
-    });
-  };
+        start.stderr.on('data', function (data) {
+            console.log('stderr: ' + data);
+        });
+    };
 };
 
-var buildDevelopment = function () {
-  var wpStream = gulpWebpack(webpackDevConfig, null, function (err, stats) {
-    var statsStr = stats.toString({
-      colors: true
+buildDevelopment = function () {
+    var wpStream = gulpWebpack(webpackDevConfig, null, function (err, stats) {
+        var statsStr = stats.toString({
+            colors: true
+        });
+        if (err) {
+            throw new gutil.PluginError('webpack:build-dev', err);
+        }
+        fs.appendFile('build.log', statsStr);
+        gutil.log('[webpack:build-dev]', statsStr);
     });
-    if (err) {
-      throw new gutil.PluginError('webpack:build-dev', err);
-    }
-    fs.appendFile('build.log', statsStr);
-    gutil.log('[webpack:build-dev]', statsStr);
-  });
 
-  fs.writeFile('build_errors.log', '');
-  fs.writeFile('build.log', ''); //remove this line to persist logs
-  fs.appendFile('build.log', `******************** Build Started in ${mode} mode at ${Date.now()}\r\n`);
+    fs.writeFile('build_errors.log', '');
+    fs.writeFile('build.log', ''); //remove this line to persist logs
+    fs.appendFile('build.log', `******************** Build Started in ${mode} mode at ${Date.now()}\r\n`);
 
-  env({
-    vars: {
-      NODE_ENV: 'development',
-      BABEL_ENV: 'development'
-    }});
-  wpStream.on('error', err => {
-    fs.writeFile('build_errors.log', err);
-    wpStream.end();
-  });
-  return gulp.src('./src/app.js')
+    env({
+        vars: {
+            NODE_ENV: 'development',
+            BABEL_ENV: 'development'
+        }});
+    wpStream.on('error', err => {
+        fs.writeFile('build_errors.log', err);
+        wpStream.end();
+    });
+    return gulp.src('./src/app.js')
         .pipe(wpStream)
         .pipe(gulp.dest('./build'))
         .pipe(gulp.dest('../cmwn-games/library/framework'));
 };
 
-var buildProduction = function () {
+buildProduction = function () {
     // modify some webpack config options
-  var wpStream = gulpWebpack(webpackProdConfig, webpack, function (err, stats) {
-    var statsStr = stats.toString({
-      colors: true
+    var wpStream = gulpWebpack(webpackProdConfig, webpack, function (err, stats) {
+        var statsStr = stats.toString({
+            colors: true
+        });
+        if (err) {
+            throw new gutil.PluginError('webpack:build', err);
+        }
+        fs.appendFile('build.log', statsStr);
+        gutil.log('[webpack:build]', statsStr);
     });
-    if (err) {
-      throw new gutil.PluginError('webpack:build', err);
-    }
-    fs.appendFile('build.log', statsStr);
-    gutil.log('[webpack:build]', statsStr);
-  });
 
-  wpStream.on('error', err => {
-    fs.writeFile('build_errors.log', err);
-    wpStream.end();
-  });
+    wpStream.on('error', err => {
+        fs.writeFile('build_errors.log', err);
+        wpStream.end();
+    });
 
-  fs.writeFile('build_errors.log', '');
-  fs.writeFile('build.log', ''); //remove this line to persist logs
-  fs.appendFile('build.log', `******************** Build Started in ${mode} mode at ${Date.now()}\r\n`);
+    fs.writeFile('build_errors.log', '');
+    fs.writeFile('build.log', ''); //remove this line to persist logs
+    fs.appendFile('build.log', `******************** Build Started in ${mode} mode at ${Date.now()}\r\n`);
 
     //mark environment as prod
-  env({
-    vars: {
-      NODE_ENV: 'production',
-      BABEL_ENV: 'production'
-    }});
+    env({
+        vars: {
+            NODE_ENV: 'production',
+            BABEL_ENV: 'production'
+        }});
     // run webpack
-  return gulp.src('./src/app.js')
+    return gulp.src('./src/app.js')
         .pipe(wpStream)
         .pipe(gulp.dest('./build'))
         .pipe(gulp.dest('../cmwn-games/library/framework'));
 };
 
-var selectBuildMode = function () {
+selectBuildMode = function () {
 
-  if (mode === 'production' || mode === 'prod') {
-    gutil.log(gutil.colors.green('Building in production mode'));
-    process.env.NODE_ENV = 'production';
-    process.env.BABEL_ENV = 'production';
-    return buildProduction();
-  }
-  gutil.log(gutil.colors.green('Building in development mode'));
-  return buildDevelopment();
+    if (mode === 'production' || mode === 'prod') {
+        gutil.log(gutil.colors.green('Building in production mode'));
+        process.env.NODE_ENV = 'production';
+        process.env.BABEL_ENV = 'production';
+        return buildProduction();
+    }
+    gutil.log(gutil.colors.green('Building in development mode'));
+    return buildDevelopment();
 };
 
 /*
@@ -163,7 +178,7 @@ ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
 gulp.task('default', ['build', 'watch']);
 
 gulp.task('watch', function () {
-  gulp.watch('src/**/*.js', ['build']);
+    gulp.watch('src/**/*.js', ['build']);
 });
 
 /*·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´JS Build Tasks`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·*/
@@ -172,7 +187,8 @@ gulp.task('build', ['webpack:build']);
 gulp.task('webpack:build', selectBuildMode);
 /** Convienience methods to run only the webpack portion of a build*/
 gulp.task('build-warning', function () {
-  console.log(gutil.colors.yellow('Warning: `gulp webpack:build` does not build the index or some styles. Run `gulp build` to build all artifacts'));
+    console.log(gutil.colors.yellow('Warning: `gulp webpack:build` does not build the ' +
+        'index or some styles. Run `gulp build` to build all artifacts'));
 });
 gulp.task('webpack:build-prod', ['build-warning'], buildProduction);
 gulp.task('webpack:build-production', ['build-warning'], buildProduction);
@@ -194,7 +210,7 @@ gulp.task('build-production', executeAsProcess('gulp build', ['build', '--produc
 /*·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´Lint and Testing Tasks`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·*/
 gulp.task('lint', ['lint-js', 'lint-config', 'lint-test']);
 gulp.task('lint-js', function () {
-  return gulp.src(['src/**/*.js', '!src/**/*.test.js'])
+    return gulp.src(['src/**/*.js', '!src/**/*.test.js'])
         // eslint() attaches the lint output to the eslint property
         // of the file object so it can be used by other modules.
         .pipe(eslint(eslintConfigJs))
@@ -218,11 +234,11 @@ gulp.task('lint-js', function () {
 // });
 
 gulp.task('test', function () {
-  return gulp.src(['src/**/*.test.js'], {read: false})
+    return gulp.src(['src/**/*.test.js'], {read: false})
          .pipe(mocha({reporter: 'min'}));
 });
 
 //this task is only required when some post-build task intentionally clears the console, as our tests do
 gulp.task('showBuildErrors', function () {
-  console.log(fs.readFileSync('build_errors.log'));
+    console.log(fs.readFileSync('build_errors.log'));
 });
