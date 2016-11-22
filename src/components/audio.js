@@ -1,3 +1,5 @@
+// AJW 20161115
+// Howler 2.0.1 is out. Perhaps we should give it a try.
 import { Howl } from 'howler';
 import Media from './media.js';
 
@@ -7,8 +9,8 @@ class Audio extends Media {
 
     this.startCount = 0;
     this.completeCount = 0;
+    this.allowMultiPlay = props.allowMultiPlay || props.type === 'sfx';
 
-    this.ready = this.ready.bind(this);
     this.playAudio = this.playAudio.bind(this);
     this.play = _.throttle(this.play.bind(this), props.playThrottle);
   }
@@ -33,8 +35,9 @@ class Audio extends Media {
     });
   }
 
-  playAudio() {
+  playAudio(resume) {
     if (this.paused) return;
+    if (!resume && !this.allowMultiPlay && this.playing) return;
 
     this.delayed = false;
     this.playing = true;
@@ -67,7 +70,7 @@ class Audio extends Media {
 
       if (!this.paused) return;
       this.paused = false;
-      this.playAudio();
+      this.playAudio(true);
     });
   }
 
@@ -142,9 +145,8 @@ class Audio extends Media {
       onload: this.ready,
       sprite,
     });
-    if (this.props.complete) {
-      this.complete();
-    }
+
+    if (this.props.complete) this.complete();
   }
 }
 
@@ -158,6 +160,7 @@ Audio.defaultProps = _.defaults({
   playThrottle: 100,
   shouldRender: false,
   sprite: undefined,
+  allowMultiPlay: false,
 }, Media.defaultProps);
 
 export default Audio;

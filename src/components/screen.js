@@ -87,7 +87,7 @@ class Screen extends Component {
   }
 
   startMedia() {
-    if (this.video[0]) {
+    if (this.media.video[0]) {
       this.playMedia('video.0');
     } else if (this.media.audio.voiceOver[0]) {
       this.playMedia('audio.voiceOver.0');
@@ -102,7 +102,7 @@ class Screen extends Component {
     setTimeout(() => {
       skoash.trigger('screenComplete', {
         screenID: this.props.id,
-        silent: opts.silent || this.props.silentComplete
+        silent: opts.silent || this.props.silentComplete || this.media['screen-complete']
       });
 
       this.playMedia('screen-complete');

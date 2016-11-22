@@ -1,6 +1,6 @@
 {
   "name": "js-interactive-library",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "CMWN Games Library (PlayJS)",
   "repository": {
     "type": "git",
@@ -12,9 +12,8 @@
     "babel-eslint": "^6.0.4",
     "babel-polyfill": "^6.0.16",
     "classnames": "^2.2.5",
+    "fontfaceobserver": "^2.0.5",
     "howler": "1.1.29",
-    "lodash": "^4.3.0",
-    "moment": "^2.12.0",
     "react": "^0.14.2",
     "react-addons-update": "^0.14.2",
     "react-bootstrap": "^0.28.3",

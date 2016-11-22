@@ -10,7 +10,9 @@ class Component extends React.Component {
     };
 
     this.onReady = this.onReady || _.noop;
+
     this.start = _.throttle(this.start.bind(this), 100);
+    this.ready = _.throttle(this.ready.bind(this), 100);
     this.complete = _.throttle(this.complete.bind(this), 100);
   }
 
@@ -167,23 +169,17 @@ class Component extends React.Component {
     };
 
     _.each(self.refs, (ref, key) => {
-      if (skoash.Video && ref instanceof skoash.Video) {
-        self.collectVideo(key);
-      }
-
-      if (skoash.Audio && ref instanceof skoash.Audio) {
-        self.collectAudio(key);
-      }
-
-      if (skoash.MediaSequence && ref instanceof skoash.MediaSequence) {
-        self.collectMediaSequence(key);
-      }
+      if (ref instanceof skoash.Video) self.collectVideo(key);
+      if (ref instanceof skoash.Audio) self.collectAudio(key);
+      if (ref instanceof skoash.MediaSequence) self.collectMediaSequence(key);
     });
 
     // TODO: remove this after making sure components reference
     // this.media.audio and this.media.video instead of
     // this.audio and this.video directly
     // this is done for the framework but should be checked in games
+    // this.video seems to be removed from the games,
+    // but this.audio is used in many games and components
     self.audio = self.media.audio;
     self.video = self.media.video;
   }
@@ -208,6 +204,13 @@ class Component extends React.Component {
 
   playMedia(path) {
     _.invoke(this.media, path + '.play');
+  }
+
+  getUnready(ready = 'ready') {
+    return _.reduce(this.refs, (a, v, k) => {
+      if (v.state && !v.state[ready]) a[k] = v;
+      return a;
+    }, {});
   }
 
   checkReady() {
@@ -282,6 +285,12 @@ class Component extends React.Component {
     });
   }
 
+  removeAllClassNames() {
+    this.setState({
+      className: null
+    });
+  }
+
   getClassNames() {
     return classNames({
       READY: this.state.ready,
@@ -294,9 +303,10 @@ class Component extends React.Component {
   renderContentList(listName = 'children') {
     return _.map([].concat(this.props[listName]), (component, key) => {
       if (!component) return;
+      var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
       return (
         <component.type
-          gameState={this.props.gameState}
+          gameState={gameState}
           {...component.props}
           ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
           key={key}
