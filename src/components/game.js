@@ -58,20 +58,20 @@ class Game extends Component {
   }
 
   bootstrap() {
-    var self = this;
-
-    if (!self.state.iOS) {
-      self.state.currentScreenIndex = 1;
+    if (!this.state.iOS) {
+      this.setState({
+        currentScreenIndex: 1,
+      });
     }
 
-    self.screensLength = Object.keys(self.screens).length;
+    this.screensLength = Object.keys(this.screens).length;
 
-    self.collectMedia();
-    self.loadScreens(self.state.currentScreenIndex, false);
+    this.collectMedia();
+    this.loadScreens(this.state.currentScreenIndex, false);
 
-    self.DOMNode = ReactDOM.findDOMNode(self);
+    this.DOMNode = ReactDOM.findDOMNode(this);
 
-    self.props.onBootstrap.call(self);
+    this.props.onBootstrap.call(this);
   }
 
   loadScreens(currentScreenIndex, goto = true) {
