@@ -129,17 +129,13 @@ class Screen extends Component {
         }, () => {
             if (self.props.startDelay) {
                 setTimeout(() => {
-                    if (!self.state.started) {
-                        self.start();
-                    }
+                    if (!self.state.started) self.start();
                     self.setState({
                         opening: false
                     });
                 }, self.props.startDelay);
             } else {
-                if (!self.state.started) {
-                    self.start();
-                }
+                if (!self.state.started) self.start();
                 self.setState({
                     opening: false
                 });
@@ -190,34 +186,34 @@ class Screen extends Component {
     renderContent() {
         if (!this.state.load) return null;
         return (
-      <div className="screen-content">
-        {this.renderContentList()}
-      </div>
-    );
+            <div className="screen-content">
+                {this.renderContentList()}
+            </div>
+        );
     }
 
     renderPrevButton() {
         if (this.props.hidePrev) return null;
         return (
-      <button className="prev-screen" onClick={this.prev} />
-    );
+            <button className="prev-screen" onClick={this.prev} />
+        );
     }
 
     renderNextButton() {
         if (this.props.hideNext) return null;
         return (
-      <button className="next-screen" onClick={this.next} />
-    );
+            <button className="next-screen" onClick={this.next} />
+        );
     }
 
     render() {
         return (
-      <div id={this.props.id} className={this.getClassNames()}>
-        {this.renderContent()}
-        {this.renderPrevButton()}
-        {this.renderNextButton()}
-      </div>
-    );
+            <div id={this.props.id} className={this.getClassNames()}>
+                {this.renderContent()}
+                {this.renderPrevButton()}
+                {this.renderNextButton()}
+            </div>
+        );
     }
 }
 
