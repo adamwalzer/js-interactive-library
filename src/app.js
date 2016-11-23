@@ -15,18 +15,18 @@ import trigger from 'methods/trigger';
 import util from 'methods/util';
 
 window.skoash = {
-  Component,
-  Screen,
-  Game,
-  Image,
-  Font,
-  Audio,
-  MediaSequence,
-  Video,
-  ListItem,
-  start,
-  trigger,
-  util,
+    Component,
+    Screen,
+    Game,
+    Image,
+    Font,
+    Audio,
+    MediaSequence,
+    Video,
+    ListItem,
+    start,
+    trigger,
+    util,
 };
 
 export default window.skoash;

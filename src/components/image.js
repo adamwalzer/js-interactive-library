@@ -1,14 +1,14 @@
 import Asset from './asset.js';
 
 class Image extends Asset {
-  bootstrap() {
-    this.setState({
-      complete: this.props.complete
-    });
-  }
+    bootstrap() {
+        this.setState({
+            complete: this.props.complete
+        });
+    }
 
-  render() {
-    return (
+    render() {
+        return (
       <img
         {...this.props}
         onLoad={this.ready}
@@ -16,11 +16,11 @@ class Image extends Asset {
         draggable={false}
       />
     );
-  }
+    }
 }
 
 Image.defaultProps = _.defaults({
-  complete: true,
+    complete: true,
 }, Asset.defaultProps);
 
 export default Image;

@@ -1,63 +1,63 @@
 import Component from './component.js';
 
 class MediaSequence extends Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.playNext = this.playNext.bind(this);
-  }
-
-  start() {
-    if (!this.props.silentOnStart && (!this.state.started || this.props.playMultiple)) this.play();
-  }
-
-  complete() {
-    super.complete();
-    this.setState({
-      started: false
-    });
-  }
-
-  play() {
-    this.setState({
-      started: true
-    });
-
-    if (this.refs[0]) {
-      this.playingIndex = 0;
-      this.refs[0].play();
+        this.playNext = this.playNext.bind(this);
     }
 
-    if (this.props.checkComplete !== false) {
-      this.checkComplete();
+    start() {
+        if (!this.props.silentOnStart && (!this.state.started || this.props.playMultiple)) this.play();
     }
-  }
 
-  playNext() {
-    var next = this.refs[++this.playingIndex];
-    if (next && this.state.started) next.play();
-  }
+    complete() {
+        super.complete();
+        this.setState({
+            started: false
+        });
+    }
 
-  renderContentList() {
-    var self = this, children = [].concat(this.props.children);
-    return children.map((component, key) =>
+    play() {
+        this.setState({
+            started: true
+        });
+
+        if (this.refs[0]) {
+            this.playingIndex = 0;
+            this.refs[0].play();
+        }
+
+        if (this.props.checkComplete !== false) {
+            this.checkComplete();
+        }
+    }
+
+    playNext() {
+        var next = this.refs[++this.playingIndex];
+        if (next && this.state.started) next.play();
+    }
+
+    renderContentList() {
+        var self = this, children = [].concat(this.props.children);
+        return children.map((component, key) =>
       <component.type
         {...component.props}
         ref={key}
         key={key}
         onComplete={function () {
-          self.playNext();
-          if (typeof component.props.onComplete === 'function') component.props.onComplete.call(this, this);
+            self.playNext();
+            if (typeof component.props.onComplete === 'function') component.props.onComplete.call(this, this);
         }}
       />
     );
-  }
+    }
 }
 
 MediaSequence.defaultProps = _.defaults({
-  silentOnStart: false,
+    silentOnStart: false,
   // this prop toggles if the media sequence can be started while it is currently playing
-  playMultiple: false,
+    playMultiple: false,
 }, Component.defaultProps);
 
 export default MediaSequence;
