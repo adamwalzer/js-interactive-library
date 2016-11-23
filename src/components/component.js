@@ -291,13 +291,14 @@ class Component extends React.Component {
             var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
             if (!component) return;
             return (
-        <component.type
-            gameState={gameState}
-            {...component.props}
-            ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
-            key={key}
-        />
-      );
+                <component.type
+                    gameState={gameState}
+                    {...component.props}
+                    ref={component.ref || (component.props && component.props['data-ref']) ||
+                        listName + '-' + key}
+                    key={key}
+                />
+            );
         });
     }
 
