@@ -39,7 +39,8 @@ class MediaSequence extends Component {
     }
 
     renderContentList() {
-        var self = this, children = [].concat(this.props.children);
+        var self = this;
+        var children = [].concat(this.props.children);
         return children.map((component, key) =>
       <component.type
         {...component.props}

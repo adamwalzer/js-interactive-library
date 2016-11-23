@@ -2,18 +2,18 @@ class DeviceDetector {
     constructor(game) {
         this.detechDevice = this.detechDevice.bind(game);
     }
-  /**
-   * Detects the device and adds the appropriate state classes.
-   */
+    /*
+     * Detects the device and adds the appropriate state classes.
+     */
     detechDevice() {
         this.setState({
             iOS: this.deviceDetector.iOS(),
             mobile: this.deviceDetector.mobileOrTablet(),
         });
     }
-  /**
-   * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
-   */
+    /*
+     * this code came from http://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+     */
     iOS() {
         var iDevices = [
             'iPad Simulator',
@@ -34,9 +34,9 @@ class DeviceDetector {
 
         return false;
     }
-  /**
-   * this code came from http://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-   */
+    /*
+     * this code came from http://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+     */
     mobileOrTablet() {
         var check = false;
     /* eslint-disable */

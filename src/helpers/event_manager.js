@@ -10,7 +10,8 @@ class EventManager {
     }
 
     attachEvents() {
-        var onblur, onfocusout;
+        var onblur;
+        var onfocusout;
 
         window.addEventListener('resize', () => {
             this.scale();
@@ -58,8 +59,10 @@ class EventManager {
 
         window.addEventListener('blur', onblur);
 
-    // code from http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
-    // Standards:
+        /* eslint-disable max-len */
+        // code from http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
+        /* eslint-enable */
+        // Standards:
         if ('hidden' in document) {
             document.addEventListener('visibilitychange', onfocusout);
         } else if ('mozHidden' in document) {
@@ -73,8 +76,7 @@ class EventManager {
             document.onfocusin = document.onfocusout = onfocusout;
         } else {
       // All others:
-            window.onpageshow = window.onpagehide
-      = window.onfocus = window.onblur = onfocusout;
+            window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onfocusout;
         }
     }
 
@@ -89,7 +91,8 @@ class EventManager {
     }
 
     emit(gameData = {}) {
-        var p, self = this;
+        var p;
+        var self = this;
         p = new Promise(resolve => {
             var event;
 

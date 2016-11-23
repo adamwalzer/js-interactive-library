@@ -10,7 +10,10 @@ class MediaManager {
     }
 
     audioPlay(opts) {
-        var playingSFX, playingVO, playingBKG, classes;
+        var playingSFX;
+        var playingVO;
+        var playingBKG;
+        var classes;
 
         playingSFX = this.state.playingSFX || [];
         playingVO = this.state.playingVO || [];
@@ -43,7 +46,10 @@ class MediaManager {
     }
 
     audioStop(opts) {
-        var playingSFX, playingVO, playingBKG, index;
+        var playingSFX;
+        var playingVO;
+        var playingBKG;
+        var index;
 
         playingSFX = this.state.playingSFX || [];
         playingVO = this.state.playingVO || [];
@@ -113,7 +119,9 @@ class MediaManager {
     }
 
     playBackground(currentScreenIndex, currentScreenID) {
-        var index, playingBKG, currentScreen;
+        var index;
+        var playingBKG;
+        var currentScreen;
 
         if (!_.isFinite(currentScreenIndex)) return;
 

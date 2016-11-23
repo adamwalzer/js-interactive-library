@@ -1,4 +1,5 @@
-/**
+/* eslint-disable one-var, vars-on-top  */
+/*
  *
  * from http://stackoverflow.com/questions/10962379/how-to-check-intersection-between-2-rotated-rectangles
  *
@@ -63,3 +64,4 @@ export default (a, b) => {
     }
     return true;
 };
+/* eslint-enable one-var vars-on-top  */

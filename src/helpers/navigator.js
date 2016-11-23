@@ -11,12 +11,19 @@ class Navigator {
     }
 
     goto(opts) {
-    /*
-     * highestScreenIndex is the index of the highest screen reached
-     * not the index of the highest screen that exists.
-     */
-        var oldScreen, prevScreen, oldIndex, currentScreenIndex, newScreen, nextScreen,
-            highestScreenIndex, screenIndexArray, data;
+        /*
+         * highestScreenIndex is the index of the highest screen reached
+         * not the index of the highest screen that exists.
+         */
+        var oldScreen;
+        var prevScreen;
+        var oldIndex;
+        var currentScreenIndex;
+        var newScreen;
+        var nextScreen;
+        var highestScreenIndex;
+        var screenIndexArray;
+        var data;
 
         opts = this.props.getGotoOpts.call(this, opts);
 
@@ -83,7 +90,9 @@ class Navigator {
     }
 
     closeOldScreen(oldScreen, newScreen, opts, oldIndex) {
-        var back = oldScreen.props.index > newScreen.props.index, buttonSound, data = _.cloneDeep(this.state.data);
+        var back = oldScreen.props.index > newScreen.props.index;
+        var buttonSound;
+        var data = _.cloneDeep(this.state.data);
 
         if (!oldScreen || oldScreen === newScreen) return data;
 
@@ -103,13 +112,15 @@ class Navigator {
     }
 
     getDefaultButtonSound(back) {
-        var audioName = back ? 'back' : 'next', buttonSound;
+        var audioName = back ? 'back' : 'next';
+        var buttonSound;
         buttonSound = this.media.audio[audioName] || this.media.audio.button || buttonSound;
         return buttonSound;
     }
 
     goBack() {
-        var screenIndexArray, index;
+        var screenIndexArray;
+        var index;
         screenIndexArray = this.state.screenIndexArray;
         screenIndexArray.pop();
         index = screenIndexArray.pop();
@@ -118,7 +129,8 @@ class Navigator {
     }
 
     openMenu(opts) {
-        var menu, openMenus;
+        var menu;
+        var openMenus;
 
         menu = this.refs['menu-' + opts.id];
 
@@ -136,7 +148,8 @@ class Navigator {
     }
 
     menuClose(opts) {
-        var menu, openMenus;
+        var menu;
+        var openMenus;
 
         menu = this.refs['menu-' + opts.id];
 
