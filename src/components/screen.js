@@ -47,9 +47,9 @@ class Screen extends Component {
         });
 
         setTimeout(
-      this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.media.audio.button),
-      this.props.nextDelay || 0
-    );
+            this.goto.bind(this, this.props.nextIndex || this.props.index + 1, this.media.audio.button),
+            this.props.nextDelay || 0
+        );
     }
 
     prev() {
