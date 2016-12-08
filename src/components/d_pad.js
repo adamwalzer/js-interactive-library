@@ -38,6 +38,14 @@ class DPad extends Component {
     }
 
     keydown(e) {
+        this.keyaction(e, true);
+    }
+
+    keyup(e) {
+        this.keyaction(e, false);
+    }
+
+    keyaction(e, isDown) {
         var ref = null;
         if (e.keyCode === LEFTKEY || e.keyCode === AKEY) {
             ref = LEFT;
@@ -48,21 +56,7 @@ class DPad extends Component {
         } else if (e.keyCode === DOWNKEY || e.keyCode === SKEY) {
             ref = DOWN;
         }
-        this.updateRef(ref);
-    }
-
-    keyup(e) {
-        var ref = null;
-        if (e.keyCode === 37) {
-            ref = 'left';
-        } else if (e.keyCode === 38) {
-            ref = 'up';
-        } else if (e.keyCode === 39) {
-            ref = 'right';
-        } else if (e.keyCode === 40) {
-            ref = 'down';
-        }
-        this.updateRef(ref, false);
+        this.updateRef(ref, isDown);
     }
 
     bootstrap() {
