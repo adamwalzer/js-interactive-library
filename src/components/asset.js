@@ -5,23 +5,23 @@ import Component from './component.js';
  * for example images, and media (audio, video)
  */
 class Asset extends Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.error = this.error.bind(this);
-  }
+        this.error = this.error.bind(this);
+    }
 
-  error() {
-    this.setState({
-      error: true,
-      ready: false
-    });
-  }
+    error() {
+        this.setState({
+            error: true,
+            ready: false
+        });
+    }
 }
 
 Asset.defaultProps = _.defaults({
-  checkComplete: false,
-  checkReady: false,
+    checkComplete: false,
+    checkReady: false,
 }, Component.defaultProps);
 
 export default Asset;
