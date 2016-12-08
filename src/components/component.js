@@ -209,9 +209,9 @@ class Component extends React.Component {
         });
 
         ready = _.every(this.refs, ref =>
-      ref &&
-        (!ref.state ||
-          (ref.state && ref.state.ready))
+          ref &&
+              (!ref.state ||
+                  (ref.state && ref.state.ready))
     );
 
         if (ready) this.ready();
@@ -225,9 +225,9 @@ class Component extends React.Component {
         _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 
         complete = _.every(this.refs, ref =>
-      ref instanceof Node ||
-        (!ref || !ref.state ||
-          (ref.state && ref.state.complete))
+          ref instanceof Node ||
+              (!ref || !ref.state ||
+                  (ref.state && ref.state.complete))
     );
 
         if (complete && !this.state.complete) {
@@ -291,13 +291,14 @@ class Component extends React.Component {
             var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
             if (!component) return;
             return (
-        <component.type
-          gameState={gameState}
-          {...component.props}
-          ref={component.ref || (component.props && component.props['data-ref']) || listName + '-' + key}
-          key={key}
-        />
-      );
+                <component.type
+                    gameState={gameState}
+                    {...component.props}
+                    ref={component.ref || (component.props && component.props['data-ref']) ||
+                        listName + '-' + key}
+                    key={key}
+                />
+            );
         });
     }
 
@@ -305,10 +306,10 @@ class Component extends React.Component {
         if (!this.props.shouldRender) return null;
 
         return (
-      <this.props.type {...this.props} className={this.getClassNames()}>
-        {this.renderContentList()}
-      </this.props.type>
-    );
+            <this.props.type {...this.props} className={this.getClassNames()}>
+                {this.renderContentList()}
+            </this.props.type>
+        );
     }
 }
 

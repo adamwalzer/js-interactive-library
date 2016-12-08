@@ -9,13 +9,13 @@ class Image extends Asset {
 
     render() {
         return (
-      <img
-        {...this.props}
-        onLoad={this.ready}
-        onError={this.error}
-        draggable={false}
-      />
-    );
+            <img
+                {...this.props}
+                onLoad={this.ready}
+                onError={this.error}
+                draggable={false}
+            />
+        );
     }
 }
 

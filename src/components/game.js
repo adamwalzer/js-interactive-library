@@ -176,8 +176,8 @@ class Game extends Component {
 
     load(opts) {
         if (opts.game === this.config.id &&
-      opts.version === this.config.version &&
-      opts.highestScreenIndex) {
+            opts.version === this.config.version &&
+            opts.highestScreenIndex) {
             if (opts.highestScreenIndex === this.screensLength - 1) return;
             this.loadScreens(opts.highestScreenIndex);
         }
@@ -233,8 +233,8 @@ class Game extends Component {
         screenClass = screen ? 'SCREEN-' + screen.props.id : '';
 
         return classNames(
-      'pl-game',
-      'skoash-game',
+            'pl-game',
+            'skoash-game',
             {
                 iOS: this.state.iOS,
                 MOBILE: this.state.mobile,
@@ -246,11 +246,11 @@ class Game extends Component {
                 ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
                 DEMO: this.state.demo,
             },
-      'SCREEN-' + this.state.currentScreenIndex,
-      screenClass,
-      ...this.state.classes,
-      super.getClassNames()
-    );
+            'SCREEN-' + this.state.currentScreenIndex,
+            screenClass,
+            ...this.state.classes,
+            super.getClassNames()
+        );
     }
 
     getStyles() {
@@ -280,26 +280,26 @@ class Game extends Component {
 
     renderMenuScreens() {
         return _.map(this.menus, (Menu, key) =>
-      <Menu.type
-        {...Menu.props}
-        gameState={this.state}
-        key={key}
-        index={key}
-        ref={'menu-' + key}
-      />
-    );
+            <Menu.type
+                {...Menu.props}
+                gameState={this.state}
+                key={key}
+                index={key}
+                ref={'menu-' + key}
+            />
+        );
     }
 
     render() {
         return (
-      <div className={this.getClassNames()} style={this.getStyles()}>
-        {this.renderContentList('loader')}
-        {this.renderContentList('assets')}
-        {this.props.renderMenu.call(this)}
-        {this.renderScreens()}
-        {this.renderMenuScreens()}
-      </div>
-    );
+            <div className={this.getClassNames()} style={this.getStyles()}>
+                {this.renderContentList('loader')}
+                {this.renderContentList('assets')}
+                {this.props.renderMenu.call(this)}
+                {this.renderScreens()}
+                {this.renderMenuScreens()}
+            </div>
+        );
     }
 }
 
@@ -309,12 +309,12 @@ Game.defaultProps = _.defaults({
     screens: {
         0: function (props, ref, key) {
             return (
-        <Screen
-          {...props}
-          ref={ref}
-          key={key}
-        />
-      );
+                <Screen
+                    {...props}
+                    ref={ref}
+                    key={key}
+                />
+            );
         }
     },
     menus: {
@@ -323,10 +323,10 @@ Game.defaultProps = _.defaults({
     ignoreReady: true,
     renderMenu: function () {
         return (
-      <div className="menu">
-        <button className="close" onClick={this.navigator.openMenu.bind(this, {id: 'quit'})} />
-      </div>
-    );
+            <div className="menu">
+                <button className="close" onClick={this.navigator.openMenu.bind(this, {id: 'quit'})} />
+            </div>
+        );
     },
     getGotoOpts: _.identity, // don't change to _.noop
     getTriggerEvents: _.identity, // don't change to _.noop
