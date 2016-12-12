@@ -1,7 +1,7 @@
 {
     "name": "js-interactive-library",
     "version": "1.1.0",
-    "description": "CMWN Games Library (PlayJS)",
+    "description": "CMWN Games Framework (SkoashJS)",
     "repository": {
         "type": "git",
         "url": "http://github.com/ginasink/js-interactive-library.git"
