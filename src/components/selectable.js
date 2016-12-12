@@ -125,6 +125,14 @@ class Selectable extends Component {
         return classNames('selectable', super.getClassNames());
     }
 
+    componentWillReceiveProps(props) {
+        super.componentWillReceiveProps(props);
+
+        if (props.select && props.select !== this.props.select) {
+            this.state.selectFunction.call(this, props.select);
+        }
+    }
+
     renderBin() {
         if (!this.props.bin) return null;
 
