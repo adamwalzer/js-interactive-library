@@ -29,6 +29,8 @@ class Game extends Component {
 
         this.state.data.screens = _.map(props.screens, () => ({}));
 
+        this.screensLength = Object.keys(props.screens).length;
+
         this.eventManager = new EventManager(this);
         this.deviceDetector = new DeviceDetector(this);
         this.mediaManager = new MediaManager(this);
@@ -59,8 +61,6 @@ class Game extends Component {
                 currentScreenIndex: 1,
             });
         }
-
-        this.screensLength = Object.keys(this.props.screens).length;
 
         this.collectMedia();
         this.loadScreens(this.state.currentScreenIndex, false);
@@ -219,6 +219,14 @@ class Game extends Component {
   // this method takes in an opts parameter object with screenID
     screenComplete(opts) {
         this.props.screenComplete.call(this, opts);
+    }
+
+    componentWillReceiveProps(props) {
+        super.componentWillReceiveProps(props);
+
+        if (props.screens && props.screens !== this.props.screens) {
+            this.screensLength = Object.keys(props.screens).length;
+        }
     }
 
     getClassNames() {
