@@ -105,16 +105,12 @@ class MediaManager {
     }
 
     fadeBackground(value = .25) {
-        _.forEach(this.state.playingBKG, bkg => {
-            bkg.setVolume(value);
-        });
+        _.each(this.state.playingBKG, bkg => _.invoke(bkg, 'setVolume', value));
     }
 
     raiseBackground(value = 1) {
         if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
-            _.forEach(this.state.playingBKG, bkg => {
-                bkg.setVolume(value);
-            });
+            _.each(this.state.playingBKG, bkg => _.invoke(bkg, 'setVolume', value));
         }
     }
 
@@ -125,22 +121,20 @@ class MediaManager {
 
         if (!_.isFinite(currentScreenIndex)) return;
 
-    // re-factor to index = this.props.getBackgroundIndex.call(this, index);
-    // after games that override it have be re-factored
-    // all-about-you, polar-bear, tag-it
+        // re-factor to index = this.props.getBackgroundIndex.call(this, index);
+        // after games that override it have be re-factored
+        // all-about-you, polar-bear, tag-it
         index = this.getBackgroundIndex(currentScreenIndex, currentScreenID);
         playingBKG = this.state.playingBKG;
 
         currentScreen = this.refs['screen-' + currentScreenIndex];
 
         if (!currentScreen.props.restartBackground &&
-      playingBKG.indexOf(this.media.audio.background[index]) !== -1) {
+            playingBKG.indexOf(this.media.audio.background[index]) !== -1) {
             return;
         }
 
-        _.each(playingBKG, bkg => {
-            bkg.stop();
-        });
+        _.each(playingBKG, bkg => _.invoke(bkg, 'stop'));
 
         this.playMedia('audio.background.' + index);
     }
