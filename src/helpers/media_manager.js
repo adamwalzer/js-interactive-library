@@ -10,15 +10,10 @@ class MediaManager {
     }
 
     audioPlay(opts) {
-        var playingSFX;
-        var playingVO;
-        var playingBKG;
-        var classes;
-
-        playingSFX = this.state.playingSFX || [];
-        playingVO = this.state.playingVO || [];
-        playingBKG = this.state.playingBKG || [];
-        classes = this.state.classes || [];
+        var playingSFX = this.state.playingSFX || [];
+        var playingVO = this.state.playingVO || [];
+        var playingBKG = this.state.playingBKG || [];
+        var classes = this.state.classes || [];
 
         if (opts.audio.props.gameClass) {
             classes.push(opts.audio.props.gameClass);
@@ -46,14 +41,10 @@ class MediaManager {
     }
 
     audioStop(opts) {
-        var playingSFX;
-        var playingVO;
-        var playingBKG;
+        var playingSFX = this.state.playingSFX || [];
+        var playingVO = this.state.playingVO || [];
+        var playingBKG = this.state.playingBKG || [];
         var index;
-
-        playingSFX = this.state.playingSFX || [];
-        playingVO = this.state.playingVO || [];
-        playingBKG = this.state.playingBKG || [];
 
         switch (opts.audio.props.type) {
             case 'sfx':
@@ -83,9 +74,7 @@ class MediaManager {
     videoPlay(opts) {
         var playingVideo = this.state.playingVideo;
 
-        if (playingVideo) {
-            playingVideo.stop();
-        }
+        if (playingVideo) playingVideo.stop();
 
         playingVideo = opts.video;
 

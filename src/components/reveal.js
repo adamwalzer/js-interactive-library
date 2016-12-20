@@ -172,7 +172,7 @@ class Reveal extends Component {
 
         if (this.state.open) {
             open = '';
-            _.forEach(this.state.currentlyOpen, ref => {
+            _.each(this.state.currentlyOpen, ref => {
                 open += 'open-' + ref;
             });
         }
