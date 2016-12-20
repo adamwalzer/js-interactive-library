@@ -82,6 +82,16 @@ class Reveal extends Component {
 
         if (!opts.silent) this.playMedia('close-sound');
 
+        if (this.props.openTarget) {
+            this.updateGameState({
+                path: this.props.openTarget,
+                data: {
+                    open: '',
+                    close: false,
+                }
+            });
+        }
+
         this.props.onClose.call(this, prevMessage);
     }
 
