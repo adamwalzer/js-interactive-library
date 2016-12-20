@@ -69,7 +69,7 @@ class Reveal extends Component {
         var open;
 
         prevMessage = this.state.openReveal;
-        currentlyOpen = this.state.currentlyOpen;
+        currentlyOpen = this.state.currentlyOpen || [];
         currentlyOpen.splice(currentlyOpen.indexOf(prevMessage), 1);
         open = currentlyOpen.length > 0;
         openReveal = open ? currentlyOpen[currentlyOpen.length - 1] : '';
@@ -152,13 +152,14 @@ class Reveal extends Component {
 
     getClass(li, key) {
         var classes = '';
+        var currentlyOpen = this.state.currentlyOpen || [];
 
         if (li.props.className) classes = li.props.className;
 
-        if (this.state.currentlyOpen.indexOf(key) !== -1 ||
-            this.state.currentlyOpen.indexOf('' + key) !== -1 ||
-            this.state.currentlyOpen.indexOf(li.props['data-ref']) !== -1 ||
-            this.state.currentlyOpen.indexOf(li.ref) !== -1
+        if (currentlyOpen.indexOf(key) !== -1 ||
+            currentlyOpen.indexOf('' + key) !== -1 ||
+            currentlyOpen.indexOf(li.props['data-ref']) !== -1 ||
+            currentlyOpen.indexOf(li.ref) !== -1
         ) {
             classes = classNames(classes, 'OPEN');
         }
