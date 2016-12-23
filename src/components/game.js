@@ -123,8 +123,8 @@ class Game extends Component {
         this.setPause(true);
     }
 
-  // paused should be a boolean determining whether to call
-  // audio.pause or audio.resume
+    // paused should be a boolean determining whether to call
+    // audio.pause or audio.resume
     setPause(paused) {
         var fnKey = paused ? 'pause' : 'resume';
 
