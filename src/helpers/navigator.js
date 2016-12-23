@@ -22,6 +22,7 @@ class Navigator {
         var currentScreenIndex;
         var newScreen;
         var nextScreen;
+        var nextNextScreen;
         var highestScreenIndex;
         var screenIndexArray;
         var data;
@@ -38,6 +39,7 @@ class Navigator {
             currentScreenIndex = Math.min(this.screensLength - 1, Math.max(0, opts.index));
             highestScreenIndex = Math.max(this.state.highestScreenIndex, currentScreenIndex);
             nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
+            nextNextScreen = this.refs['screen-' + (currentScreenIndex + 2)];
             prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
             prevPrevScreen = this.refs['screen-' + (currentScreenIndex - 2)];
         } else if (typeof opts.index === 'string') {
@@ -55,6 +57,7 @@ class Navigator {
         _.invoke(prevPrevScreen, 'unload');
         _.invoke(prevScreen, 'replay');
         _.invoke(nextScreen, 'load');
+        _.invoke(nextNextScreen, 'unload');
         if (!opts.load) this.eventManager.emitSave(highestScreenIndex, currentScreenIndex);
         this.mediaManager.playBackground(currentScreenIndex, newScreen.props.id);
 

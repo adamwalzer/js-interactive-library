@@ -70,11 +70,11 @@ class Screen extends Component {
     }
 
     unload() {
-        if (this.state.load) {
+        if (this.state.load && this.props.shouldUnload) {
             this.setState({
                 load: false,
             }, () => {
-                this.props.onLoad.call(this);
+                this.props.onUnload.call(this);
             });
         }
     }
@@ -237,6 +237,7 @@ Screen.defaultProps = _.defaults({
     onOpen: _.noop,
     onLoad: _.noop,
     onUnload: _.noop,
+    shouldUnload: true,
     gameState: {},
 }, Component.defaultProps);
 
