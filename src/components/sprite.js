@@ -123,7 +123,8 @@ class Sprite extends Component {
     animate(i = 1) {
         var now = Date.now();
 
-        if (this.props.static || this.props.pause) return;
+        if (this.props.static || this.props.pause ||
+            this.state.paused || !this.state.started) return;
 
         if (!this.props.loop) {
             if (this.props.animate) {
@@ -144,6 +145,19 @@ class Sprite extends Component {
 
         window.requestAnimationFrame(() => {
             this.animate(i);
+        });
+    }
+
+    pause() {
+        super.pause();
+        this.setState({ paused: true });
+    }
+
+    resume() {
+        super.resume();
+        this.setState({ paused: false }, () => {
+            if (this.props.animate) this.animate();
+            else if (this.props.animateBackwards) this.animate(-1);
         });
     }
 
