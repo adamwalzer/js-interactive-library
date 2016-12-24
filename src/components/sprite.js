@@ -110,6 +110,25 @@ class Sprite extends Component {
         });
     }
 
+    bootstrap() {
+        super.bootstrap();
+        if (this.props.hoverFrame) this.setUpHover(this.props);
+    }
+
+    setUpHover(props) {
+        this.refs.sprite.addEventListener('mouseover', () => {
+            this.setState({ frame: props.hoverFrame }, () => {
+                this.update();
+            });
+        });
+
+        this.refs.sprite.addEventListener('mouseout', () => {
+            this.setState({ frame: props.frame }, () => {
+                this.update();
+            });
+        });
+    }
+
     ready() {
         if (this.data) super.ready();
     }

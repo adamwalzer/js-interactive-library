@@ -25,6 +25,7 @@ import Score from 'components/score';
 import ScrollArea from 'components/scroll_area';
 import Selectable from 'components/selectable';
 import Slider from 'components/slider';
+import Sprite from 'components/sprite';
 import SpriteAnimation from 'components/sprite_animation';
 import Timer from 'components/timer';
 
@@ -58,6 +59,7 @@ window.skoash = {
     ScrollArea,
     Selectable,
     Slider,
+    Sprite,
     SpriteAnimation,
     Timer,
     //methods
