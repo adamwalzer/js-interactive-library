@@ -1,21 +1,8 @@
 import classNames from 'classnames';
 import shortid from 'shortid';
 
+import util from 'methods/util';
 import Component from 'components/component';
-
-function loadJSON(file, callback) {
-    var xobj = new XMLHttpRequest();
-    xobj.overrideMimeType('application/json');
-    xobj.open('GET', file, true);
-    xobj.onreadystatechange = function () {
-        /* eslint-disable eqeqeq */
-        if (xobj.readyState == 4 && xobj.status == '200') {
-            callback(JSON.parse(xobj.responseText));
-        }
-        /* eslint-enable eqeqeq */
-    };
-    xobj.send(null);
-}
 
 class Sprite extends Component {
     constructor(props) {
@@ -45,7 +32,7 @@ class Sprite extends Component {
             this.checkReady();
             this.update(props);
         } else {
-            loadJSON(`${props.src}.${props.dataExtension}`, data => {
+            util.loadJSON(`${props.src}.${props.dataExtension}`, data => {
                 this.data = data;
                 this.frames = data.frames.length;
                 this.checkReady();
@@ -112,7 +99,7 @@ class Sprite extends Component {
 
     bootstrap() {
         super.bootstrap();
-        if (this.props.hoverFrame) this.setUpHover(this.props);
+        if (this.props.hoverFrame != null) this.setUpHover(this.props);
     }
 
     setUpHover(props) {
@@ -257,6 +244,7 @@ Sprite.defaultProps = _.defaults({
     dataExtension: 'json',
     duration: 1000,
     frame: 0,
+    hoverFrame: null,
     static: false,
     pause: false,
     loop: true,
