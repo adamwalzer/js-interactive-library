@@ -54,10 +54,10 @@ class Sprite extends Component {
             });
         }
 
-        if (props.animateForwards) {
-            this.animateForwards();
+        if (props.animate) {
+            this.animate();
         } else if (props.animateBackwards) {
-            this.animateBackwards();
+            this.animate(-1);
         }
     }
 
@@ -120,21 +120,13 @@ class Sprite extends Component {
         if (this.data) super.ready();
     }
 
-    animateForwards() {
-        this.animate(1);
-    }
-
-    animateBackwards() {
-        this.animate(-1);
-    }
-
-    animate(i) {
+    animate(i = 1) {
         var now = Date.now();
 
         if (this.props.static || this.props.pause) return;
 
         if (!this.props.loop) {
-            if (this.props.animateForwards) {
+            if (this.props.animate) {
                 if (this.state.frame === this.frames - 1) return;
             } else if (this.props.animateBackwards) {
                 if (this.state.frame === 0) return;
@@ -166,10 +158,10 @@ class Sprite extends Component {
             this.setState({ frame: props.frame });
         }
 
-        if (props.animateForwards) {
-            this.animateForwards();
+        if (props.animate) {
+            this.animate();
         } else if (props.animateBackwards) {
-            this.animateBackwards();
+            this.animate(-1);
         }
     }
 
@@ -248,7 +240,7 @@ Sprite.defaultProps = _.defaults({
     static: false,
     pause: false,
     loop: true,
-    animateForwards: false,
+    animate: false,
     animateBackwards: false,
 }, Component.defaultProps);
 
