@@ -72,7 +72,14 @@ class Sprite extends Component {
         props = props || this.props;
 
         if (props.frames) {
-            // todo later
+            top = 0;
+            left = 0;
+            backgroundPosition =
+                `-${this.state.frame * width}px 0px`;
+            backgroundSize =
+                `${this.image.offsetWidth}px ${this.image.offsetHeight}px`;
+            width = this.image.offsetWidth / props.frames;
+            height = this.image.offsetHeight;
         } else {
             this.frameData = this.data.frames[this.state.frame];
             top = this.frameData.spriteSourceSize.y;
@@ -103,13 +110,13 @@ class Sprite extends Component {
     }
 
     setUpHover(props) {
-        this.refs.sprite.addEventListener('mouseover', () => {
+        this.refs.view.addEventListener('mouseover', () => {
             this.setState({ frame: props.hoverFrame }, () => {
                 this.update();
             });
         });
 
-        this.refs.sprite.addEventListener('mouseout', () => {
+        this.refs.view.addEventListener('mouseout', () => {
             this.setState({ frame: props.frame }, () => {
                 this.update();
             });
@@ -234,10 +241,11 @@ class Sprite extends Component {
             >
                 <skoash.Image
                     className="hidden"
+                    ref="image"
                     src={this.image}
                 />
                 <div
-                    ref="sprite"
+                    ref="view"
                     className="view"
                     style={this.getStyle()}
                 />
