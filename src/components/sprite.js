@@ -169,7 +169,9 @@ class Sprite extends Component {
         }
 
         if (props.frame !== this.props.frame) {
-            this.setState({ frame: props.frame });
+            this.setState({ frame: props.frame }, () => {
+                this.update(props);
+            });
         }
 
         if (props.animate) {
