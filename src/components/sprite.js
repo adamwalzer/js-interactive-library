@@ -1,8 +1,8 @@
 import classNames from 'classnames';
-import shortid from 'shortid';
 
 import util from 'methods/util';
 import Component from 'components/component';
+import Image from 'components/image';
 
 class Sprite extends Component {
     constructor(props) {
@@ -12,9 +12,7 @@ class Sprite extends Component {
             frame: props.frame,
         }, this.state);
 
-        this.uniqueID = shortid(Math.random());
         this.lastAnimation = Date.now();
-
         this.setUp(props);
     }
 
@@ -229,7 +227,7 @@ class Sprite extends Component {
     }
 
     getClassNames() {
-        return classNames('sprite', this.uniqueID, super.getClassNames());
+        return classNames('sprite', super.getClassNames());
     }
 
     render() {
@@ -239,7 +237,7 @@ class Sprite extends Component {
                 className={this.getClassNames()}
                 style={this.getContainerStyle()}
             >
-                <skoash.Image
+                <Image
                     className="hidden"
                     ref="image"
                     src={this.image}
