@@ -15,7 +15,7 @@ class Score extends Component {
 
     checkComplete() {
         if (!this.props.checkComplete || !this.state.ready) return;
-        if (!this.props.max) return;
+        if (!_.isFinite(this.props.max)) return;
         if ((this.state.score >= this.props.max || this.props.correct >= this.props.max) &&
             !this.state.complete) this.complete();
     }
@@ -92,7 +92,7 @@ class Score extends Component {
         } else {
             upIncrement = _.isFinite(props.increment) ? props.increment : 1;
             downIncrement = _.isFinite(props.downIncrement) ? props.downIncrement :
-        _.isFinite(props.increment) ? props.increment : 1;
+                _.isFinite(props.increment) ? props.increment : 1;
             score = upIncrement * props.correct - downIncrement * props.incorrect;
         }
 
