@@ -142,6 +142,7 @@ class Audio extends Media {
             volume: this.props.volume,
             onend: this.complete,
             onload: this.ready,
+            rate: this.props.rate,
             sprite,
         });
 
@@ -152,6 +153,7 @@ class Audio extends Media {
 Audio.defaultProps = _.defaults({
     format: 'mp3',
     delay: 0,
+    rate: 1,
     loop: false,
     volume: 1,
     maxVolume: 1,
