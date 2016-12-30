@@ -62,6 +62,7 @@ class Screen extends Component {
             this.setState({
                 load: true,
                 ready: false,
+                complete: false,
             }, () => {
                 super.bootstrap();
                 this.props.onLoad.call(this);

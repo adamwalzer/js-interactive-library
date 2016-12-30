@@ -84,13 +84,14 @@ class Navigator {
         var screenIndexArray = this.state.screenIndexArray;
         if (!newScreen) return screenIndexArray;
 
-    // this should only be dropped into for non-linear screens
+        // this should only be dropped into for non-linear screens
         if (!newScreen.state.load || !newScreen.state.ready) {
-            this.loadScreens(currentScreenIndex, false);
+            this.loadScreens(currentScreenIndex);
+        } else {
+            newScreen.open(opts);
         }
 
         screenIndexArray.push(currentScreenIndex);
-        newScreen.open(opts);
 
         return screenIndexArray;
     }
