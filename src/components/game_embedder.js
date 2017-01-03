@@ -38,8 +38,8 @@ class GameEmbedder extends Component {
         this.emitEvent({ name: 'pause' });
     }
 
-    resume() {
-        if (this.props.pause) return;
+    resume(force) {
+        if (this.props.pause && !force) return;
         super.resume();
         this.emitEvent({ name: 'resume' });
     }
@@ -66,6 +66,14 @@ class GameEmbedder extends Component {
                 name: 'data-update',
                 data: props.data,
             });
+        }
+
+        if (props.pause && props.pause !== this.props.pause) {
+            this.pause();
+        }
+
+        if (props.resume && props.resume !== this.props.resume) {
+            this.resume(true);
         }
     }
 
