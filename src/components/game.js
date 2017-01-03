@@ -12,10 +12,6 @@ class Game extends Component {
     constructor(props = {}) {
         super(props);
 
-        this.config = props.config ? props.config : props;
-        this.screens = props.screens;
-        this.menus = props.menus;
-
         this.state = {
             currentScreenIndex: 0,
             highestScreenIndex: 0,
@@ -31,7 +27,9 @@ class Game extends Component {
             classes: [],
         };
 
-        this.state.data.screens = _.map(this.screens, () => ({}));
+        this.state.data.screens = _.map(props.screens, () => ({}));
+
+        this.screensLength = Object.keys(props.screens).length;
 
         this.eventManager = new EventManager(this);
         this.deviceDetector = new DeviceDetector(this);
@@ -63,8 +61,6 @@ class Game extends Component {
                 currentScreenIndex: 1,
             });
         }
-
-        this.screensLength = Object.keys(this.screens).length;
 
         this.collectMedia();
         this.loadScreens(this.state.currentScreenIndex, false);
@@ -107,7 +103,7 @@ class Game extends Component {
         }, () => {
             this.eventManager.emit({
                 name: 'ready',
-                game: this.config.id,
+                game: this.props.config.id,
             });
             this.navigator.goto({
                 index: this.state.currentScreenIndex,
@@ -148,7 +144,7 @@ class Game extends Component {
 
     scale() {
         this.setState({
-            scale: window.innerWidth / this.config.dimensions.width,
+            scale: window.innerWidth / this.props.config.dimensions.width,
         });
     }
 
@@ -159,7 +155,7 @@ class Game extends Component {
     }
 
     getGame(opts) {
-        if (this.config.id === opts.id) _.invoke(opts, 'respond', this);
+        if (this.props.config.id === opts.id) _.invoke(opts, 'respond', this);
     }
 
     getData(opts) {
@@ -175,8 +171,8 @@ class Game extends Component {
     }
 
     load(opts) {
-        if (opts.game === this.config.id &&
-            opts.version === this.config.version &&
+        if (opts.game === this.props.config.id &&
+            opts.version === this.props.config.version &&
             opts.highestScreenIndex) {
             if (opts.highestScreenIndex === this.screensLength - 1) return;
             this.loadScreens(opts.highestScreenIndex);
@@ -186,7 +182,7 @@ class Game extends Component {
     quit() {
         this.eventManager.emit({
             name: 'exit',
-            game: this.config.id,
+            game: this.props.config.id,
         });
     }
 
@@ -223,6 +219,14 @@ class Game extends Component {
   // this method takes in an opts parameter object with screenID
     screenComplete(opts) {
         this.props.screenComplete.call(this, opts);
+    }
+
+    componentWillReceiveProps(props) {
+        super.componentWillReceiveProps(props);
+
+        if (props.screens && props.screens !== this.props.screens) {
+            this.screensLength = Object.keys(props.screens).length;
+        }
     }
 
     getClassNames() {
@@ -269,17 +273,17 @@ class Game extends Component {
     }
 
     renderScreens() {
-        return _.map(Object.keys(this.screens), (key, index) => {
-            var props = this.screens[key].props || {};
+        return _.map(Object.keys(this.props.screens), (key, index) => {
+            var props = this.props.screens[key].props || {};
             props.data = this.state.data.screens[key];
             props.gameState = this.state;
             props.index = index;
-            return this.screens[key](props, 'screen-' + key, key);
+            return this.props.screens[key](props, 'screen-' + key, key);
         });
     }
 
     renderMenuScreens() {
-        return _.map(this.menus, (Menu, key) =>
+        return _.map(this.props.menus, (Menu, key) =>
             <Menu.type
                 {...Menu.props}
                 gameState={this.state}

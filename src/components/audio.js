@@ -26,10 +26,7 @@ class Audio extends Media {
                 this.delayed = true;
 
                 if (!state.paused) {
-                    this.timeout = setTimeout(
-            this.playAudio,
-            this.props.delay
-          );
+                    this.timeout = setTimeout(this.playAudio, this.props.delay);
                 }
             }
         });
@@ -91,7 +88,8 @@ class Audio extends Media {
     }
 
     setVolume(volume) {
-        volume = Math.min(this.props.maxVolume, Math.max(this.props.minVolume, volume));
+        volume = Math.min(this.props.maxVolume,
+            Math.max(this.props.minVolume, volume));
         this.audio.volume(volume);
     }
 
@@ -137,7 +135,8 @@ class Audio extends Media {
         }
 
         this.audio = new Howl({
-            urls: [].concat(this.props.src), // switch this to src when moving to Howler ^2.0.0
+            // switch urls to src when moving to Howler ^2.0.0
+            urls: [].concat(this.props.src),
             format: [].concat(this.props.format),
             loop: this.props.loop,
             volume: this.props.volume,

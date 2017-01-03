@@ -97,8 +97,8 @@ class EventManager {
             var event;
 
             if (typeof gameData !== 'object') return;
-            if (!gameData.game) gameData.game = self.config.id;
-            if (!gameData.version) gameData.version = self.config.version;
+            if (!gameData.game) gameData.game = self.props.config.id;
+            if (!gameData.version) gameData.version = self.props.config.version;
 
             event = new Event('game-event', {bubbles: true, cancelable: false});
 
@@ -122,8 +122,8 @@ class EventManager {
         if (highestScreenIndex < 2) return;
         this.eventManager.emit({
             name: 'save',
-            game: this.config.id,
-            version: this.config.version,
+            game: this.props.config.id,
+            version: this.props.config.version,
             highestScreenIndex,
             currentScreenIndex,
         });

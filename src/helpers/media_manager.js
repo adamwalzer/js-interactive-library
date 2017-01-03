@@ -10,15 +10,10 @@ class MediaManager {
     }
 
     audioPlay(opts) {
-        var playingSFX;
-        var playingVO;
-        var playingBKG;
-        var classes;
-
-        playingSFX = this.state.playingSFX || [];
-        playingVO = this.state.playingVO || [];
-        playingBKG = this.state.playingBKG || [];
-        classes = this.state.classes || [];
+        var playingSFX = this.state.playingSFX || [];
+        var playingVO = this.state.playingVO || [];
+        var playingBKG = this.state.playingBKG || [];
+        var classes = this.state.classes || [];
 
         if (opts.audio.props.gameClass) {
             classes.push(opts.audio.props.gameClass);
@@ -46,14 +41,10 @@ class MediaManager {
     }
 
     audioStop(opts) {
-        var playingSFX;
-        var playingVO;
-        var playingBKG;
+        var playingSFX = this.state.playingSFX || [];
+        var playingVO = this.state.playingVO || [];
+        var playingBKG = this.state.playingBKG || [];
         var index;
-
-        playingSFX = this.state.playingSFX || [];
-        playingVO = this.state.playingVO || [];
-        playingBKG = this.state.playingBKG || [];
 
         switch (opts.audio.props.type) {
             case 'sfx':
@@ -83,9 +74,7 @@ class MediaManager {
     videoPlay(opts) {
         var playingVideo = this.state.playingVideo;
 
-        if (playingVideo) {
-            playingVideo.stop();
-        }
+        if (playingVideo) playingVideo.stop();
 
         playingVideo = opts.video;
 
@@ -105,16 +94,12 @@ class MediaManager {
     }
 
     fadeBackground(value = .25) {
-        _.forEach(this.state.playingBKG, bkg => {
-            bkg.setVolume(value);
-        });
+        _.each(this.state.playingBKG, bkg => _.invoke(bkg, 'setVolume', value));
     }
 
     raiseBackground(value = 1) {
         if (this.state.playingVO.length === 0 && !this.state.playingVideo) {
-            _.forEach(this.state.playingBKG, bkg => {
-                bkg.setVolume(value);
-            });
+            _.each(this.state.playingBKG, bkg => _.invoke(bkg, 'setVolume', value));
         }
     }
 
@@ -125,22 +110,20 @@ class MediaManager {
 
         if (!_.isFinite(currentScreenIndex)) return;
 
-    // re-factor to index = this.props.getBackgroundIndex.call(this, index);
-    // after games that override it have be re-factored
-    // all-about-you, polar-bear, tag-it
+        // re-factor to index = this.props.getBackgroundIndex.call(this, index);
+        // after games that override it have be re-factored
+        // all-about-you, polar-bear, tag-it
         index = this.getBackgroundIndex(currentScreenIndex, currentScreenID);
         playingBKG = this.state.playingBKG;
 
         currentScreen = this.refs['screen-' + currentScreenIndex];
 
         if (!currentScreen.props.restartBackground &&
-      playingBKG.indexOf(this.media.audio.background[index]) !== -1) {
+            playingBKG.indexOf(this.media.audio.background[index]) !== -1) {
             return;
         }
 
-        _.each(playingBKG, bkg => {
-            bkg.stop();
-        });
+        _.each(playingBKG, bkg => _.invoke(bkg, 'stop'));
 
         this.playMedia('audio.background.' + index);
     }
