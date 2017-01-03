@@ -69,7 +69,7 @@ class Reveal extends Component {
         var open;
 
         prevMessage = this.state.openReveal;
-        currentlyOpen = this.state.currentlyOpen;
+        currentlyOpen = this.state.currentlyOpen || [];
         currentlyOpen.splice(currentlyOpen.indexOf(prevMessage), 1);
         open = currentlyOpen.length > 0;
         openReveal = open ? currentlyOpen[currentlyOpen.length - 1] : '';
@@ -81,6 +81,16 @@ class Reveal extends Component {
         });
 
         if (!opts.silent) this.playMedia('close-sound');
+
+        if (this.props.openTarget) {
+            this.updateGameState({
+                path: this.props.openTarget,
+                data: {
+                    open: '',
+                    close: false,
+                }
+            });
+        }
 
         this.props.onClose.call(this, prevMessage);
     }
@@ -135,7 +145,7 @@ class Reveal extends Component {
     componentWillReceiveProps(props) {
         super.componentWillReceiveProps(props);
 
-        if (props.openReveal != null && props.openReveal !== this.props.openReveal) {
+        if (props.openReveal && props.openReveal !== this.props.openReveal) {
             this.open(props.openReveal);
         }
 
@@ -152,13 +162,14 @@ class Reveal extends Component {
 
     getClass(li, key) {
         var classes = '';
+        var currentlyOpen = this.state.currentlyOpen || [];
 
         if (li.props.className) classes = li.props.className;
 
-        if (this.state.currentlyOpen.indexOf(key) !== -1 ||
-            this.state.currentlyOpen.indexOf('' + key) !== -1 ||
-            this.state.currentlyOpen.indexOf(li.props['data-ref']) !== -1 ||
-            this.state.currentlyOpen.indexOf(li.ref) !== -1
+        if (currentlyOpen.indexOf(key) !== -1 ||
+            currentlyOpen.indexOf('' + key) !== -1 ||
+            currentlyOpen.indexOf(li.props['data-ref']) !== -1 ||
+            currentlyOpen.indexOf(li.ref) !== -1
         ) {
             classes = classNames(classes, 'OPEN');
         }
@@ -172,7 +183,7 @@ class Reveal extends Component {
 
         if (this.state.open) {
             open = '';
-            _.forEach(this.state.currentlyOpen, ref => {
+            _.each(this.state.currentlyOpen, ref => {
                 open += 'open-' + ref;
             });
         }
