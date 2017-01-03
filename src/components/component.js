@@ -16,15 +16,16 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
-    complete() {
+    complete(props) {
+        props = _.defaults(props || {}, this.props);
         setTimeout(() => {
             this.setState({
                 complete: true,
             }, () => {
                 skoash.trigger('complete');
-                this.props.onComplete.call(this, this);
+                props.onComplete.call(this, this);
             });
-        }, this.props.completeDelay);
+        }, props.completeDelay);
     }
 
     incomplete() {
@@ -247,7 +248,7 @@ class Component extends React.Component {
 
     componentWillReceiveProps(props) {
         if (props.complete === true && props.complete !== this.props.complete) {
-            this.complete();
+            this.complete(props);
         }
 
         if (props.start === true && props.start !== this.props.start) {

@@ -105,8 +105,10 @@ class Audio extends Media {
         this.audio.fadeOut(volume);
     }
 
-    complete() {
-        if (!this.props.loop) {
+    complete(props) {
+        props = _.defaults(props || {}, this.props);
+
+        if (!props.loop) {
             skoash.trigger('audioStop', {
                 audio: this
             });
@@ -114,10 +116,10 @@ class Audio extends Media {
 
         this.completeCount++;
 
-        if (!this.props.complete && (!this.playing || this.paused)) return;
+        if (!props.complete && (!this.playing || this.paused)) return;
         if (this.startCount > this.completeCount) return;
 
-        if (!this.props.loop) this.playing = false;
+        if (!props.loop) this.playing = false;
         super.complete();
     }
 
