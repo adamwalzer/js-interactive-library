@@ -247,6 +247,14 @@ class Component extends React.Component {
         return skoash.trigger('updateState', opts);
     }
 
+    updateGameData(opts) {
+        return skoash.trigger('updateGameData', opts);
+    }
+
+    updateScreenData(opts) {
+        return skoash.trigger('updateScreenData', opts);
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.shouldComponentUpdate.call(this, nextProps, nextState);
     }

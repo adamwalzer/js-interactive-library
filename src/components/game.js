@@ -188,18 +188,32 @@ class Game extends Component {
 
     updateState(opts) {
         if (typeof opts.path === 'string') {
-            opts.data = {
-                screens: {
-                    [this.state.currentScreenIndex]: {
-                        [opts.path]: opts.data
-                    }
-                }
-            };
-            this.updateData(opts);
+            /* eslint-disable no-console */
+            console.warn('As of skoash 1.1.1 please trigger updateScreenData directly');
+            /* eslint-enable no-console */
+            this.updateScreenData(opts);
         } else if (_.isArray(opts.path)) {
-            opts.data = _.setWith({}, opts.path, opts.data, Object);
-            this.updateData(opts);
+            /* eslint-disable no-console */
+            console.warn('As of skoash 1.1.1 please trigger updateGameData directly');
+            /* eslint-enable no-console */
+            this.updateGameData(opts);
         }
+    }
+
+    updateGameData(opts) {
+        opts.data = _.setWith({}, opts.key || opts.path, opts.data, Object);
+        this.updateData(opts);
+    }
+
+    updateScreenData(opts) {
+        opts.data = {
+            screens: {
+                [this.state.currentScreenIndex]: {
+                    [opts.key || opts.path]: opts.data
+                }
+            }
+        };
+        this.updateData(opts);
     }
 
     updateData(opts) {

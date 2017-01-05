@@ -138,11 +138,13 @@ class EventManager {
             videoPlay: this.mediaManager.videoPlay,
             videoStop: this.mediaManager.videoStop,
             demo: this.demo,
-            'toggle-demo-mode': this.demo,
+            toggleDemoMode: this.demo,
             getData: this.getData,
             passData: this.passData,
-            updateData: this.updateData,
             updateState: this.updateState,
+            updateGameData: this.updateGameData,
+            updateScreenData: this.updateScreenData,
+            updateData: this.updateData,
             screenComplete: this.screenComplete,
             openMenu: this.navigator.openMenu,
             menuClose: this.navigator.menuClose,
@@ -155,7 +157,7 @@ class EventManager {
             ready: this.checkReady,
             resize: this.scale,
             getGame: this.getGame,
-        })[event], 'call', this, opts);
+        })[_.camelCase(event)], 'call', this, opts);
     }
 }
 
