@@ -173,12 +173,16 @@ class Component extends React.Component {
 
     collectVideo(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
+        if (!_.isFinite(key)) this.media.video[key] = this.refs[key];
         this.media.video.push(this.refs[key]);
     }
 
     collectAudio(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
         if (!this.media.audio[key]) this.media.audio[key] = this.refs[key];
+        if (!_.isFinite(key)) {
+            this.media.audio[this.refs[key].props.type][key] = this.refs[key];
+        }
         if (this.refs[key].props.type) {
             this.media.audio[this.refs[key].props.type].push(this.refs[key]);
         }
@@ -186,6 +190,7 @@ class Component extends React.Component {
 
     collectMediaSequence(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
+        if (!_.isFinite(key)) this.media.sequence[key] = this.refs[key];
         this.media.sequence.push(this.refs[key]);
     }
 

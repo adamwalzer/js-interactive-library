@@ -31,6 +31,7 @@ import Timer from 'components/timer';
 import start from 'methods/start';
 import trigger from 'methods/trigger';
 import util from 'methods/util';
+import mixins from 'mixins/mixins';
 
 window.$k = window.skoash = {
     // components
@@ -64,6 +65,7 @@ window.$k = window.skoash = {
     start,
     trigger,
     util,
+    mixins,
 };
 
 export default window.skoash;
