@@ -1,5 +1,3 @@
-import 'react-fastclick';
-
 // components
 import Component from 'components/component';
 import Screen from 'components/screen';
@@ -34,7 +32,7 @@ import start from 'methods/start';
 import trigger from 'methods/trigger';
 import util from 'methods/util';
 
-window.skoash = {
+window.$k = window.skoash = {
     // components
     Component,
     Screen,

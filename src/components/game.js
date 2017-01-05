@@ -216,7 +216,7 @@ class Game extends Component {
         _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'checkComplete');
     }
 
-  // this method takes in an opts parameter object with screenID
+    // this method takes in an opts parameter object with screenID
     screenComplete(opts) {
         this.props.screenComplete.call(this, opts);
     }
