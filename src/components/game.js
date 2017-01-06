@@ -191,6 +191,9 @@ class Game extends Component {
             /* eslint-disable no-console */
             console.warn('As of skoash 1.1.1 please trigger updateScreenData directly');
             /* eslint-enable no-console */
+            opts.data = {
+                [opts.key || opts.path]: opts.data
+            };
             this.updateScreenData(opts);
         } else if (_.isArray(opts.path)) {
             /* eslint-disable no-console */
@@ -201,16 +204,15 @@ class Game extends Component {
     }
 
     updateGameData(opts) {
-        opts.data = _.setWith({}, opts.key || opts.path, opts.data, Object);
+        var keys = opts.keys || opts.key || opts.path;
+        if (keys) opts.data = _.setWith({}, keys, opts.data, Object);
         this.updateData(opts);
     }
 
     updateScreenData(opts) {
         opts.data = {
             screens: {
-                [this.state.currentScreenIndex]: {
-                    [opts.key || opts.path]: opts.data
-                }
+                [this.state.currentScreenIndex]: opts.data
             }
         };
         this.updateData(opts);
