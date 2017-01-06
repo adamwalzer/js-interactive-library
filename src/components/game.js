@@ -210,11 +210,22 @@ class Game extends Component {
     }
 
     updateScreenData(opts) {
-        opts.data = {
-            screens: {
-                [this.state.currentScreenIndex]: opts.data
-            }
-        };
+        var key = opts.key || opts.path;
+        if (key) {
+            opts.data = {
+                screens: {
+                    [this.state.currentScreenIndex]: {
+                        [key]: opts.data
+                    }
+                }
+            };
+        } else {
+            opts.data = {
+                screens: {
+                    [this.state.currentScreenIndex]: opts.data
+                }
+            };
+        }
         this.updateData(opts);
     }
 
