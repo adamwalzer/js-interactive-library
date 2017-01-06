@@ -136,8 +136,8 @@ class Game extends Component {
         });
     }
 
-  // Remove this method after refactoring games that override it.
-  // all-about-you, polar-bear, tag-it
+    // Remove this method after refactoring games that override it.
+    // all-about-you, polar-bear, tag-it
     getBackgroundIndex(index, id) {
         return this.props.getBackgroundIndex.call(this, index, id);
     }
@@ -148,8 +148,8 @@ class Game extends Component {
         });
     }
 
-  // remove once games are refactored to call this.eventManager.emit(gameData);
-  // all-about-you
+    // remove once games are refactored to call this.eventManager.emit(gameData);
+    // all-about-you
     emit(gameData = {}) {
         return this.eventManager.emit(gameData);
     }
@@ -257,11 +257,8 @@ class Game extends Component {
     }
 
     getClassNames() {
-        var screen;
-        var screenClass;
-
-        screen = this.refs['screen-' + this.state.currentScreenIndex];
-        screenClass = screen ? 'SCREEN-' + screen.props.id : '';
+        var screen = this.refs['screen-' + this.state.currentScreenIndex];
+        var screenClass = screen ? 'SCREEN-' + screen.props.id : '';
 
         return classNames(
             'pl-game',
@@ -285,11 +282,8 @@ class Game extends Component {
     }
 
     getStyles() {
-        var transform;
-        var transformOrigin;
-
-        transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
-        transformOrigin = this.state.scale < 1 ? '0px 0px 0px' : '50% 0px 0px';
+        var transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
+        var transformOrigin = this.state.scale < 1 ? '0px 0px 0px' : '50% 0px 0px';
 
         return {
             transform,
