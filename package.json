@@ -38,7 +38,7 @@
     "del": "^2.0.2",
     "dropzone": "^4.2.0",
     "escope": "^3.3.0",
-    "eslint": "^2.1.0",
+    "eslint": "^3.11.0",
     "eslint-plugin-babel": "^3.1.0",
     "eslint-plugin-react": "^3.8.0",
     "express": "^4.13.3",
