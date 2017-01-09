@@ -214,11 +214,7 @@ class Component extends React.Component {
             if (!_.get(ref, 'state.ready')) _.invoke(ref, 'checkReady');
         });
 
-        ready = _.every(this.refs, ref =>
-          ref &&
-              (!ref.state ||
-                  (ref.state && ref.state.ready))
-    );
+        ready = !_.size(this.getUnready());
 
         if (ready) this.ready();
     }
@@ -230,11 +226,7 @@ class Component extends React.Component {
 
         _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 
-        complete = _.every(this.refs, ref =>
-          ref instanceof Node ||
-              (!ref || !ref.state ||
-                  (ref.state && ref.state.complete))
-    );
+        complete = !_.size(this.getUnready('complete'));
 
         if (complete && !this.state.complete) {
             this.complete();
