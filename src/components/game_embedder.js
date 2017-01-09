@@ -16,7 +16,9 @@ class GameEmbedder extends Component {
     }
 
     respond(opts) {
-        if (opts.complete) {
+        if (opts.ready) {
+            this.phaserReady();
+        } else if (opts.complete) {
             this.complete();
         } else if (opts.updateGameState) {
             this.updateGameState(opts.updateGameState);
@@ -25,12 +27,22 @@ class GameEmbedder extends Component {
         this.props.onRespond.call(this, opts);
     }
 
+    phaserReady() {
+        this.setState({
+            phaserReady: true,
+        });
+    }
+
     onLoad() {
         this.emitEvent({
             name: 'focus',
         });
 
-        this.props.onLoad.call(this);
+        this.setState({
+            loaded: true,
+        }, () => {
+            this.props.onLoad.call(this);
+        });
     }
 
     pause() {
@@ -46,6 +58,9 @@ class GameEmbedder extends Component {
 
     emitEvent(data) {
         var e = new Event('skoash-event');
+
+        if (!this.state.loaded || !this.state.phaserReady) return;
+
         e.name = data.name;
         e.data = data;
         this.gameNode.contentWindow.dispatchEvent(e);
