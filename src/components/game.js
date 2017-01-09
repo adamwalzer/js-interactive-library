@@ -191,9 +191,6 @@ class Game extends Component {
             /* eslint-disable no-console */
             console.warn('As of skoash 1.1.1 please trigger updateScreenData directly');
             /* eslint-enable no-console */
-            opts.data = {
-                [opts.key || opts.path]: opts.data
-            };
             this.updateScreenData(opts);
         } else if (_.isArray(opts.path)) {
             /* eslint-disable no-console */
