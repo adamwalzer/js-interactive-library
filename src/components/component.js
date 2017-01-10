@@ -266,7 +266,7 @@ class Component extends React.Component {
     }
 
     addClassName(className) {
-        if (this.state.className && this.state.className.indexOf(className) === -1) return;
+        if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
             className: classNames(this.state.className, className),
         });
