@@ -42,7 +42,7 @@ class Score extends Component {
     }
 
     checkScore(props) {
-        if (!props.max) return;
+        if (!_.isFinite(props.max)) return;
         if (this.state.score >= props.max && (!this.state.complete || props.multipleCompletes)) {
             this.complete();
         } else if (this.state.complete && !props.complete) {
