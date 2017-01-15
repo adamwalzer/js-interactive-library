@@ -72,10 +72,10 @@ class EventManager {
         } else if ('msHidden' in document) {
             document.addEventListener('msvisibilitychange', onfocusout);
         } else if ('onfocusin' in document) {
-      // IE 9 and lower:
+            // IE 9 and lower:
             document.onfocusin = document.onfocusout = onfocusout;
         } else {
-      // All others:
+            // All others:
             window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onfocusout;
         }
     }

@@ -57,7 +57,7 @@ class MediaSequence extends Component {
 
 MediaSequence.defaultProps = _.defaults({
     silentOnStart: false,
-  // this prop toggles if the media sequence can be started while it is currently playing
+    // this prop toggles if the media sequence can be started while it is currently playing
     playMultiple: false,
 }, Component.defaultProps);
 
