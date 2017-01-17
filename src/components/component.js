@@ -281,7 +281,7 @@ class Component extends React.Component {
     removeAllClassNames(callback) {
         this.setState({
             className: null
-        , callback});
+        }, callback);
     }
 
     getClassNames() {
