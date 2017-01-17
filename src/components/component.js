@@ -265,23 +265,23 @@ class Component extends React.Component {
         }
     }
 
-    addClassName(className) {
+    addClassName(className, callback) {
         if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
             className: classNames(this.state.className, className),
-        });
+        }, callback);
     }
 
-    removeClassName(className) {
+    removeClassName(className, callback) {
         this.setState({
             className: this.state.className.replace(className, ''),
-        });
+        }, callback);
     }
 
-    removeAllClassNames() {
+    removeAllClassNames(callback) {
         this.setState({
             className: null
-        });
+        , callback});
     }
 
     getClassNames() {
