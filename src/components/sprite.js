@@ -17,10 +17,10 @@ class Sprite extends Component {
     }
 
     setUp(props) {
-        var maxWidth;
-        var maxHeight;
-        var minX;
-        var minY;
+        let maxWidth;
+        let maxHeight;
+        let minX;
+        let minY;
 
         this.image = `${props.src}.${props.extension}`;
 
@@ -60,12 +60,12 @@ class Sprite extends Component {
     }
 
     update(props) {
-        var top;
-        var left;
-        var backgroundPosition;
-        var backgroundSize;
-        var width;
-        var height;
+        let top;
+        let left;
+        let backgroundPosition;
+        let backgroundSize;
+        let width;
+        let height;
 
         props = props || this.props;
 
@@ -99,6 +99,8 @@ class Sprite extends Component {
             backgroundSize,
             width,
             height,
+        }, () => {
+            this.props.onUpdate.call(this);
         });
     }
 
@@ -110,13 +112,13 @@ class Sprite extends Component {
     setUpHover(props) {
         this.refs.view.addEventListener('mouseover', () => {
             this.setState({ frame: props.hoverFrame }, () => {
-                this.update();
+                this.update(props);
             });
         });
 
         this.refs.view.addEventListener('mouseout', () => {
             this.setState({ frame: props.frame }, () => {
-                this.update();
+                this.update(props);
             });
         });
     }
@@ -126,23 +128,32 @@ class Sprite extends Component {
     }
 
     animate(i = 1) {
-        var now = Date.now();
+        const now = Date.now();
+        let frame;
 
         if (this.props.static || this.props.pause ||
             this.state.paused || !this.state.started) return;
 
         if (!this.props.loop) {
             if (this.props.animate) {
-                if (this.state.frame === this.frames - 1) return;
+                if (this.state.frame === this.frames - 1) {
+                    this.complete();
+                    return;
+                }
             } else if (this.props.animateBackwards) {
-                if (this.state.frame === 0) return;
+                if (this.state.frame === 0) {
+                    this.complete();
+                    return;
+                }
             }
         }
 
         if (now > this.lastAnimation + this.frameRate) {
             this.lastAnimation = now;
+            frame = (this.state.frame + i + this.frames) % this.frames;
+            if (this.frame === 0) this.props.onLoop.call(this);
             this.setState({
-                frame: (this.state.frame + i + this.frames) % this.frames
+                frame
             }, () => {
                 this.update(this.props);
             });
@@ -187,8 +198,8 @@ class Sprite extends Component {
     }
 
     getContainerStyle() {
-        var width;
-        var height;
+        let width;
+        let height;
 
         if (!this.props.static) {
             width = this.state.maxWidth;
@@ -203,9 +214,9 @@ class Sprite extends Component {
     }
 
     getStyle() {
-        var position;
-        var top;
-        var left;
+        let position;
+        let top;
+        let left;
 
         if (!this.props.static) {
             position = 'absolute';
@@ -213,7 +224,7 @@ class Sprite extends Component {
             left = this.state.left - this.state.minX;
         }
 
-        return {
+        return _.defaults({
             position,
             top,
             left,
@@ -223,7 +234,7 @@ class Sprite extends Component {
             backgroundSize: this.state.backgroundSize,
             width: this.state.width,
             height: this.state.height,
-        };
+        }, this.props.style);
     }
 
     getClassNames() {
@@ -264,6 +275,9 @@ Sprite.defaultProps = _.defaults({
     loop: true,
     animate: false,
     animateBackwards: false,
+    onLoop: _.noop,
+    onUpdate: _.noop,
+    style: {},
 }, Component.defaultProps);
 
 export default Sprite;

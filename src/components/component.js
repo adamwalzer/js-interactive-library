@@ -76,7 +76,7 @@ class Component extends React.Component {
                 _.invoke(ref, 'start');
             });
 
-            if (this.props.completeOnStart) this.complete();
+            if (this.props.completeOnStart || this.props.complete) this.complete();
 
             this.props.onStart.call(this);
 
@@ -285,12 +285,21 @@ class Component extends React.Component {
     }
 
     getClassNames() {
-        return classNames({
-            READY: this.state.ready,
-            STARTED: this.state.started,
-            COMPLETE: this.state.complete,
-            OPEN: this.state.open,
-        }, this.state.className, this.props.className, this.props.getClassNames.call(this));
+        // Eventually I would like to make this return _.toUpper of all this.state keys with values === true
+        // I don't think that will break anything, but it will need to be tested.
+        // _.filter(this.state, v => v === true)
+        return classNames(
+            {
+                READY: this.state.ready,
+                STARTED: this.state.started,
+                COMPLETE: this.state.complete,
+                OPEN: this.state.open,
+            },
+            this.state.className,
+            this.props.className,
+            this.props.componentName,
+            this.props.getClassNames.call(this)
+        );
     }
 
     renderContentList(listName = 'children') {
@@ -328,6 +337,7 @@ Component.defaultProps = {
     completeDelay: 0,
     completeIncorrect: false,
     completeOnStart: false,
+    componentName: '',
     getClassNames: _.noop,
     ignoreReady: false,
     loadData: _.noop,
