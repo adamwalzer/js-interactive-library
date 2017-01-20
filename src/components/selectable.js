@@ -13,24 +13,21 @@ class Selectable extends Component {
     }
 
     start() {
-        var selectClass;
         var selectFunction;
         var classes = this.state.classes;
 
         super.start();
 
-        selectClass = this.props.selectClass || this.state.selectClass || 'SELECTED';
-        selectFunction = selectClass === 'HIGHLIGHTED' ? this.highlight : this.select;
+        selectFunction = this.props.selectClass === 'HIGHLIGHTED' ? this.highlight : this.select;
 
         if (this.props.selectOnStart) {
-            classes[this.props.selectOnStart] = selectClass;
+            classes[this.props.selectOnStart] = this.props.selectClass;
         }
 
         this.setState({
             started: true,
             classes,
             selectFunction,
-            selectClass,
         });
     }
 
@@ -69,7 +66,7 @@ class Selectable extends Component {
         if (this.props.allowDeselect && classes[dataRef]) {
             delete classes[dataRef];
         } else if (isCorrect) {
-            classes[dataRef] = this.state.selectClass;
+            classes[dataRef] = this.props.selectClass;
         }
 
         this.setState({
