@@ -16,6 +16,12 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
+    invokeChildrenFunction(functionName) {
+        _.forEach(this.refs, ref => {
+            _.invoke(ref, functionName);
+        });
+    }
+
     complete(props) {
         props = _.defaults(props || {}, this.props);
         setTimeout(() => {
@@ -40,18 +46,12 @@ class Component extends React.Component {
     }
 
     completeRefs() {
-        _.forEach(this.refs, ref => {
-            _.invoke(ref, 'completeRefs');
-        });
-
+        this.invokeChildrenFunction('completeRefs');
         this.complete({silent: true});
     }
 
     incompleteRefs() {
-        _.forEach(this.refs, ref => {
-            _.invoke(ref, 'incompleteRefs');
-        });
-
+        this.invokeChildrenFunction('incompleteRefs');
         this.incomplete();
     }
 
@@ -72,9 +72,7 @@ class Component extends React.Component {
             started: true
         }, () => {
             this.checkComplete();
-            _.each(this.refs, ref => {
-                _.invoke(ref, 'start');
-            });
+            this.invokeChildrenFunction('start');
 
             if (this.props.completeOnStart || this.props.complete) this.complete();
 
@@ -88,27 +86,18 @@ class Component extends React.Component {
         this.setState({
             started: false
         }, () => {
-            _.each(this.refs, ref => {
-                _.invoke(ref, 'stop');
-            });
-
+            this.invokeChildrenFunction('stop');
             this.props.onStop.call(this);
         });
     }
 
     pause() {
-        _.each(this.refs, ref => {
-            _.invoke(ref, 'pause');
-        });
-
+        this.invokeChildrenFunction('pause');
         this.props.onPause.call(this);
     }
 
     resume() {
-        _.each(this.refs, ref => {
-            _.invoke(ref, 'resume');
-        });
-
+        this.invokeChildrenFunction('resume');
         this.props.onResume.call(this);
     }
 
