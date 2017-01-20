@@ -252,6 +252,8 @@ class Component extends React.Component {
         if (props.stop === true && props.stop !== this.props.stop) {
             this.stop();
         }
+
+        this.props.onComponentWillReceiveProps.call(this, props);
     }
 
     addClassName(className, callback) {
@@ -262,6 +264,7 @@ class Component extends React.Component {
     }
 
     removeClassName(className, callback) {
+        if (!this.state.className) return;
         this.setState({
             className: this.state.className.replace(className, ''),
         }, callback);
@@ -333,6 +336,7 @@ Component.defaultProps = {
     onBootstrap: _.noop,
     onClose: _.noop,
     onComplete: _.noop,
+    onComponentWillReceiveProps: _.noop,
     onReady: _.noop,
     onIncomplete: _.noop,
     onOpen: _.noop,
