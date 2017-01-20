@@ -48,7 +48,6 @@ class Selectable extends Component {
         var ref;
         var dataRef;
         var target;
-        var id;
         var isCorrect;
         var self = this;
 
@@ -93,13 +92,9 @@ class Selectable extends Component {
 
         if (self.props.completeListOnClick) {
             _.each(self.refs, (r, k) => {
-                if (k === id) _.invoke(r, 'complete');
+                if (k === dataRef) _.invoke(r, 'complete');
             });
         }
-
-        _.each(self.refs, (r, k) => {
-            if (k === dataRef) _.invoke(r, 'complete');
-        });
     }
 
     select(e) {
