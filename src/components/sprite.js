@@ -13,7 +13,6 @@ class Sprite extends Component {
         }, this.state);
 
         this.lastAnimation = Date.now();
-        this.setUp(props);
     }
 
     setUp(props) {
@@ -27,8 +26,18 @@ class Sprite extends Component {
         if (props.frames) {
             this.frames = props.frames;
             this.data = {};
-            this.checkReady();
-            this.update(props);
+            this.imageRef = ReactDOM.findDOMNode(this.refs.image);
+            this.imageRef.onload = () => {
+                this.checkReady();
+                this.update(props);
+
+                if (props.animate) {
+                    this.animate();
+                } else if (props.animateBackwards) {
+                    this.animate(-1);
+                }
+            };
+            this.imageRef.src = this.image;
         } else {
             util.loadJSON(`${props.src}.${props.dataExtension}`, data => {
                 this.data = data;
@@ -50,12 +59,12 @@ class Sprite extends Component {
                     minY,
                 });
             });
-        }
 
-        if (props.animate) {
-            this.animate();
-        } else if (props.animateBackwards) {
-            this.animate(-1);
+            if (props.animate) {
+                this.animate();
+            } else if (props.animateBackwards) {
+                this.animate(-1);
+            }
         }
     }
 
@@ -66,18 +75,22 @@ class Sprite extends Component {
         let backgroundSize;
         let width;
         let height;
+        let maxWidth;
+        let maxHeight;
 
         props = props || this.props;
 
         if (props.frames) {
             top = 0;
             left = 0;
+            width = this.imageRef.naturalWidth / props.frames;
+            height = this.imageRef.naturalHeight;
+            maxWidth = width;
+            maxHeight = height;
             backgroundPosition =
                 `-${this.state.frame * width}px 0px`;
             backgroundSize =
-                `${this.image.offsetWidth}px ${this.image.offsetHeight}px`;
-            width = this.image.offsetWidth / props.frames;
-            height = this.image.offsetHeight;
+                `${this.imageRef.naturalWidth}px ${this.imageRef.naturalHeight}px`;
         } else {
             this.frameData = this.data.frames[this.state.frame];
             top = this.frameData.spriteSourceSize.y;
@@ -88,6 +101,8 @@ class Sprite extends Component {
                 `${this.data.meta.size.w}px ${this.data.meta.size.h}px`;
             width = this.frameData.frame.w;
             height = this.frameData.frame.h;
+            maxWidth = this.state.maxWidth;
+            maxHeight = this.state.maxHeight;
         }
 
         this.frameRate = props.duration / this.frames;
@@ -99,13 +114,16 @@ class Sprite extends Component {
             backgroundSize,
             width,
             height,
+            maxWidth,
+            maxHeight,
         }, () => {
-            this.props.onUpdate.call(this);
+            props.onUpdate.call(this);
         });
     }
 
     bootstrap() {
         super.bootstrap();
+        this.setUp(this.props);
         if (this.props.hoverFrame != null) this.setUpHover(this.props);
     }
 
@@ -161,6 +179,12 @@ class Sprite extends Component {
 
         window.requestAnimationFrame(() => {
             this.animate(i);
+        });
+    }
+
+    start() {
+        super.start(() => {
+            this.animate();
         });
     }
 

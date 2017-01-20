@@ -11,6 +11,7 @@ class Image extends Asset {
         return (
             <img
                 {...this.props}
+                className={this.getClassNames()}
                 onLoad={this.ready}
                 onError={this.error}
                 draggable={false}
