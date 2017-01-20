@@ -49,7 +49,6 @@ class Selectable extends Component {
         var dataRef;
         var target;
         var isCorrect;
-        var self = this;
 
         if (typeof e === 'string') {
             dataRef = e;
@@ -61,37 +60,37 @@ class Selectable extends Component {
             dataRef = target.getAttribute('data-ref');
         }
 
-        ref = self.refs[dataRef];
+        ref = this.refs[dataRef];
 
         isCorrect = (ref && ref.props && ref.props.correct) ||
-            (!self.props.answers || !self.props.answers.length ||
-                self.props.answers.indexOf(dataRef) !== -1);
+            (!this.props.answers || !this.props.answers.length ||
+                this.props.answers.indexOf(dataRef) !== -1);
 
-        if (self.props.allowDeselect && classes[dataRef]) {
+        if (this.props.allowDeselect && classes[dataRef]) {
             delete classes[dataRef];
         } else if (isCorrect) {
-            classes[dataRef] = self.state.selectClass;
+            classes[dataRef] = this.state.selectClass;
         }
 
-        self.setState({
+        this.setState({
             classes,
         });
 
-        self.props.onSelect.call(self, dataRef);
+        this.props.onSelect.call(this, dataRef);
 
-        if (self.props.chooseOne) self.complete();
+        if (this.props.chooseOne) this.complete();
 
-        if (self.props.dataTarget) {
-            self.updateGameState({
-                path: self.props.dataTarget,
+        if (this.props.dataTarget) {
+            this.updateGameState({
+                path: this.props.dataTarget,
                 data: {
                     target: ref
                 }
             });
         }
 
-        if (self.props.completeListOnClick) {
-            _.each(self.refs, (r, k) => {
+        if (this.props.completeListOnClick) {
+            _.each(this.refs, (r, k) => {
                 if (k === dataRef) _.invoke(r, 'complete');
             });
         }
