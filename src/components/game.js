@@ -249,17 +249,11 @@ class Game extends Component {
 
         return classNames(
             'pl-game',
-            'skoash-game',
             {
-                iOS: this.state.iOS,
-                MOBILE: this.state.mobile,
                 SFX: this.state.playingSFX.length,
                 'VOICE-OVER': this.state.playingVO.length,
-                PAUSED: this.state.paused,
-                LOADING: this.state.loading,
                 MENU: this.state.openMenus.length,
                 ['MENU-' + this.state.openMenus[0]]: this.state.openMenus[0],
-                DEMO: this.state.demo,
             },
             'SCREEN-' + this.state.currentScreenIndex,
             screenClass,
@@ -316,6 +310,7 @@ class Game extends Component {
 }
 
 Game.defaultProps = _.defaults({
+    componentName: 'skoash-game',
     getBackgroundIndex: () => 0,
     passData: _.noop,
     screens: {

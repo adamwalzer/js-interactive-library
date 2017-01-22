@@ -186,16 +186,6 @@ class Screen extends Component {
         return this.props.loadData.call(this);
     }
 
-    getClassNames() {
-        return classNames({
-            LOAD: this.state.load,
-            LEAVING: this.state.leaving,
-            LEAVE: this.state.leave,
-            CLOSE: this.state.close,
-            REPLAY: this.state.replay,
-        }, super.getClassNames(), 'screen');
-    }
-
     renderContent() {
         if (!this.state.load) return null;
         return (
@@ -231,6 +221,7 @@ class Screen extends Component {
 }
 
 Screen.defaultProps = _.defaults({
+    componentName: 'screen',
     resetOnClose: true,
     startDelay: 250,
     collectData: _.noop,

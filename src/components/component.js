@@ -17,7 +17,7 @@ class Component extends React.Component {
     }
 
     invokeChildrenFunction(functionName) {
-        _.forEach(this.refs, ref => {
+        _.each(this.refs, ref => {
             _.invoke(ref, functionName);
         });
     }
@@ -281,12 +281,10 @@ class Component extends React.Component {
         // I don't think that will break anything, but it will need to be tested.
         // _.filter(this.state, v => v === true)
         return classNames(
-            {
-                READY: this.state.ready,
-                STARTED: this.state.started,
-                COMPLETE: this.state.complete,
-                OPEN: this.state.open,
-            },
+            _.reduce(this.state, (a, v, k) => {
+                if (v === true) a[_.toUpper(k)] = v;
+                return a;
+            }, {}),
             this.state.className,
             this.props.className,
             this.props.componentName,

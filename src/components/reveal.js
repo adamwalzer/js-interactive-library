@@ -50,8 +50,8 @@ class Reveal extends Component {
         }
 
         if (this.props.openTarget) {
-            this.updateGameState({
-                path: this.props.openTarget,
+            this.updateScreenData({
+                key: this.props.openTarget,
                 data: {
                     open: '' + message,
                     close: false,
@@ -83,8 +83,8 @@ class Reveal extends Component {
         if (!opts.silent) this.playMedia('close-sound');
 
         if (this.props.openTarget) {
-            this.updateGameState({
-                path: this.props.openTarget,
+            this.updateScreenData({
+                key: this.props.openTarget,
                 data: {
                     open: '',
                     close: false,

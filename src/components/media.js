@@ -14,8 +14,8 @@ class Media extends Asset {
     // and the class that extends media should
     // call super.play() inside of its play method
         if (this.props.playTarget) {
-            this.updateGameState({
-                path: this.props.playTarget,
+            this.updateScreenData({
+                key: this.props.playTarget,
                 data: {
                     playing: true
                 }
@@ -27,8 +27,8 @@ class Media extends Asset {
 
     complete() {
         if (this.props.completeTarget) {
-            this.updateGameState({
-                path: this.props.completeTarget,
+            this.updateScreenData({
+                key: this.props.completeTarget,
                 data: {
                     playing: false,
                     complete: true

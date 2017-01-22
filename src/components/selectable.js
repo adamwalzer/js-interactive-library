@@ -78,7 +78,7 @@ class Selectable extends Component {
         if (this.props.chooseOne) this.complete();
 
         if (this.props.dataTarget) {
-            this.updateGameState({
+            this.updateScreenData({
                 path: this.props.dataTarget,
                 data: {
                     target: ref
