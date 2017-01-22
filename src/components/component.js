@@ -277,9 +277,6 @@ class Component extends React.Component {
     }
 
     getClassNames() {
-        // Eventually I would like to make this return _.toUpper of all this.state keys with values === true
-        // I don't think that will break anything, but it will need to be tested.
-        // _.filter(this.state, v => v === true)
         return classNames(
             _.reduce(this.state, (a, v, k) => {
                 if (v === true) a[_.toUpper(k)] = v;
