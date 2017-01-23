@@ -5,4 +5,3 @@ build_errors.log
 **/*.swp
 .DS_Store
 NOTES.txt
-jsconfig.json
