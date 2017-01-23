@@ -69,8 +69,8 @@ class Sprite extends Component {
     }
 
     update(props) {
-        let top;
-        let left;
+        let styleTop;
+        let styleLeft;
         let backgroundPosition;
         let backgroundSize;
         let width;
@@ -81,8 +81,8 @@ class Sprite extends Component {
         props = props || this.props;
 
         if (props.frames) {
-            top = 0;
-            left = 0;
+            styleTop = 0;
+            styleLeft = 0;
             width = this.imageRef.naturalWidth / props.frames;
             height = this.imageRef.naturalHeight;
             maxWidth = width;
@@ -93,8 +93,8 @@ class Sprite extends Component {
                 `${this.imageRef.naturalWidth}px ${this.imageRef.naturalHeight}px`;
         } else {
             this.frameData = this.data.frames[this.state.frame];
-            top = this.frameData.spriteSourceSize.y;
-            left = this.frameData.spriteSourceSize.x;
+            styleTop = this.frameData.spriteSourceSize.y;
+            styleLeft = this.frameData.spriteSourceSize.x;
             backgroundPosition =
                 `-${this.frameData.frame.x}px -${this.frameData.frame.y}px`;
             backgroundSize =
@@ -108,8 +108,8 @@ class Sprite extends Component {
         this.frameRate = props.duration / this.frames;
 
         this.setState({
-            top,
-            left,
+            styleTop,
+            styleLeft,
             backgroundPosition,
             backgroundSize,
             width,
@@ -239,19 +239,19 @@ class Sprite extends Component {
 
     getStyle() {
         let position;
-        let top;
-        let left;
+        let styleTop;
+        let styleLeft;
 
         if (!this.props.static) {
             position = 'absolute';
-            top = this.state.top - this.state.minY;
-            left = this.state.left - this.state.minX;
+            styleTop = this.state.styleTop - this.state.minY || undefined;
+            styleLeft = this.state.styleLeft - this.state.minX || undefined;
         }
 
         return _.defaults({
             position,
-            top,
-            left,
+            top: styleTop,
+            left: styleLeft,
             backgroundImage: `url(${this.props.src}.${this.props.extension})`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: this.state.backgroundPosition,
