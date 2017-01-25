@@ -79,7 +79,7 @@ class Selectable extends Component {
 
         if (this.props.dataTarget) {
             this.updateScreenData({
-                path: this.props.dataTarget,
+                key: this.props.dataTarget,
                 data: {
                     target: ref
                 }

@@ -146,7 +146,7 @@ class Sprite extends Component {
     }
 
     animate(i = 1) {
-        const now = Date.now();
+        const NOW = Date.now();
         let frame;
 
         if (this.props.static || this.props.pause ||
@@ -166,8 +166,8 @@ class Sprite extends Component {
             }
         }
 
-        if (now > this.lastAnimation + this.frameRate) {
-            this.lastAnimation = now;
+        if (NOW > this.lastAnimation + this.frameRate) {
+            this.lastAnimation = NOW;
             frame = (this.state.frame + i + this.frames) % this.frames;
             if (this.frame === 0) this.props.onLoop.call(this);
             this.setState({

@@ -1,5 +1,3 @@
-import classNames from 'classnames';
-
 import Component from 'components/component';
 
 class Screen extends Component {
