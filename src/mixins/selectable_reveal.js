@@ -3,6 +3,7 @@ export default function (props, opts = {}) {
         <$k.Component>
             <$k.MediaCollection
                 play={_.get(props, 'data.reveal.open')}
+                {...opts.MediaCollectionProps}
             />
             <$k.Selectable
                 dataTarget="selectable"
