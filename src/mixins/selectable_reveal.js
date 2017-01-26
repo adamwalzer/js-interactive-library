@@ -1,6 +1,6 @@
 export default function (props, opts = {}) {
     return (
-        <$k.Component>
+        <$k.Component className="selectable-reveal">
             <$k.MediaCollection
                 play={_.get(props, 'data.reveal.open')}
                 {...opts.MediaCollectionProps}
