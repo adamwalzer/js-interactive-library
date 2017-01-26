@@ -11,7 +11,7 @@ export default function (props, opts = {}) {
             />
             <$k.Reveal
                 openTarget="reveal"
-                openReveal={_.get(props, 'data.selectable.target.props.data-ref')}
+                openReveal={_.get(props, 'data.selectable.target.props.message')}
                 {...opts.RevealProps}
             />
         </$k.Component>
