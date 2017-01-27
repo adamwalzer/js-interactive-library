@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 
-import util from 'methods/util';
 import Component from 'components/component';
 import Image from 'components/image';
+import JSON from 'components/json';
 
 class Sprite extends Component {
     constructor(props) {
@@ -13,6 +13,13 @@ class Sprite extends Component {
         }, this.state);
 
         this.lastAnimation = Date.now();
+
+        this.onJSONReady = this.onJSONReady.bind(this);
+    }
+
+    onJSONReady() {
+        this.data = this.refs.json.getData();
+        this.setUp(this.props);
     }
 
     setUp(props) {
@@ -38,26 +45,23 @@ class Sprite extends Component {
                 }
             };
             this.imageRef.src = this.image;
-        } else {
-            util.loadJSON(`${props.src}.${props.dataExtension}`, data => {
-                this.data = data;
-                this.frames = data.frames.length;
-                this.checkReady();
-                this.update(props);
+        } else if (this.data && this.data.frames) {
+            this.frames = this.data.frames.length;
+            this.checkReady();
+            this.update(props);
 
-                minX = _.reduce(data.frames, (a, v) => Math.min(a, v.spriteSourceSize.x), Infinity);
-                minY = _.reduce(data.frames, (a, v) => Math.min(a, v.spriteSourceSize.y), Infinity);
-                maxWidth = _.reduce(data.frames, (a, v) =>
-                    Math.max(a, v.spriteSourceSize.x + v.spriteSourceSize.w - minX), 0);
-                maxHeight = _.reduce(data.frames, (a, v) =>
-                    Math.max(a, v.spriteSourceSize.y + v.spriteSourceSize.h - minY), 0);
+            minX = _.reduce(this.data.frames, (a, v) => Math.min(a, v.spriteSourceSize.x), Infinity);
+            minY = _.reduce(this.data.frames, (a, v) => Math.min(a, v.spriteSourceSize.y), Infinity);
+            maxWidth = _.reduce(this.data.frames, (a, v) =>
+                Math.max(a, v.spriteSourceSize.x + v.spriteSourceSize.w - minX), 0);
+            maxHeight = _.reduce(this.data.frames, (a, v) =>
+                Math.max(a, v.spriteSourceSize.y + v.spriteSourceSize.h - minY), 0);
 
-                this.setState({
-                    maxWidth,
-                    maxHeight,
-                    minX,
-                    minY,
-                });
+            this.setState({
+                maxWidth,
+                maxHeight,
+                minX,
+                minY,
             });
 
             if (props.animate) {
@@ -265,6 +269,18 @@ class Sprite extends Component {
         return classNames('sprite', super.getClassNames());
     }
 
+    renderJSON() {
+        if (this.props.frames) return null;
+
+        return (
+            <JSON
+                ref="json"
+                src={`${this.props.src}.${this.props.dataExtension}`}
+                onReady={this.onJSONReady}
+            />
+        );
+    }
+
     render() {
         return (
             <div
@@ -277,6 +293,7 @@ class Sprite extends Component {
                     ref="image"
                     src={this.image}
                 />
+                {this.renderJSON()}
                 <div
                     ref="view"
                     className="view"
