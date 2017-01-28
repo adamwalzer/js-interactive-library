@@ -153,6 +153,7 @@ class Audio extends Media {
 }
 
 Audio.defaultProps = _.defaults({
+    type: 'sfx',
     format: 'mp3',
     delay: 0,
     rate: 1,
