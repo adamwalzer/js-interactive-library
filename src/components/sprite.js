@@ -157,16 +157,16 @@ class Sprite extends Component {
             this.state.paused || !this.state.started) return;
 
         if (!this.props.loop) {
-            if (this.props.animate) {
-                if (this.state.frame === this.frames - 1) {
-                    this.complete();
-                    return;
-                }
-            } else if (this.props.animateBackwards) {
+            if (this.props.animateBackwards) {
                 if (this.state.frame === 0) {
                     this.complete();
                     return;
                 }
+            }
+
+            if (this.state.frame === this.frames - 1) {
+                this.complete();
+                return;
             }
         }
 
@@ -188,7 +188,7 @@ class Sprite extends Component {
 
     start() {
         super.start(() => {
-            this.animate();
+            if (this.props.animate) this.animate();
         });
     }
 
