@@ -109,7 +109,17 @@ class Sprite extends Component {
             maxHeight = this.state.maxHeight;
         }
 
-        this.frameRate = props.duration / this.frames;
+        this.frameRates = [];
+
+        if (_.isArray(props.duration)) {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration[i]);
+            }
+        } else {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration / this.frames);
+            }
+        }
 
         this.setState({
             styleTop,
@@ -170,10 +180,10 @@ class Sprite extends Component {
             }
         }
 
-        if (NOW > this.lastAnimation + this.frameRate) {
+        if (NOW > this.lastAnimation + this.frameRates[this.state.frame]) {
             this.lastAnimation = NOW;
             frame = (this.state.frame + i + this.frames) % this.frames;
-            if (this.frame === 0) this.props.onLoop.call(this);
+            if (frame === 0) this.props.onLoop.call(this);
             this.setState({
                 frame
             }, () => {
