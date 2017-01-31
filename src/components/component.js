@@ -292,7 +292,7 @@ class Component extends React.Component {
     renderContentList(listName = 'children') {
         return _.map([].concat(this.props[listName]), (component, key) => {
             var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
-            if (!component) return;
+            if (!component || !component.type) return;
             return (
                 <component.type
                     gameState={gameState}
