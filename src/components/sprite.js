@@ -70,6 +70,18 @@ class Sprite extends Component {
                 this.animate(-1);
             }
         }
+
+        this.frameRates = [];
+
+        if (_.isArray(props.duration)) {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration[i]);
+            }
+        } else {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration / this.frames);
+            }
+        }
     }
 
     update(props) {
@@ -95,7 +107,7 @@ class Sprite extends Component {
                 `-${this.state.frame * width}px 0px`;
             backgroundSize =
                 `${this.imageRef.naturalWidth}px ${this.imageRef.naturalHeight}px`;
-        } else {
+        } else if (this.data && this.data.frames) {
             this.frameData = this.data.frames[this.state.frame];
             styleTop = this.frameData.spriteSourceSize.y;
             styleLeft = this.frameData.spriteSourceSize.x;
@@ -107,18 +119,6 @@ class Sprite extends Component {
             height = this.frameData.frame.h;
             maxWidth = this.state.maxWidth;
             maxHeight = this.state.maxHeight;
-        }
-
-        this.frameRates = [];
-
-        if (_.isArray(props.duration)) {
-            for (let i = 0; i < this.frames; i++) {
-                this.frameRates.push(props.duration[i]);
-            }
-        } else {
-            for (let i = 0; i < this.frames; i++) {
-                this.frameRates.push(props.duration / this.frames);
-            }
         }
 
         this.setState({
@@ -228,7 +228,7 @@ class Sprite extends Component {
             });
         }
 
-        if (props.animate) {
+        if (props.animate && props.animate !== this.props.animate) {
             this.animate();
         } else if (props.animateBackwards) {
             this.animate(-1);
