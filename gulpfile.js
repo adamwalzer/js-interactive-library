@@ -1,45 +1,30 @@
-var gulp;
-var args;
-var gutil;
-var webpack;
-var gulpWebpack;
-var webpackDevConfig;
-var webpackProdConfig;
-var appPackage;
-var childProcess;
-var spawn;
-var eslint;
-var fs;
-var eslintConfigJs;
-var env;
-var mocha;
 var mode;
 var getMode;
 var buildDevelopment;
 var buildProduction;
 var selectBuildMode;
 
-require('babel-core/register');//for mocha to use es6
 /*global require process*/
 /*eslint-env node */
 /*eslint no-console:0 */
-gulp = require('gulp');
-args = require('yargs').argv;
-gutil = require('gulp-util');
-webpack = require('webpack');
-gulpWebpack = require('webpack-stream');
-webpackDevConfig = require('./webpack.config.dev.js');
-webpackProdConfig = require('./webpack.config.prod.js');
-appPackage = require('./package.json');
+var gulp = require('gulp');
+var args = require('yargs').argv;
+var gutil = require('gulp-util');
+var webpack = require('webpack');
+var gulpWebpack = require('webpack-stream');
+var webpackDevConfig = require('./webpack.config.dev.js');
+var webpackProdConfig = require('./webpack.config.prod.js');
+var appPackage = require('./package.json');
+var eslint = require('gulp-eslint');
+var fs = require('fs');
+var eslintConfigJs = JSON.parse(fs.readFileSync('./.eslintrc'));
+var env = require('gulp-env');
+var mocha = require('gulp-mocha');
+
 webpackDevConfig.output.filename = 'skoash.' + appPackage.version + '.js';
 webpackProdConfig.output.filename = 'skoash.' + appPackage.version + '.js';
-childProcess = require('child_process');
-spawn = childProcess.spawn;
-eslint = require('gulp-eslint');
-fs = require('fs');
-eslintConfigJs = JSON.parse(fs.readFileSync('./.eslintrc'));
-env = require('gulp-env');
-mocha = require('gulp-mocha');
+
+require('babel-core/register');//for mocha to use es6
 
 //mode defaults to development and is selected with the following precedences:
 // --development flag
