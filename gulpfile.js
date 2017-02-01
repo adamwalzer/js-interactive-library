@@ -14,7 +14,7 @@ var eslintConfigJs;
 var env;
 var mocha;
 var mode;
-var executeAsProcess;
+var getMode;
 var buildDevelopment;
 var buildProduction;
 var selectBuildMode;
@@ -46,16 +46,20 @@ mocha = require('gulp-mocha');
 // --production flag
 // APP_ENV environment variable
 // NODE_ENV environment variable
-mode = 'development';
-if (args.development || args.prod) {
-    mode = 'development';
-} else if (args.prod || args.production) {
-    mode = 'production';
-} else if (process.env.APP_ENV) {
-    mode = process.env.APP_ENV;
-} else if (process.env.NODE_ENV) {
-    mode = process.env.NODE_ENV;
-}
+getMode = function (m = 'production') {
+    if (args.development || args.dev) {
+        m = 'development';
+    } else if (args.prod || args.production) {
+        m = 'production';
+    } else if (process.env.APP_ENV) {
+        m = process.env.APP_ENV;
+    } else if (process.env.NODE_ENV) {
+        m = process.env.NODE_ENV;
+    }
+    return m;
+};
+
+mode = getMode();
 
 /*
 ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
@@ -66,26 +70,6 @@ ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__  __)(__
 (______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)(______)
 */
-
-/*
- * Higher order function. Starts an arbitrary shell command
- * note that this is not a gulp best practice, and should be
- * used sparingly and only with justification.
- * @param {string} command - command to run
- * @param {string[]} [flags = []] - any flags that need to be passed to command
- */
-executeAsProcess = function (command, flags) {
-    return function () {
-        var start = spawn(command, flags);
-        start.stdout.on('data', function (data) {
-            console.log('stdout: ' + data);
-        });
-
-        start.stderr.on('data', function (data) {
-            console.log('stderr: ' + data);
-        });
-    };
-};
 
 buildDevelopment = function () {
     var wpStream = gulpWebpack(webpackDevConfig, null, function (err, stats) {
@@ -178,6 +162,7 @@ ___  ______  ______  ______  ______  ______  ______  ______  ______  ______  ___
 gulp.task('default', ['build', 'watch']);
 
 gulp.task('watch', function () {
+    mode = getMode('development');
     gulp.watch('src/**/*.js', ['build']);
 });
 
@@ -194,18 +179,6 @@ gulp.task('webpack:build-prod', ['build-warning'], buildProduction);
 gulp.task('webpack:build-production', ['build-warning'], buildProduction);
 gulp.task('webpack:build-dev', ['build-warning'], buildDevelopment);
 gulp.task('webpack:build-development', ['build-warning'], buildDevelopment);
-/** Convienience Build Aliases */
-// eAP here just lets us restart gulp with appropriate flags
-// so that build is the single source of truth. Style and index
-// are dependent, so we need a way to call different commands
-// while still going through the single webpack:build dependency.
-// as such, this is how we need to alias build commands.
-gulp.task('build-dev', executeAsProcess('gulp build', ['build', '--development']));
-gulp.task('build-development', executeAsProcess('gulp build', ['build', '--development']));
-gulp.task('build-prod', executeAsProcess('gulp build', ['build', '--production']));
-gulp.task('build-production', executeAsProcess('gulp build', ['build', '--production']));
-
-/*·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´Resource and Static Asset Tasks`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·*/
 
 /*·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´Lint and Testing Tasks`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·•·.·´`·.·*/
 gulp.task('lint', ['lint-js', 'lint-config', 'lint-test']);
