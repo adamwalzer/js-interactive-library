@@ -12,7 +12,7 @@ class MediaCollection extends Component {
         super.componentWillReceiveProps(props);
 
         if (props.play && props.play !== this.props.play) {
-            this.play(props.play);
+            props.play.split(' ').forEach(this.play.bind(this));
         }
     }
 }

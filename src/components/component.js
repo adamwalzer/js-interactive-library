@@ -16,6 +16,12 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
+    invokeChildrenFunction(functionName) {
+        _.each(this.refs, ref => {
+            _.invoke(ref, functionName);
+        });
+    }
+
     complete(props) {
         props = _.defaults(props || {}, this.props);
         setTimeout(() => {
@@ -40,18 +46,12 @@ class Component extends React.Component {
     }
 
     completeRefs() {
-        _.forEach(this.refs, ref => {
-            _.invoke(ref, 'completeRefs');
-        });
-
+        this.invokeChildrenFunction('completeRefs');
         this.complete({silent: true});
     }
 
     incompleteRefs() {
-        _.forEach(this.refs, ref => {
-            _.invoke(ref, 'incompleteRefs');
-        });
-
+        this.invokeChildrenFunction('incompleteRefs');
         this.incomplete();
     }
 
@@ -72,11 +72,9 @@ class Component extends React.Component {
             started: true
         }, () => {
             this.checkComplete();
-            _.each(this.refs, ref => {
-                _.invoke(ref, 'start');
-            });
+            this.invokeChildrenFunction('start');
 
-            if (this.props.completeOnStart) this.complete();
+            if (this.props.completeOnStart || this.props.complete) this.complete();
 
             this.props.onStart.call(this);
 
@@ -88,27 +86,18 @@ class Component extends React.Component {
         this.setState({
             started: false
         }, () => {
-            _.each(this.refs, ref => {
-                _.invoke(ref, 'stop');
-            });
-
+            this.invokeChildrenFunction('stop');
             this.props.onStop.call(this);
         });
     }
 
     pause() {
-        _.each(this.refs, ref => {
-            _.invoke(ref, 'pause');
-        });
-
+        this.invokeChildrenFunction('pause');
         this.props.onPause.call(this);
     }
 
     resume() {
-        _.each(this.refs, ref => {
-            _.invoke(ref, 'resume');
-        });
-
+        this.invokeChildrenFunction('resume');
         this.props.onResume.call(this);
     }
 
@@ -263,34 +252,41 @@ class Component extends React.Component {
         if (props.stop === true && props.stop !== this.props.stop) {
             this.stop();
         }
+
+        this.props.onComponentWillReceiveProps.call(this, props);
     }
 
-    addClassName(className) {
+    addClassName(className, callback) {
         if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
             className: classNames(this.state.className, className),
-        });
+        }, callback);
     }
 
-    removeClassName(className) {
+    removeClassName(className, callback) {
+        if (!this.state.className) return;
         this.setState({
             className: this.state.className.replace(className, ''),
-        });
+        }, callback);
     }
 
-    removeAllClassNames() {
+    removeAllClassNames(callback) {
         this.setState({
             className: null
-        });
+        }, callback);
     }
 
     getClassNames() {
-        return classNames({
-            READY: this.state.ready,
-            STARTED: this.state.started,
-            COMPLETE: this.state.complete,
-            OPEN: this.state.open,
-        }, this.state.className, this.props.className, this.props.getClassNames.call(this));
+        return classNames(
+            _.reduce(this.state, (a, v, k) => {
+                if (v === true) a[_.toUpper(k)] = v;
+                return a;
+            }, {}),
+            this.state.className,
+            this.props.className,
+            this.props.componentName,
+            this.props.getClassNames.call(this)
+        );
     }
 
     renderContentList(listName = 'children') {
@@ -328,12 +324,14 @@ Component.defaultProps = {
     completeDelay: 0,
     completeIncorrect: false,
     completeOnStart: false,
+    componentName: '',
     getClassNames: _.noop,
     ignoreReady: false,
     loadData: _.noop,
     onBootstrap: _.noop,
     onClose: _.noop,
     onComplete: _.noop,
+    onComponentWillReceiveProps: _.noop,
     onReady: _.noop,
     onIncomplete: _.noop,
     onOpen: _.noop,

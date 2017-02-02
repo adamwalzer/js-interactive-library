@@ -17,6 +17,7 @@ import GameEmbedder from 'components/game_embedder';
 import InteractiveItem from 'components/interactive_item';
 import Labyrinth from 'components/labyrinth';
 import MediaCollection from 'components/media_collection';
+import Randomizer from 'components/randomizer';
 import Repeater from 'components/repeater';
 import Reveal from 'components/reveal';
 import Score from 'components/score';
@@ -52,6 +53,7 @@ window.$k = window.skoash = {
     InteractiveItem,
     Labyrinth,
     MediaCollection,
+    Randomizer,
     Repeater,
     Reveal,
     Score,
