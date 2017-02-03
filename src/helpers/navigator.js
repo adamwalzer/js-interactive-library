@@ -73,11 +73,11 @@ class Navigator {
 
     shouldGoto(oldScreen, newScreen, opts) {
         return !(
-      (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) ||
-      (oldScreen.props.index < newScreen.props.index && !opts.load && !this.state.demo &&
-        !(oldScreen.state.complete || oldScreen.state.replay)) ||
-      (oldScreen.props.index > newScreen.props.index && newScreen.props.index === 0)
-    );
+            (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) ||
+            (oldScreen.props.index < newScreen.props.index && !opts.load && !this.state.demo &&
+                !(oldScreen.state.complete || oldScreen.state.replay)) ||
+            (oldScreen.props.index > newScreen.props.index && newScreen.props.index === 0)
+        );
     }
 
     openNewScreen(newScreen, currentScreenIndex, opts) {
