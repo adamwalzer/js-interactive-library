@@ -145,11 +145,11 @@ class Reveal extends Component {
     componentWillReceiveProps(props) {
         super.componentWillReceiveProps(props);
 
-        if (props.openReveal && props.openReveal !== this.props.openReveal) {
+        if (props.openReveal != null && props.openReveal !== this.props.openReveal) {
             this.open(props.openReveal);
         }
 
-        if (props.closeReveal !== this.props.closeReveal) {
+        if (props.closeReveal && props.closeReveal !== this.props.closeReveal) {
             if (props.closeReveal === true) {
                 this.close();
             } else if (Number.isInteger(props.closeReveal)) {
