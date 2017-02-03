@@ -61,7 +61,12 @@ class Component extends React.Component {
         }, () => {
             if (this.props.triggerReady) skoash.trigger('ready');
             if (this.state.open) this.start();
-            this.onReady.call(this);
+            if (_.isFunction(this.onReadyCallback)) {
+                _.invoke(this, 'onReadyCallback.call', this);
+                delete this.onReadyCallback;
+            } else {
+                _.invoke(this, 'onReady.call', this);
+            }
             this.props.onReady.call(this);
         });
     }
