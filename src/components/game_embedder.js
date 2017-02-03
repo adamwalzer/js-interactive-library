@@ -55,7 +55,7 @@ class GameEmbedder extends Component {
         this.emitEvent({ name: 'pause' });
     }
 
-    resume(force) {
+    resume(force = false) {
         if (this.props.pause && !force) return;
         super.resume();
         this.emitEvent({ name: 'resume' });
