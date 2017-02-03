@@ -39,7 +39,7 @@ class Reveal extends Component {
             this.complete();
         } else {
             _.each(this.refs, (ref, key) => {
-                if (ref && key === message) ref.complete();
+                if (key === message) _.invoke(ref, 'complete');
             });
         }
 
