@@ -86,7 +86,7 @@ class Reveal extends Component {
             this.updateScreenData({
                 key: this.props.openTarget,
                 data: {
-                    open: '',
+                    open: null,
                     close: false,
                 }
             });
