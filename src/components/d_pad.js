@@ -56,6 +56,9 @@ class DPad extends Component {
         } else if (e.keyCode === DOWNKEY || e.keyCode === SKEY) {
             ref = DOWN;
         }
+
+        if (!ref) ref = this.props.onKeyAction.call(this, e.keyCode, isDown);
+
         this.updateRef(ref, isDown);
     }
 
@@ -132,6 +135,7 @@ class DPad extends Component {
 
 DPad.defaultProps = _.defaults({
     outputTarget: 'd-pad',
+    onKeyAction: _.noop,
 }, Component.defaultProps);
 
 export default DPad;

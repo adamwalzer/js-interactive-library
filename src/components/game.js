@@ -123,8 +123,8 @@ class Game extends Component {
         this.setPause(true);
     }
 
-  // paused should be a boolean determining whether to call
-  // audio.pause or audio.resume
+    // paused should be a boolean determining whether to call
+    // audio.pause or audio.resume
     setPause(paused) {
         var fnKey = paused ? 'pause' : 'resume';
 
@@ -136,8 +136,8 @@ class Game extends Component {
         });
     }
 
-  // Remove this method after refactoring games that override it.
-  // all-about-you, polar-bear, tag-it
+    // Remove this method after refactoring games that override it.
+    // all-about-you, polar-bear, tag-it
     getBackgroundIndex(index, id) {
         return this.props.getBackgroundIndex.call(this, index, id);
     }
@@ -148,8 +148,8 @@ class Game extends Component {
         });
     }
 
-  // remove once games are refactored to call this.eventManager.emit(gameData);
-  // all-about-you
+    // remove once games are refactored to call this.eventManager.emit(gameData);
+    // all-about-you
     emit(gameData = {}) {
         return this.eventManager.emit(gameData);
     }
@@ -188,18 +188,32 @@ class Game extends Component {
 
     updateState(opts) {
         if (typeof opts.path === 'string') {
-            opts.data = {
-                screens: {
-                    [this.state.currentScreenIndex]: {
-                        [opts.path]: opts.data
-                    }
-                }
-            };
-            this.updateData(opts);
+            /* eslint-disable no-console */
+            console.warn('As of skoash 1.1.1 please trigger updateScreenData directly');
+            /* eslint-enable no-console */
+            this.updateScreenData(opts);
         } else if (_.isArray(opts.path)) {
-            opts.data = _.setWith({}, opts.path, opts.data, Object);
-            this.updateData(opts);
+            /* eslint-disable no-console */
+            console.warn('As of skoash 1.1.1 please trigger updateGameData directly');
+            /* eslint-enable no-console */
+            this.updateGameData(opts);
         }
+    }
+
+    updateGameData(opts) {
+        var keys = opts.keys || opts.key || opts.path;
+        if (keys) opts.data = _.setWith({}, keys, opts.data, Object);
+        this.updateData(opts);
+    }
+
+    updateScreenData(opts) {
+        opts.keys = _.filter(
+            ['screens', this.state.currentScreenIndex]
+            .concat(opts.keys)
+            .concat(opts.key || opts.path),
+            _.identity
+        );
+        this.updateGameData(opts);
     }
 
     updateData(opts) {
@@ -216,7 +230,7 @@ class Game extends Component {
         _.invoke(this.refs['screen-' + this.state.currentScreenIndex], 'checkComplete');
     }
 
-  // this method takes in an opts parameter object with screenID
+    // this method takes in an opts parameter object with screenID
     screenComplete(opts) {
         this.props.screenComplete.call(this, opts);
     }
@@ -230,11 +244,8 @@ class Game extends Component {
     }
 
     getClassNames() {
-        var screen;
-        var screenClass;
-
-        screen = this.refs['screen-' + this.state.currentScreenIndex];
-        screenClass = screen ? 'SCREEN-' + screen.props.id : '';
+        var screen = this.refs['screen-' + this.state.currentScreenIndex];
+        var screenClass = screen ? 'SCREEN-' + screen.props.id : '';
 
         return classNames(
             'pl-game',
@@ -258,11 +269,8 @@ class Game extends Component {
     }
 
     getStyles() {
-        var transform;
-        var transformOrigin;
-
-        transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
-        transformOrigin = this.state.scale < 1 ? '0px 0px 0px' : '50% 0px 0px';
+        var transform = `scale3d(${this.state.scale},${this.state.scale},1)`;
+        var transformOrigin = this.state.scale < 1 ? '0px 0px 0px' : '50% 0px 0px';
 
         return {
             transform,

@@ -1,5 +1,3 @@
-import 'react-fastclick';
-
 // components
 import Component from 'components/component';
 import Screen from 'components/screen';
@@ -25,6 +23,7 @@ import Score from 'components/score';
 import ScrollArea from 'components/scroll_area';
 import Selectable from 'components/selectable';
 import Slider from 'components/slider';
+import Sprite from 'components/sprite';
 import SpriteAnimation from 'components/sprite_animation';
 import Timer from 'components/timer';
 
@@ -32,8 +31,9 @@ import Timer from 'components/timer';
 import start from 'methods/start';
 import trigger from 'methods/trigger';
 import util from 'methods/util';
+import mixins from 'mixins/mixins';
 
-window.skoash = {
+window.$k = window.skoash = {
     // components
     Component,
     Screen,
@@ -58,12 +58,14 @@ window.skoash = {
     ScrollArea,
     Selectable,
     Slider,
+    Sprite,
     SpriteAnimation,
     Timer,
     //methods
     start,
     trigger,
     util,
+    mixins,
 };
 
 export default window.skoash;

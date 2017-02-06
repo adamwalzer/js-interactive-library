@@ -62,8 +62,20 @@ class Screen extends Component {
             this.setState({
                 load: true,
                 ready: false,
+                complete: false,
             }, () => {
                 super.bootstrap();
+                this.props.onLoad.call(this);
+            });
+        }
+    }
+
+    unload() {
+        if (this.state.load && this.props.shouldUnload) {
+            this.setState({
+                load: false,
+            }, () => {
+                this.props.onUnload.call(this);
             });
         }
     }
@@ -75,6 +87,7 @@ class Screen extends Component {
     }
 
     replay(replay = true) {
+        this.load();
         this.setState({
             replay,
         });
@@ -223,6 +236,9 @@ Screen.defaultProps = _.defaults({
     collectData: _.noop,
     loadData: _.noop,
     onOpen: _.noop,
+    onLoad: _.noop,
+    onUnload: _.noop,
+    shouldUnload: true,
     gameState: {},
 }, Component.defaultProps);
 
