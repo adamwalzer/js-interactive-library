@@ -70,8 +70,8 @@ class Score extends Component {
         this.setState({
             score: this.state.score + increment
         }, () => {
-            this.updateGameState({
-                path: this.props.dataTarget,
+            this.updateScreenData({
+                key: this.props.dataTarget,
                 data: {
                     score: this.state.score
                 }

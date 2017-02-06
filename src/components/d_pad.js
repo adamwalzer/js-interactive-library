@@ -90,8 +90,8 @@ class DPad extends Component {
         window.removeEventListener('keyup', this.keyup);
 
         this.keys = {};
-        this.updateGameState({
-            path: this.props.outputTarget,
+        this.updateScreenData({
+            key: this.props.outputTarget,
             data: {
                 up: false,
                 down: false,
@@ -105,8 +105,8 @@ class DPad extends Component {
         if (this.keys[ref] === isDown) return;
         if (isDown && this.media.keydown) this.media.keydown.play();
         this.keys[ref] = isDown;
-        this.updateGameState({
-            path: this.props.outputTarget,
+        this.updateScreenData({
+            key: this.props.outputTarget,
             data: {
                 [ref]: isDown
             }

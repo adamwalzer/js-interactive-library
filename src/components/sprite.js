@@ -13,22 +13,31 @@ class Sprite extends Component {
         }, this.state);
 
         this.lastAnimation = Date.now();
-        this.setUp(props);
     }
 
     setUp(props) {
-        var maxWidth;
-        var maxHeight;
-        var minX;
-        var minY;
+        let maxWidth;
+        let maxHeight;
+        let minX;
+        let minY;
 
         this.image = `${props.src}.${props.extension}`;
 
         if (props.frames) {
             this.frames = props.frames;
             this.data = {};
-            this.checkReady();
-            this.update(props);
+            this.imageRef = ReactDOM.findDOMNode(this.refs.image);
+            this.imageRef.onload = () => {
+                this.checkReady();
+                this.update(props);
+
+                if (props.animate) {
+                    this.animate();
+                } else if (props.animateBackwards) {
+                    this.animate(-1);
+                }
+            };
+            this.imageRef.src = this.image;
         } else {
             util.loadJSON(`${props.src}.${props.dataExtension}`, data => {
                 this.data = data;
@@ -50,73 +59,84 @@ class Sprite extends Component {
                     minY,
                 });
             });
-        }
 
-        if (props.animate) {
-            this.animate();
-        } else if (props.animateBackwards) {
-            this.animate(-1);
+            if (props.animate) {
+                this.animate();
+            } else if (props.animateBackwards) {
+                this.animate(-1);
+            }
         }
     }
 
     update(props) {
-        var top;
-        var left;
-        var backgroundPosition;
-        var backgroundSize;
-        var width;
-        var height;
+        let styleTop;
+        let styleLeft;
+        let backgroundPosition;
+        let backgroundSize;
+        let width;
+        let height;
+        let maxWidth;
+        let maxHeight;
 
         props = props || this.props;
 
         if (props.frames) {
-            top = 0;
-            left = 0;
+            styleTop = 0;
+            styleLeft = 0;
+            width = this.imageRef.naturalWidth / props.frames;
+            height = this.imageRef.naturalHeight;
+            maxWidth = width;
+            maxHeight = height;
             backgroundPosition =
                 `-${this.state.frame * width}px 0px`;
             backgroundSize =
-                `${this.image.offsetWidth}px ${this.image.offsetHeight}px`;
-            width = this.image.offsetWidth / props.frames;
-            height = this.image.offsetHeight;
+                `${this.imageRef.naturalWidth}px ${this.imageRef.naturalHeight}px`;
         } else {
             this.frameData = this.data.frames[this.state.frame];
-            top = this.frameData.spriteSourceSize.y;
-            left = this.frameData.spriteSourceSize.x;
+            styleTop = this.frameData.spriteSourceSize.y;
+            styleLeft = this.frameData.spriteSourceSize.x;
             backgroundPosition =
                 `-${this.frameData.frame.x}px -${this.frameData.frame.y}px`;
             backgroundSize =
                 `${this.data.meta.size.w}px ${this.data.meta.size.h}px`;
             width = this.frameData.frame.w;
             height = this.frameData.frame.h;
+            maxWidth = this.state.maxWidth;
+            maxHeight = this.state.maxHeight;
         }
 
         this.frameRate = props.duration / this.frames;
 
         this.setState({
-            top,
-            left,
+            styleTop,
+            styleLeft,
             backgroundPosition,
             backgroundSize,
             width,
             height,
+            maxWidth,
+            maxHeight,
+        }, () => {
+            props.onUpdate.call(this);
         });
     }
 
     bootstrap() {
         super.bootstrap();
+        this.setUp(this.props);
         if (this.props.hoverFrame != null) this.setUpHover(this.props);
     }
 
     setUpHover(props) {
         this.refs.view.addEventListener('mouseover', () => {
             this.setState({ frame: props.hoverFrame }, () => {
-                this.update();
+                this.update(props);
             });
         });
 
         this.refs.view.addEventListener('mouseout', () => {
             this.setState({ frame: props.frame }, () => {
-                this.update();
+                this.update(props);
             });
         });
     }
@@ -126,23 +146,32 @@ class Sprite extends Component {
     }
 
     animate(i = 1) {
-        var now = Date.now();
+        const NOW = Date.now();
+        let frame;
 
         if (this.props.static || this.props.pause ||
             this.state.paused || !this.state.started) return;
 
         if (!this.props.loop) {
             if (this.props.animate) {
-                if (this.state.frame === this.frames - 1) return;
+                if (this.state.frame === this.frames - 1) {
+                    this.complete();
+                    return;
+                }
             } else if (this.props.animateBackwards) {
-                if (this.state.frame === 0) return;
+                if (this.state.frame === 0) {
+                    this.complete();
+                    return;
+                }
             }
         }
 
-        if (now > this.lastAnimation + this.frameRate) {
-            this.lastAnimation = now;
+        if (NOW > this.lastAnimation + this.frameRate) {
+            this.lastAnimation = NOW;
+            frame = (this.state.frame + i + this.frames) % this.frames;
+            if (this.frame === 0) this.props.onLoop.call(this);
             this.setState({
-                frame: (this.state.frame + i + this.frames) % this.frames
+                frame
             }, () => {
                 this.update(this.props);
             });
@@ -150,6 +179,12 @@ class Sprite extends Component {
 
         window.requestAnimationFrame(() => {
             this.animate(i);
+        });
+    }
+
+    start() {
+        super.start(() => {
+            this.animate();
         });
     }
 
@@ -187,8 +222,8 @@ class Sprite extends Component {
     }
 
     getContainerStyle() {
-        var width;
-        var height;
+        let width;
+        let height;
 
         if (!this.props.static) {
             width = this.state.maxWidth;
@@ -203,27 +238,27 @@ class Sprite extends Component {
     }
 
     getStyle() {
-        var position;
-        var top;
-        var left;
+        let position;
+        let styleTop;
+        let styleLeft;
 
         if (!this.props.static) {
             position = 'absolute';
-            top = this.state.top - this.state.minY;
-            left = this.state.left - this.state.minX;
+            styleTop = this.state.styleTop - this.state.minY || undefined;
+            styleLeft = this.state.styleLeft - this.state.minX || undefined;
         }
 
-        return {
+        return _.defaults({
             position,
-            top,
-            left,
+            top: styleTop,
+            left: styleLeft,
             backgroundImage: `url(${this.props.src}.${this.props.extension})`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: this.state.backgroundPosition,
             backgroundSize: this.state.backgroundSize,
             width: this.state.width,
             height: this.state.height,
-        };
+        }, this.props.style);
     }
 
     getClassNames() {
@@ -264,6 +299,9 @@ Sprite.defaultProps = _.defaults({
     loop: true,
     animate: false,
     animateBackwards: false,
+    onLoop: _.noop,
+    onUpdate: _.noop,
+    style: {},
 }, Component.defaultProps);
 
 export default Sprite;
