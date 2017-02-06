@@ -14,9 +14,13 @@ export default function (file, callback) {
     xobj.open('GET', file, true);
     xobj.onreadystatechange = function () {
         /* eslint-disable eqeqeq */
-        if (xobj.readyState == 4 && xobj.status == '200') {
-            skoash._cache[file] = xobj.responseText;
-            callback(xobj.responseText);
+        if (xobj.readyState == 4) {
+            if (xobj.status == '200') {
+                skoash._cache[file] = xobj.responseText;
+                callback(xobj.responseText);
+            } else {
+                console.log('Error', xobj.statusText); // eslint-disable-line no-console
+            }
         }
         /* eslint-enable eqeqeq */
     };
