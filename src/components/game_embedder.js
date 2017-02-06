@@ -21,7 +21,12 @@ class GameEmbedder extends Component {
         } else if (opts.complete) {
             this.complete();
         } else if (opts.updateGameState) {
+            // remove this once updateGameState is removed from the Game Component
             this.updateGameState(opts.updateGameState);
+        } else if (opts.updateGameData) {
+            this.updateGameData(opts.updateGameData);
+        } else if (opts.updateScreenData) {
+            this.updateScreenData(opts.updateScreenData);
         }
 
         this.props.onRespond.call(this, opts);

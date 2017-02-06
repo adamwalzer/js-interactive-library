@@ -13,24 +13,21 @@ class Selectable extends Component {
     }
 
     start() {
-        var selectClass;
         var selectFunction;
         var classes = this.state.classes;
 
         super.start();
 
-        selectClass = this.props.selectClass || this.state.selectClass || 'SELECTED';
-        selectFunction = selectClass === 'HIGHLIGHTED' ? this.highlight : this.select;
+        selectFunction = this.props.selectClass === 'HIGHLIGHTED' ? this.highlight : this.select;
 
         if (this.props.selectOnStart) {
-            classes[this.props.selectOnStart] = selectClass;
+            classes[this.props.selectOnStart] = this.props.selectClass;
         }
 
         this.setState({
             started: true,
             classes,
             selectFunction,
-            selectClass,
         });
     }
 
@@ -48,9 +45,7 @@ class Selectable extends Component {
         var ref;
         var dataRef;
         var target;
-        var id;
         var isCorrect;
-        var self = this;
 
         if (typeof e === 'string') {
             dataRef = e;
@@ -62,44 +57,40 @@ class Selectable extends Component {
             dataRef = target.getAttribute('data-ref');
         }
 
-        ref = self.refs[dataRef];
+        ref = this.refs[dataRef];
 
         isCorrect = (ref && ref.props && ref.props.correct) ||
-            (!self.props.answers || !self.props.answers.length ||
-                self.props.answers.indexOf(dataRef) !== -1);
+            (!this.props.answers || !this.props.answers.length ||
+                this.props.answers.indexOf(dataRef) !== -1);
 
-        if (self.props.allowDeselect && classes[dataRef]) {
+        if (this.props.allowDeselect && classes[dataRef]) {
             delete classes[dataRef];
         } else if (isCorrect) {
-            classes[dataRef] = self.state.selectClass;
+            classes[dataRef] = this.props.selectClass;
         }
 
-        self.setState({
+        this.setState({
             classes,
         });
 
-        self.props.onSelect.call(self, dataRef);
+        this.props.onSelect.call(this, dataRef);
 
-        if (self.props.chooseOne) self.complete();
+        if (this.props.chooseOne) this.complete();
 
-        if (self.props.dataTarget) {
-            self.updateGameState({
-                path: self.props.dataTarget,
+        if (this.props.dataTarget) {
+            this.updateScreenData({
+                key: this.props.dataTarget,
                 data: {
                     target: ref
                 }
             });
         }
 
-        if (self.props.completeListOnClick) {
-            _.each(self.refs, (r, k) => {
-                if (k === id) _.invoke(r, 'complete');
+        if (this.props.completeListOnClick) {
+            _.each(this.refs, (r, k) => {
+                if (k === dataRef) _.invoke(r, 'complete');
             });
         }
-
-        _.each(self.refs, (r, k) => {
-            if (k === dataRef) _.invoke(r, 'complete');
-        });
     }
 
     select(e) {
