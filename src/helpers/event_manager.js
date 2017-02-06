@@ -72,10 +72,10 @@ class EventManager {
         } else if ('msHidden' in document) {
             document.addEventListener('msvisibilitychange', onfocusout);
         } else if ('onfocusin' in document) {
-      // IE 9 and lower:
+            // IE 9 and lower:
             document.onfocusin = document.onfocusout = onfocusout;
         } else {
-      // All others:
+            // All others:
             window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onfocusout;
         }
     }
@@ -138,11 +138,13 @@ class EventManager {
             videoPlay: this.mediaManager.videoPlay,
             videoStop: this.mediaManager.videoStop,
             demo: this.demo,
-            'toggle-demo-mode': this.demo,
+            toggleDemoMode: this.demo,
             getData: this.getData,
             passData: this.passData,
-            updateData: this.updateData,
             updateState: this.updateState,
+            updateGameData: this.updateGameData,
+            updateScreenData: this.updateScreenData,
+            updateData: this.updateData,
             screenComplete: this.screenComplete,
             openMenu: this.navigator.openMenu,
             menuClose: this.navigator.menuClose,
@@ -155,7 +157,7 @@ class EventManager {
             ready: this.checkReady,
             resize: this.scale,
             getGame: this.getGame,
-        })[event], 'call', this, opts);
+        })[_.camelCase(event)], 'call', this, opts);
     }
 }
 

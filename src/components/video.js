@@ -61,14 +61,14 @@ class Video extends Media {
 
     render() {
         return (
-      <video
-        {...this.props}
-        onCanPlay={this.ready}
-        onEnded={this.complete}
-        preload="auto"
-        controls={true}
-      />
-    );
+            <video
+                {...this.props}
+                onCanPlay={this.ready}
+                onEnded={this.complete}
+                preload="auto"
+                controls={true}
+            />
+        );
     }
 }
 

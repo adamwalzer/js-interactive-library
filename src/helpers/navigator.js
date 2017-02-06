@@ -17,10 +17,12 @@ class Navigator {
          */
         var oldScreen;
         var prevScreen;
+        var prevPrevScreen;
         var oldIndex;
         var currentScreenIndex;
         var newScreen;
         var nextScreen;
+        var nextNextScreen;
         var highestScreenIndex;
         var screenIndexArray;
         var data;
@@ -37,7 +39,9 @@ class Navigator {
             currentScreenIndex = Math.min(this.screensLength - 1, Math.max(0, opts.index));
             highestScreenIndex = Math.max(this.state.highestScreenIndex, currentScreenIndex);
             nextScreen = this.refs['screen-' + (currentScreenIndex + 1)];
+            nextNextScreen = this.refs['screen-' + (currentScreenIndex + 2)];
             prevScreen = this.refs['screen-' + (currentScreenIndex - 1)];
+            prevPrevScreen = this.refs['screen-' + (currentScreenIndex - 2)];
         } else if (typeof opts.index === 'string') {
             currentScreenIndex = opts.index;
             highestScreenIndex = this.state.highestScreenIndex;
@@ -50,8 +54,10 @@ class Navigator {
         data = this.navigator.closeOldScreen(oldScreen, newScreen, opts, oldIndex);
         screenIndexArray = this.navigator.openNewScreen(newScreen, currentScreenIndex, opts);
 
+        _.invoke(prevPrevScreen, 'unload');
         _.invoke(prevScreen, 'replay');
         _.invoke(nextScreen, 'load');
+        _.invoke(nextNextScreen, 'unload');
         if (!opts.load) this.eventManager.emitSave(highestScreenIndex, currentScreenIndex);
         this.mediaManager.playBackground(currentScreenIndex, newScreen.props.id);
 
@@ -78,13 +84,14 @@ class Navigator {
         var screenIndexArray = this.state.screenIndexArray;
         if (!newScreen) return screenIndexArray;
 
-    // this should only be dropped into for non-linear screens
+        // this should only be dropped into for non-linear screens
         if (!newScreen.state.load || !newScreen.state.ready) {
-            this.loadScreens(currentScreenIndex, false);
+            this.loadScreens(currentScreenIndex);
+        } else {
+            newScreen.open(opts);
         }
 
         screenIndexArray.push(currentScreenIndex);
-        newScreen.open(opts);
 
         return screenIndexArray;
     }

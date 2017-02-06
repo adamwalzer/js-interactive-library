@@ -9,6 +9,10 @@ class SpriteAnimation extends Component {
 
         this.uniqueID = shortid(Math.random());
         this.sprite = {};
+
+        /* eslint-disable no-console */
+        console.warn('Consider switching to skoash.Sprite as SpriteAnimation will soon be deprecated.');
+        /* eslint-enable no-console */
     }
 
     onReady() {

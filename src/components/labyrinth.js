@@ -143,15 +143,15 @@ class Labyrinth extends Component {
         };
 
         return skoash.util.doIntersect([
-      {x: playerX, y: playerY},
-      {x: playerX + offset.width, y: playerY},
-      {x: playerX + offset.width, y: playerY + offset.height},
-      {x: playerX, y: playerY + offset.height},
+            {x: playerX, y: playerY},
+            {x: playerX + offset.width, y: playerY},
+            {x: playerX + offset.width, y: playerY + offset.height},
+            {x: playerX, y: playerY + offset.height},
         ], [
-      {x: itemOffset.left, y: itemOffset.top},
-      {x: (itemOffset.left + itemOffset.width), y: itemOffset.top},
-      {x: (itemOffset.left + itemOffset.width), y: (itemOffset.top + itemOffset.height)},
-      {x: itemOffset.left, y: (itemOffset.top + itemOffset.height)},
+            {x: itemOffset.left, y: itemOffset.top},
+            {x: (itemOffset.left + itemOffset.width), y: itemOffset.top},
+            {x: (itemOffset.left + itemOffset.width), y: (itemOffset.top + itemOffset.height)},
+            {x: itemOffset.left, y: (itemOffset.top + itemOffset.height)},
         ]);
     }
 

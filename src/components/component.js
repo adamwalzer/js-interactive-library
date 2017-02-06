@@ -16,15 +16,16 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
-    complete() {
+    complete(props) {
+        props = _.defaults(props || {}, this.props);
         setTimeout(() => {
             this.setState({
                 complete: true,
             }, () => {
                 skoash.trigger('complete');
-                this.props.onComplete.call(this, this);
+                props.onComplete.call(this, this);
             });
-        }, this.props.completeDelay);
+        }, props.completeDelay);
     }
 
     incomplete() {
@@ -172,12 +173,16 @@ class Component extends React.Component {
 
     collectVideo(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
+        if (!_.isFinite(key)) this.media.video[key] = this.refs[key];
         this.media.video.push(this.refs[key]);
     }
 
     collectAudio(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
         if (!this.media.audio[key]) this.media.audio[key] = this.refs[key];
+        if (!_.isFinite(key)) {
+            this.media.audio[this.refs[key].props.type][key] = this.refs[key];
+        }
         if (this.refs[key].props.type) {
             this.media.audio[this.refs[key].props.type].push(this.refs[key]);
         }
@@ -185,6 +190,7 @@ class Component extends React.Component {
 
     collectMediaSequence(key) {
         if (!this.media[key]) this.media[key] = this.refs[key];
+        if (!_.isFinite(key)) this.media.sequence[key] = this.refs[key];
         this.media.sequence.push(this.refs[key]);
     }
 
@@ -208,11 +214,7 @@ class Component extends React.Component {
             if (!_.get(ref, 'state.ready')) _.invoke(ref, 'checkReady');
         });
 
-        ready = _.every(this.refs, ref =>
-          ref &&
-              (!ref.state ||
-                  (ref.state && ref.state.ready))
-    );
+        ready = !_.size(this.getUnready());
 
         if (ready) this.ready();
     }
@@ -224,11 +226,7 @@ class Component extends React.Component {
 
         _.each(this.refs, ref => _.invoke(ref, 'checkComplete'));
 
-        complete = _.every(this.refs, ref =>
-          ref instanceof Node ||
-              (!ref || !ref.state ||
-                  (ref.state && ref.state.complete))
-    );
+        complete = !_.size(this.getUnready('complete'));
 
         if (complete && !this.state.complete) {
             this.complete();
@@ -241,13 +239,21 @@ class Component extends React.Component {
         return skoash.trigger('updateState', opts);
     }
 
+    updateGameData(opts) {
+        return skoash.trigger('updateGameData', opts);
+    }
+
+    updateScreenData(opts) {
+        return skoash.trigger('updateScreenData', opts);
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.shouldComponentUpdate.call(this, nextProps, nextState);
     }
 
     componentWillReceiveProps(props) {
         if (props.complete === true && props.complete !== this.props.complete) {
-            this.complete();
+            this.complete(props);
         }
 
         if (props.start === true && props.start !== this.props.start) {
@@ -260,6 +266,7 @@ class Component extends React.Component {
     }
 
     addClassName(className) {
+        if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
             className: classNames(this.state.className, className),
         });

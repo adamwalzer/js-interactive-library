@@ -15,6 +15,8 @@ class Asset extends Component {
         this.setState({
             error: true,
             ready: false
+        }, () => {
+            this.props.onError.call(this);
         });
     }
 }
@@ -22,6 +24,7 @@ class Asset extends Component {
 Asset.defaultProps = _.defaults({
     checkComplete: false,
     checkReady: false,
+    onError: _.noop,
 }, Component.defaultProps);
 
 export default Asset;
