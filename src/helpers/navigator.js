@@ -59,7 +59,11 @@ class Navigator {
         _.invoke(nextScreen, 'load');
         _.invoke(nextNextScreen, 'unload');
         if (!opts.load) this.eventManager.emitSave(highestScreenIndex, currentScreenIndex);
-        this.mediaManager.playBackground(currentScreenIndex, newScreen.props.id);
+        this.mediaManager.playBackground(
+            currentScreenIndex,
+            newScreen.props.id,
+            newScreen.props.backgroundAudio
+        );
 
         this.setState({
             loading: false,
