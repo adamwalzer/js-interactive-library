@@ -35,6 +35,7 @@ class Timer extends Component {
                     }
                     window.requestAnimationFrame(this.checkComplete);
                 }
+                this.props.onCheckComplete.call(this);
             });
         } else {
             window.requestAnimationFrame(this.checkComplete);
@@ -132,6 +133,7 @@ Timer.defaultProps = _.defaults({
     leadingContent: '',
     timeout: 60000,
     countDown: false,
+    onCheckComplete: _.noop,
 }, Component.defaultProps);
 
 export default Timer;
