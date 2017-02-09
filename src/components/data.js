@@ -5,6 +5,8 @@ class Data extends Component {
     constructor(props) {
         super(props);
 
+        this.state.ready = false;
+
         this.loadFile = util.loadFile;
         this.loadData(props.src);
     }

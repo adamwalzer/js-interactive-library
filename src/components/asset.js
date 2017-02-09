@@ -8,6 +8,8 @@ class Asset extends Component {
     constructor(props) {
         super(props);
 
+        this.state.ready = false;
+
         this.error = this.error.bind(this);
     }
 

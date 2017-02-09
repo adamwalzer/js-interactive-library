@@ -41,8 +41,6 @@ class Media extends Asset {
 
 Media.defaultProps = _.defaults({
     bootstrap: false,
-    checkComplete: false,
-    checkReady: false,
     completeDelay: 0,
     completeOnStart: false,
     silentOnStart: true,

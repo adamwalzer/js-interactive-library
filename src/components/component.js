@@ -6,7 +6,7 @@ class Component extends React.Component {
 
         this.state = {
             started: false,
-            ready: false,
+            ready: !props.checkReady,
         };
 
         this.onReady = this.onReady || _.noop;
