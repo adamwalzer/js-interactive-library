@@ -16,9 +16,9 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
-    invokeChildrenFunction(functionName) {
+    invokeChildrenFunction(functionName, opts) {
         _.each(this.refs, ref => {
-            _.invoke(ref, functionName);
+            _.invoke(ref, functionName, opts);
         });
     }
 
