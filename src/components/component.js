@@ -72,7 +72,7 @@ class Component extends React.Component {
     }
 
     start(callback) {
-        if (!this.state || !this.state.ready || this.state.started) return;
+        if (!this.state || !this.state.ready || this.state.started || !this.props.shouldStart) return;
         this.setState({
             started: true
         }, () => {
@@ -261,6 +261,10 @@ class Component extends React.Component {
         this.props.onComponentWillReceiveProps.call(this, props);
     }
 
+    componentWillUnmount() {
+        this.stop();
+    }
+
     addClassName(className, callback) {
         if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
@@ -346,6 +350,7 @@ Component.defaultProps = {
     onStop: _.noop,
     shouldComponentUpdate: () => true,
     shouldRender: true,
+    shouldStart: true,
     triggerReady: true,
     type: 'div',
 };
