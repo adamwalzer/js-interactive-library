@@ -97,12 +97,19 @@ class GameEmbedder extends Component {
         }
     }
 
+    getStyle() {
+        return _.defaults({}, this.props.style, {
+            pointerEvents: 'none',
+        });
+    }
+
     render() {
         return (
             <iframe
                 {...this.props}
                 ref="game"
                 onLoad={this.onLoad}
+                style={this.getStyle()}
             />
         );
     }
