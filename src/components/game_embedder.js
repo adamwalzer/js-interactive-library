@@ -1,8 +1,8 @@
 import Component from 'components/component';
 
 class GameEmbedder extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.respond = this.respond.bind(this);
         this.onLoad = this.onLoad.bind(this);

@@ -10,8 +10,8 @@ const BUFFER = 'buffer';
 const CONTEXT = 'context';
 
 class Labyrinth extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.update = _.throttle(this.update.bind(this), 10);
         this.playCollideSound = _.throttle(this.playCollideSound.bind(this), 500);

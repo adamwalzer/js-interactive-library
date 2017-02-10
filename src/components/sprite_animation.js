@@ -4,8 +4,8 @@ import shortid from 'shortid';
 import Component from 'components/component';
 
 class SpriteAnimation extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.uniqueID = shortid(Math.random());
         this.sprite = {};
