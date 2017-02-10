@@ -150,6 +150,12 @@ class Audio extends Media {
 
         if (this.props.complete) this.complete();
     }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.volume !== null && nextProps.volume !== this.props.volume) {
+            this.setVolume(nextProps.volume);
+        }
+    }
 }
 
 Audio.defaultProps = _.defaults({

@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 class Component extends React.Component {
-    constructor(props = {}) {
+    constructor(props = Component.defaultProps) {
         super(props);
 
         this.state = {
