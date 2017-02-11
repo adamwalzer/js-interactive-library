@@ -1,8 +1,8 @@
 import Component from 'components/component';
 
 class GameEmbedder extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.respond = this.respond.bind(this);
         this.onLoad = this.onLoad.bind(this);
@@ -55,7 +55,7 @@ class GameEmbedder extends Component {
         this.emitEvent({ name: 'pause' });
     }
 
-    resume(force) {
+    resume(force = false) {
         if (this.props.pause && !force) return;
         super.resume();
         this.emitEvent({ name: 'resume' });
@@ -97,12 +97,19 @@ class GameEmbedder extends Component {
         }
     }
 
+    getStyle() {
+        return _.defaults({}, this.props.style, {
+            pointerEvents: 'none',
+        });
+    }
+
     render() {
         return (
             <iframe
                 {...this.props}
                 ref="game"
                 onLoad={this.onLoad}
+                style={this.getStyle()}
             />
         );
     }

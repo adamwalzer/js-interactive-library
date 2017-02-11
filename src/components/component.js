@@ -1,12 +1,12 @@
 import classNames from 'classnames';
 
 class Component extends React.Component {
-    constructor(props) {
+    constructor(props = Component.defaultProps) {
         super(props);
 
         this.state = {
             started: false,
-            ready: false,
+            ready: !props.checkReady,
         };
 
         this.onReady = this.onReady || _.noop;
@@ -16,9 +16,9 @@ class Component extends React.Component {
         this.complete = _.throttle(this.complete.bind(this), 100);
     }
 
-    invokeChildrenFunction(functionName) {
+    invokeChildrenFunction(functionName, opts) {
         _.each(this.refs, ref => {
-            _.invoke(ref, functionName);
+            _.invoke(ref, functionName, opts);
         });
     }
 
@@ -61,13 +61,18 @@ class Component extends React.Component {
         }, () => {
             if (this.props.triggerReady) skoash.trigger('ready');
             if (this.state.open) this.start();
-            this.onReady.call(this);
+            if (_.isFunction(this.onReadyCallback)) {
+                _.invoke(this, 'onReadyCallback.call', this);
+                delete this.onReadyCallback;
+            } else {
+                _.invoke(this, 'onReady.call', this);
+            }
             this.props.onReady.call(this);
         });
     }
 
     start(callback) {
-        if (!this.state || !this.state.ready || this.state.started) return;
+        if (!this.state || !this.state.ready || this.state.started || !this.props.shouldStart) return;
         this.setState({
             started: true
         }, () => {
@@ -256,6 +261,10 @@ class Component extends React.Component {
         this.props.onComponentWillReceiveProps.call(this, props);
     }
 
+    componentWillUnmount() {
+        this.stop();
+    }
+
     addClassName(className, callback) {
         if (this.state.className && this.state.className.indexOf(className) !== -1) return;
         this.setState({
@@ -292,7 +301,7 @@ class Component extends React.Component {
     renderContentList(listName = 'children') {
         return _.map([].concat(this.props[listName]), (component, key) => {
             var gameState = component instanceof skoash.MediaSequence ? this.state : this.props.gameState;
-            if (!component) return;
+            if (!component || !component.type) return;
             return (
                 <component.type
                     gameState={gameState}
@@ -341,6 +350,7 @@ Component.defaultProps = {
     onStop: _.noop,
     shouldComponentUpdate: () => true,
     shouldRender: true,
+    shouldStart: true,
     triggerReady: true,
     type: 'div',
 };

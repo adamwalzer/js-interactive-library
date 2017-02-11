@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 
-import util from 'methods/util';
 import Component from 'components/component';
 import Image from 'components/image';
+import JSON from 'components/json';
 
 class Sprite extends Component {
     constructor(props) {
@@ -13,6 +13,13 @@ class Sprite extends Component {
         }, this.state);
 
         this.lastAnimation = Date.now();
+
+        this.onJSONReady = this.onJSONReady.bind(this);
+    }
+
+    onJSONReady() {
+        this.data = this.refs.json.getData();
+        this.setUp(this.props);
     }
 
     setUp(props) {
@@ -38,32 +45,41 @@ class Sprite extends Component {
                 }
             };
             this.imageRef.src = this.image;
-        } else {
-            util.loadJSON(`${props.src}.${props.dataExtension}`, data => {
-                this.data = data;
-                this.frames = data.frames.length;
-                this.checkReady();
-                this.update(props);
+        } else if (this.data && this.data.frames) {
+            this.frames = this.data.frames.length;
+            this.checkReady();
+            this.update(props);
 
-                minX = _.reduce(data.frames, (a, v) => Math.min(a, v.spriteSourceSize.x), Infinity);
-                minY = _.reduce(data.frames, (a, v) => Math.min(a, v.spriteSourceSize.y), Infinity);
-                maxWidth = _.reduce(data.frames, (a, v) =>
-                    Math.max(a, v.spriteSourceSize.x + v.spriteSourceSize.w - minX), 0);
-                maxHeight = _.reduce(data.frames, (a, v) =>
-                    Math.max(a, v.spriteSourceSize.y + v.spriteSourceSize.h - minY), 0);
+            minX = _.reduce(this.data.frames, (a, v) => Math.min(a, v.spriteSourceSize.x), Infinity);
+            minY = _.reduce(this.data.frames, (a, v) => Math.min(a, v.spriteSourceSize.y), Infinity);
+            maxWidth = _.reduce(this.data.frames, (a, v) =>
+                Math.max(a, v.spriteSourceSize.x + v.spriteSourceSize.w - minX), 0);
+            maxHeight = _.reduce(this.data.frames, (a, v) =>
+                Math.max(a, v.spriteSourceSize.y + v.spriteSourceSize.h - minY), 0);
 
-                this.setState({
-                    maxWidth,
-                    maxHeight,
-                    minX,
-                    minY,
-                });
+            this.setState({
+                maxWidth,
+                maxHeight,
+                minX,
+                minY,
             });
 
             if (props.animate) {
                 this.animate();
             } else if (props.animateBackwards) {
                 this.animate(-1);
+            }
+        }
+
+        this.frameRates = [];
+
+        if (_.isArray(props.duration)) {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration[i]);
+            }
+        } else {
+            for (let i = 0; i < this.frames; i++) {
+                this.frameRates.push(props.duration / this.frames);
             }
         }
     }
@@ -91,7 +107,7 @@ class Sprite extends Component {
                 `-${this.state.frame * width}px 0px`;
             backgroundSize =
                 `${this.imageRef.naturalWidth}px ${this.imageRef.naturalHeight}px`;
-        } else {
+        } else if (this.data && this.data.frames) {
             this.frameData = this.data.frames[this.state.frame];
             styleTop = this.frameData.spriteSourceSize.y;
             styleLeft = this.frameData.spriteSourceSize.x;
@@ -104,8 +120,6 @@ class Sprite extends Component {
             maxWidth = this.state.maxWidth;
             maxHeight = this.state.maxHeight;
         }
-
-        this.frameRate = props.duration / this.frames;
 
         this.setState({
             styleTop,
@@ -153,23 +167,23 @@ class Sprite extends Component {
             this.state.paused || !this.state.started) return;
 
         if (!this.props.loop) {
-            if (this.props.animate) {
-                if (this.state.frame === this.frames - 1) {
-                    this.complete();
-                    return;
-                }
-            } else if (this.props.animateBackwards) {
+            if (this.props.animateBackwards) {
                 if (this.state.frame === 0) {
                     this.complete();
                     return;
                 }
             }
+
+            if (this.state.frame === this.frames - 1) {
+                this.complete();
+                return;
+            }
         }
 
-        if (NOW > this.lastAnimation + this.frameRate) {
+        if (NOW > this.lastAnimation + this.frameRates[this.state.frame]) {
             this.lastAnimation = NOW;
             frame = (this.state.frame + i + this.frames) % this.frames;
-            if (this.frame === 0) this.props.onLoop.call(this);
+            if (frame === 0) this.props.onLoop.call(this);
             this.setState({
                 frame
             }, () => {
@@ -184,7 +198,7 @@ class Sprite extends Component {
 
     start() {
         super.start(() => {
-            this.animate();
+            if (this.props.animate) this.animate();
         });
     }
 
@@ -214,7 +228,7 @@ class Sprite extends Component {
             });
         }
 
-        if (props.animate) {
+        if (props.animate && props.animate !== this.props.animate) {
             this.animate();
         } else if (props.animateBackwards) {
             this.animate(-1);
@@ -265,6 +279,18 @@ class Sprite extends Component {
         return classNames('sprite', super.getClassNames());
     }
 
+    renderJSON() {
+        if (this.props.frames) return null;
+
+        return (
+            <JSON
+                ref="json"
+                src={`${this.props.src}.${this.props.dataExtension}`}
+                onReady={this.onJSONReady}
+            />
+        );
+    }
+
     render() {
         return (
             <div
@@ -277,6 +303,7 @@ class Sprite extends Component {
                     ref="image"
                     src={this.image}
                 />
+                {this.renderJSON()}
                 <div
                     ref="view"
                     className="view"

@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import Component from 'components/component';
 
 class Selectable extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             classes: {},

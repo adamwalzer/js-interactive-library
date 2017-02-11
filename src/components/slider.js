@@ -6,8 +6,8 @@ const AREA = 'area';
 const CONTENT = 'content';
 
 class Slider extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = _.defaults({
             currentSlide: 0,

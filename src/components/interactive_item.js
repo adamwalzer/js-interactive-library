@@ -10,8 +10,8 @@ import Component from 'components/component';
  * A canInteract prop can also be passed into this component.
  */
 class InteractiveItem extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = _.defaults({
             enabled: true,

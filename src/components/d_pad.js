@@ -18,8 +18,8 @@ const SKEY = 83;
 const WKEY = 87;
 
 class DPad extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.keys = {};
 

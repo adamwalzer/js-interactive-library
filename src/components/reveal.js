@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import Component from 'components/component';
 
 class Reveal extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             openReveal: '',
@@ -39,7 +39,7 @@ class Reveal extends Component {
             this.complete();
         } else {
             _.each(this.refs, (ref, key) => {
-                if (ref && key === message) ref.complete();
+                if (key === message) _.invoke(ref, 'complete');
             });
         }
 
@@ -86,7 +86,7 @@ class Reveal extends Component {
             this.updateScreenData({
                 key: this.props.openTarget,
                 data: {
-                    open: '',
+                    open: null,
                     close: false,
                 }
             });
@@ -145,11 +145,11 @@ class Reveal extends Component {
     componentWillReceiveProps(props) {
         super.componentWillReceiveProps(props);
 
-        if (props.openReveal && props.openReveal !== this.props.openReveal) {
+        if (props.openReveal != null && props.openReveal !== this.props.openReveal) {
             this.open(props.openReveal);
         }
 
-        if (props.closeReveal !== this.props.closeReveal) {
+        if (props.closeReveal && props.closeReveal !== this.props.closeReveal) {
             if (props.closeReveal === true) {
                 this.close();
             } else if (Number.isInteger(props.closeReveal)) {
