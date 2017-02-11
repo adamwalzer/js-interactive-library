@@ -7,8 +7,7 @@ class Repeater extends Component {
             a.push(
                 <this.props.item.type
                     key={i}
-                    ref={this.props.ref || (this.props && this.props['data-ref']) ||
-                        listName + '-' + i}
+                    ref={_.get(this, `props.refs.${i}`, listName + '-' + i)}
                     {...this.props.item.props}
                     {...this.props.props[i]}
                 />
