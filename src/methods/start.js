@@ -14,7 +14,7 @@ export default function (Game, id) {
     Game = typeof Game === 'object' ? Game : <Game />;
 
     ReactDOM.render(
-    Game,
-    el
-  );
+        Game,
+        el
+    );
 }

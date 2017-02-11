@@ -235,6 +235,10 @@ class Game extends Component {
         this.props.screenComplete.call(this, opts);
     }
 
+    getCurrentScreen() {
+        return this.refs[`screen-${this.state.currentScreenIndex}`];
+    }
+
     componentWillReceiveProps(props) {
         super.componentWillReceiveProps(props);
 
@@ -280,6 +284,9 @@ class Game extends Component {
             props.data = this.state.data.screens[key];
             props.gameState = this.state;
             props.index = index;
+            if (_.isNumber(_.parseInt(key)) && Math.abs(this.state.currentScreenIndex - index) > 5) {
+                return null;
+            }
             return this.props.screens[key](props, 'screen-' + key, key);
         });
     }
@@ -343,7 +350,10 @@ Game.defaultProps = _.defaults({
         return this.eventManager.emit(opts);
     },
     screenComplete: function (opts) {
-        if (opts.silent) return;
+        let screen = this.getCurrentScreen();
+
+        if (opts.silent || !screen || screen.props.id !== opts.screenID) return;
+
         this.playMedia('screen-complete');
     },
 }, Component.defaultProps);

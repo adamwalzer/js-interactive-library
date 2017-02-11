@@ -58,6 +58,7 @@ Randomizer.defaultProps = _.defaults({
     bin: [],
     remain: false,
     shouldComponentUpdate: () => false,
+    shouldStart: false,
 }, Component.defaultProps);
 
 export default Randomizer;

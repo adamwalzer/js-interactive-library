@@ -28,6 +28,11 @@ import Sprite from 'components/sprite';
 import SpriteAnimation from 'components/sprite_animation';
 import Timer from 'components/timer';
 
+// new data components
+import Data from 'components/data';
+import JSON from 'components/json';
+
+
 //methods
 import start from 'methods/start';
 import trigger from 'methods/trigger';
@@ -63,6 +68,9 @@ window.$k = window.skoash = {
     Sprite,
     SpriteAnimation,
     Timer,
+    // new data components
+    Data,
+    JSON,
     //methods
     start,
     trigger,

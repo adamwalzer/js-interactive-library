@@ -59,7 +59,11 @@ class Navigator {
         _.invoke(nextScreen, 'load');
         _.invoke(nextNextScreen, 'unload');
         if (!opts.load) this.eventManager.emitSave(highestScreenIndex, currentScreenIndex);
-        this.mediaManager.playBackground(currentScreenIndex, newScreen.props.id);
+        this.mediaManager.playBackground(
+            currentScreenIndex,
+            newScreen.props.id,
+            newScreen.props.backgroundAudio
+        );
 
         this.setState({
             loading: false,
@@ -73,11 +77,11 @@ class Navigator {
 
     shouldGoto(oldScreen, newScreen, opts) {
         return !(
-      (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) ||
-      (oldScreen.props.index < newScreen.props.index && !opts.load && !this.state.demo &&
-        !(oldScreen.state.complete || oldScreen.state.replay)) ||
-      (oldScreen.props.index > newScreen.props.index && newScreen.props.index === 0)
-    );
+            (!opts.load && oldScreen && oldScreen.state && oldScreen.state.opening) ||
+            (oldScreen.props.index < newScreen.props.index && !opts.load && !this.state.demo &&
+                !(oldScreen.state.complete || oldScreen.state.replay)) ||
+            (oldScreen.props.index > newScreen.props.index && newScreen.props.index === 0)
+        );
     }
 
     openNewScreen(newScreen, currentScreenIndex, opts) {

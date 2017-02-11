@@ -103,17 +103,18 @@ class MediaManager {
         }
     }
 
-    playBackground(currentScreenIndex, currentScreenID) {
+    playBackground(currentScreenIndex, currentScreenID, backgroundIndex) {
         var index;
         var playingBKG;
         var currentScreen;
 
-        if (!_.isFinite(currentScreenIndex)) return;
-
         // re-factor to index = this.props.getBackgroundIndex.call(this, index);
-        // after games that override it have be re-factored
-        // all-about-you, polar-bear, tag-it
-        index = this.getBackgroundIndex(currentScreenIndex, currentScreenID);
+        // after games that override it have been re-factored
+        // all-about-you, polar-bear
+        index = _.defaultTo(backgroundIndex, this.getBackgroundIndex(currentScreenIndex, currentScreenID));
+
+        if (index == null) return;
+
         playingBKG = this.state.playingBKG;
 
         currentScreen = this.refs['screen-' + currentScreenIndex];

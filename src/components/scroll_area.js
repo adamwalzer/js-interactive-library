@@ -9,8 +9,8 @@ const SCROLLBAR = 'scrollbar';
 const SCROLLER = 'scroller';
 
 class ScrollArea extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = _.defaults({
             startY: 0,

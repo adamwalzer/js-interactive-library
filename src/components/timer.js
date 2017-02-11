@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import Component from 'components/component';
 
 class Timer extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.state = {
             time: 0,
@@ -35,6 +35,7 @@ class Timer extends Component {
                     }
                     window.requestAnimationFrame(this.checkComplete);
                 }
+                this.props.onIncrement.call(this);
             });
         } else {
             window.requestAnimationFrame(this.checkComplete);
@@ -132,6 +133,7 @@ Timer.defaultProps = _.defaults({
     leadingContent: '',
     timeout: 60000,
     countDown: false,
+    onIncrement: _.noop,
 }, Component.defaultProps);
 
 export default Timer;

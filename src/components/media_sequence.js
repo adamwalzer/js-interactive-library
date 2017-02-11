@@ -42,16 +42,16 @@ class MediaSequence extends Component {
         var self = this;
         var children = [].concat(this.props.children);
         return children.map((component, key) =>
-      <component.type
-        {...component.props}
-        ref={key}
-        key={key}
-        onComplete={function () {
-            self.playNext();
-            if (typeof component.props.onComplete === 'function') component.props.onComplete.call(this, this);
-        }}
-      />
-    );
+            <component.type
+                {...component.props}
+                ref={key}
+                key={key}
+                onComplete={function () {
+                    self.playNext();
+                    _.invoke(component, 'props.onComplete.call', this, this);
+                }}
+            />
+        );
     }
 }
 
